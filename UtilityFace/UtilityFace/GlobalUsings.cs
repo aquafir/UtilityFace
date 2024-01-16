@@ -9,6 +9,7 @@ global using Decal.Adapter;
 global using System;
 global using System.Reflection;
 
+global using UtilityFace;
 global using AcClient;
 global using System.IO;
 global using UtilityBelt.Service;

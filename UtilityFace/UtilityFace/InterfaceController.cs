@@ -1,4 +1,5 @@
-﻿using UtilityFace.HUDs;
+﻿using ACEditor;
+using UtilityFace.HUDs;
 
 namespace UtilityFace;
 
@@ -17,12 +18,13 @@ internal class InterfaceController : IDisposable
     Vector2 MAX_SIZE = new(1000, 900);
 
     readonly InventoryHud backpack;
+    //readonly PropertyEditor propertyEditor;
 
     public InterfaceController()
     {
         
         // Create a new UBService Hud
-        hud = UBService.Huds.CreateHud("UtilityFace");
+        hud = UBService.Huds.CreateHud("Inventory");
         hud.WindowSettings = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoScrollbar;
 
         // set to show our icon in the UBService HudBar
@@ -30,6 +32,8 @@ internal class InterfaceController : IDisposable
         hud.Visible = true;
 
         backpack = new(hud);
+
+        //propertyEditor = new();
 
         AddEvents();
     }
@@ -45,10 +49,8 @@ internal class InterfaceController : IDisposable
             return;
 
         
-        C.Chat($"{s.Name} - {s.ValidWieldedLocations}");
+        Log.Chat($"{s.Name} - {s.ValidWieldedLocations}");
         e.Eat = true;
-
-
 
 
         return;
@@ -87,7 +89,7 @@ internal class InterfaceController : IDisposable
         }
         catch (Exception ex)
         {
-            PluginCore.Log(ex);
+            Log.Error(ex);
         }
     }
 
@@ -106,7 +108,7 @@ internal class InterfaceController : IDisposable
 
             //hud.OnPreRender -= Hud_OnPreRender;
             //hud.OnRender -= Hud_OnRender;
-        }catch(Exception ex) { PluginCore.Log(ex); }
+        }catch(Exception ex) { Log.Error(ex); }
     }
 
     public void Dispose()
@@ -116,10 +118,11 @@ internal class InterfaceController : IDisposable
             RemoveEvents();
             backpack?.Dispose();
             hud?.Dispose();
+            //propertyEditor?.Dispose();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            PluginCore.Log(ex);
+            Log.Error(ex);
         }
     }
 }

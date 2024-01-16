@@ -59,12 +59,12 @@ public static class DescriptionHelper
 
         var desc = wo.ObjectType switch
         {
-            //ObjectType.MeleeWeapon => $"{wo.Name}\n{wo.IntValues[IntId.Damage]}{wo.FloatValues[FloatId.DamageVariance]}",
-            //ObjectType.Caster => $"{wo.Name}",
-            //ObjectType.MissileWeapon => $"{wo.Name}",
-            //ObjectType.Armor => $"{wo.Name}",
-            //ObjectType.Clothing => $"{wo.Name}",
-            //ObjectType.Jewelry => $"{wo.Name}",
+            ObjectType.MeleeWeapon => wo.WeaponDescription(),
+            ObjectType.Caster => wo.WeaponDescription(),
+            ObjectType.MissileWeapon => wo.WeaponDescription(),
+            ObjectType.Armor => $"{wo.Name}",
+            ObjectType.Clothing => $"{wo.Name}",
+            ObjectType.Jewelry => $"{wo.Name}",
             ObjectType.Container => $"""
             {wo.Name}
             Value: {wo.Value(IntId.Value)}
@@ -94,7 +94,7 @@ public static class DescriptionHelper
         {
             ObjectType.MeleeWeapon => 
             $"""
-            "{wo.IntValues[IntId.Damage]}
+            Damage: {wo.IntValues[IntId.Damage]} 
             {wo.FloatValues[FloatId.DamageVariance]}
             """,
             ObjectType.Caster => $"{wo.Name}",
@@ -103,19 +103,6 @@ public static class DescriptionHelper
         };
 
     }
-
-    //public static void DrawContainerTooltip(this WorldObject wo)
-    //{
-    //    var desc = $"""
-    //        Value: {wo.Value(IntId.Value)}
-    //        Burden: {wo.Burden}
-    //        Capacity: {wo.Items.Count}/{wo.IntValues[IntId.ItemsCapacity]}
-    //        """;
-    //    ImGui.BeginTooltip();
-    //    ImGui.Text(wo.Name);
-    //    ImGui.Text(desc);
-    //    ImGui.EndTooltip();
-    //}
 }
 
 public class Description

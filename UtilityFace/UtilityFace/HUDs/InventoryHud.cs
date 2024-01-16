@@ -162,7 +162,7 @@ public class InventoryHud : IDisposable
         }
         catch (Exception ex)
         {
-            PluginCore.Log(ex);
+            Log.Error(ex);
         }
     }
 
@@ -252,7 +252,7 @@ public class InventoryHud : IDisposable
             {
                 propFilter = new PropertyFilter(propType);
                 SetFilteredItems();
-                C.Chat($"Custom filter set to: {propType}");
+                Log.Chat($"Custom filter set to: {propType}");
             }
 
             changed = true;
@@ -275,7 +275,7 @@ public class InventoryHud : IDisposable
 
         if (changed)
         {
-            C.Chat("Updating filters");
+            Log.Chat("Updating filters");
             UpdateFilters();
         }
     }
@@ -292,7 +292,7 @@ public class InventoryHud : IDisposable
             if (propType == PropType.String)
             {
                 CustomFilterRegex = new(customFilterText, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                C.Chat($"Built regex for {propFilter.Selection}");
+                Log.Chat($"Built regex for {propFilter.Selection}");
             }
             else
             {
@@ -308,7 +308,7 @@ public class InventoryHud : IDisposable
                         TargetValue = result,
                         PropKey = propFilter.EnumIndex ?? 0,
                     };
-                    C.Chat($"Parsed value requirement: {propType} - {comparison} - {result}");
+                    Log.Chat($"Parsed value requirement: {propType} - {comparison} - {result}");
 
                 }
                 else
@@ -453,8 +453,9 @@ public class InventoryHud : IDisposable
         //Setup dimensions
         //Available width divided into columns
         Index = 0;
-        var width = ImGui.GetContentRegionAvail().X - IconSize.X / 2;
-        int columns = (int)(width / ICON_COL_WIDTH);
+        var width = Math.Max(1, ImGui.GetContentRegionAvail().X - IconSize.X / 2);
+        int columns = Math.Max(1,(int)(width / ICON_COL_WIDTH));
+        //Log.Error($"Width: {width} - Cols {columns}");
 
         int index = 0;
         foreach (var wo in filteredItems)
@@ -676,7 +677,7 @@ public class InventoryHud : IDisposable
 
         if (game.World.Selected.ObjectType == ObjectType.Container)
         {
-            C.Chat($"Moving items to {game.World.Selected.Name}");
+            Log.Chat($"Moving items to {game.World.Selected.Name}");
             foreach (var item in filteredItems)
                 //game.Actions.ObjectMove(item.Id, game.World.Selected.Id);
                 item.Move(game.World.Selected.Id, 0, true, quickFail);
@@ -786,7 +787,7 @@ public class InventoryHud : IDisposable
         }
         catch (Exception ex)
         {
-            PluginCore.Log(ex);
+            Log.Error(ex);
         }
     }
 
@@ -804,7 +805,7 @@ public class InventoryHud : IDisposable
         }
         catch (Exception ex)
         {
-            PluginCore.Log(ex);
+            Log.Error(ex);
         }
     }
 
@@ -816,7 +817,7 @@ public class InventoryHud : IDisposable
         }
         catch (Exception ex)
         {
-            PluginCore.Log(ex);
+            Log.Error(ex);
         }
     }
     #endregion

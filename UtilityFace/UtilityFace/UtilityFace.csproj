@@ -15,8 +15,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="HUDs\PropertyEditor.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="PluginCore.cs" />
-    <None Include="ExampleUI.cs" />
     <Content Include="scripts\installer.nsi" />
     <Content Include="scripts\post-build.ps1" />
   </ItemGroup>

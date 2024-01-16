@@ -28,12 +28,16 @@ public class PluginCore : PluginBase
     protected override void Startup()
     {
         try
-        {           
-            StartUI();
+        {
+            CoreManager.Current.CharacterFilter.LoginComplete += CharacterFilter_LoginComplete;
+
+            //Check for hotload
+            if (ui is null)
+                StartUI();
         }
         catch (Exception ex)
         {
-            Log(ex);
+            Log.Error(ex);
         }
     }
 
@@ -41,16 +45,13 @@ public class PluginCore : PluginBase
     {
         try
         {
-            CoreManager.Current.CharacterFilter.LoginComplete += CharacterFilter_LoginComplete;
             ui = new InterfaceController();
-
         }
         catch (Exception ex)
         {
-            Log(ex);
+            Log.Error(ex);
         }
     }
-
 
     /// <summary>
     /// Called when your plugin is unloaded. Either when logging out, closing the client, or hot reloading.
@@ -59,37 +60,14 @@ public class PluginCore : PluginBase
     {
         try
         {
-            CoreManager.Current.CharacterFilter.LoginComplete -= CharacterFilter_LoginComplete;
-
             ui?.Dispose();
+            ui = null;
+
+            CoreManager.Current.CharacterFilter.LoginComplete -= CharacterFilter_LoginComplete;
         }
         catch (Exception ex)
         {
-            Log(ex);
+            Log.Error(ex);
         }
     }
-
-    #region logging
-    /// <summary>
-    /// Log an exception to log.txt in the same directory as the plugin.
-    /// </summary>
-    /// <param name="ex"></param>
-    internal static void Log(Exception ex)
-    {
-        Log(ex.ToString());
-    }
-
-    /// <summary>
-    /// Log a string to log.txt in the same directory as the plugin.
-    /// </summary>
-    /// <param name="message"></param>
-    internal static void Log(string message)
-    {
-        try
-        {
-            File.AppendAllText(System.IO.Path.Combine(AssemblyDirectory, "log.txt"), $"{message}\n");
-        }
-        catch { }
-    }
-    #endregion // logging
 }
