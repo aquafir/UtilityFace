@@ -23,10 +23,10 @@ public class InventoryHud : IDisposable
 
     //Options
     bool showBags = true;
-    bool showIcons;
+    bool showIcons = true;
     bool showExtraFilter;
     bool showGroupActions = true;
-    bool showEquipment;
+    bool showEquipment = true;
 
     #region Filter Setup
     //Standard name (maybe more?) filter
@@ -79,6 +79,8 @@ public class InventoryHud : IDisposable
     {
         SelectedBag = game.CharacterId;
         this.hud = hud;
+
+        UpdateFilters();
 
         AddEvents();
     }
@@ -332,11 +334,9 @@ public class InventoryHud : IDisposable
             wo.Appraise();
 
         //Filter by regex
-        if (!string.IsNullOrEmpty(FilterText))
-        {
+        //if (!string.IsNullOrEmpty(FilterText))
             if (!FilterRegex.IsMatch(wo.Name))
                 return true;
-        }
 
         //Filter by prop
         if (!showExtraFilter)
