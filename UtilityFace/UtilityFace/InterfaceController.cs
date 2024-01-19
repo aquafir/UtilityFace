@@ -18,11 +18,11 @@ internal class InterfaceController : IDisposable
     Vector2 MAX_SIZE = new(1000, 900);
 
     readonly InventoryHud backpack;
-    //readonly PropertyEditor propertyEditor;
+    readonly PropertyEditor propertyEditor;
 
     public InterfaceController()
     {
-        
+
         // Create a new UBService Hud
         hud = UBService.Huds.CreateHud("Inventory");
         hud.WindowSettings = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoScrollbar;
@@ -40,37 +40,37 @@ internal class InterfaceController : IDisposable
 
     unsafe private void World_OnChatInput(object sender, UtilityBelt.Scripting.Events.ChatInputEventArgs e)
     {
-        if (e.Text != "/t1")
-            return;
+        //if (e.Text != "/t1")
+        //    return;
 
-        Game g = new();
-        var s = g.World.Selected;
-        if (s is null)
-            return;
-
-        
-        Log.Chat($"{s.Name} - {s.ValidWieldedLocations}");
-        e.Eat = true;
+        //Game g = new();
+        //var s = g.World.Selected;
+        //if (s is null)
+        //    return;
 
 
-        return;
-        //foreach (var item in UBService.Scripts.GameState.Character.Weenie.AllItemIds)
-        foreach (var item in g.Character.Inventory.Select(x => x.Id))
-        {
-            using (var stream = new MemoryStream())
-            using (var writer = new BinaryWriter(stream))
-            {
-                writer.Write((uint)0xF7B1); // order header
-                writer.Write((uint)0x0); // sequence.. ace doesnt verify this
-                writer.Write((uint)0x001B); // drop item
-                writer.Write((uint)item);
-                var bytes = stream.ToArray();
-                fixed (byte* bytesPtr = bytes)
-                {
-                    Proto_UI.SendToControl((char*)bytesPtr, bytes.Length);
-                }
-            }
-        }
+        //Log.Chat($"{s.Name} - {s.ValidWieldedLocations}");
+        //e.Eat = true;
+
+
+        //return;
+        ////foreach (var item in UBService.Scripts.GameState.Character.Weenie.AllItemIds)
+        //foreach (var item in g.Character.Inventory.Select(x => x.Id))
+        //{
+        //    using (var stream = new MemoryStream())
+        //    using (var writer = new BinaryWriter(stream))
+        //    {
+        //        writer.Write((uint)0xF7B1); // order header
+        //        writer.Write((uint)0x0); // sequence.. ace doesnt verify this
+        //        writer.Write((uint)0x001B); // drop item
+        //        writer.Write((uint)item);
+        //        var bytes = stream.ToArray();
+        //        fixed (byte* bytesPtr = bytes)
+        //        {
+        //            Proto_UI.SendToControl((char*)bytesPtr, bytes.Length);
+        //        }
+        //    }
+        //}
     }
 
     private void Hud_OnPreRender(object sender, EventArgs e)
@@ -93,7 +93,8 @@ internal class InterfaceController : IDisposable
         }
     }
 
-    private void AddEvents() {
+    private void AddEvents()
+    {
         hud.OnPreRender += Hud_OnPreRender;
         hud.OnRender += Hud_OnRender;
         g.World.OnChatInput += World_OnChatInput;
@@ -103,12 +104,12 @@ internal class InterfaceController : IDisposable
     {
         try
         {
-            if (g is not null)
-                g.World.OnChatInput -= World_OnChatInput;
+            g.World.OnChatInput -= World_OnChatInput;
 
             //hud.OnPreRender -= Hud_OnPreRender;
             //hud.OnRender -= Hud_OnRender;
-        }catch(Exception ex) { Log.Error(ex); }
+        }
+        catch (Exception ex) { }
     }
 
     public void Dispose()

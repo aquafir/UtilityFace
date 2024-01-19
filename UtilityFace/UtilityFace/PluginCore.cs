@@ -32,7 +32,7 @@ public class PluginCore : PluginBase
             CoreManager.Current.CharacterFilter.LoginComplete += CharacterFilter_LoginComplete;
 
             //Check for hotload
-            if (ui is null)
+            if(new Game().CharacterId != 0)
                 StartUI();
         }
         catch (Exception ex)

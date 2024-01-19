@@ -2,6 +2,9 @@
 //using ACE.Server.WorldObjects;
 //using PropertyBool = ACEditor.Props.PropertyBool;
 
+using AcClient;
+using UtilityBelt.Service.Views;
+
 namespace ACEditor.Props;
 
 public enum PropType
@@ -102,53 +105,6 @@ public static class PropertyTypeExtensions
         return props;
     }
 
-
-    //public static bool TryGetKey(this PropType propType, string name, out int val)
-    //{
-    //    val = 0;
-
-    //    bool success = true;
-    //    switch (propType)
-    //    {
-    //        case PropType.PropertyBool:
-    //            success = Enum.TryParse< target.BoolValues.TryGetValue((BoolId)key, out var targetBool);
-    //            val = targetBool.ToString();
-    //            break;
-    //        case PropType.PropertyDataId:
-    //            success = target.DataValues.TryGetValue((DataId)key, out var targetDID);
-    //            val = targetDID.ToString();
-    //            break;
-    //        case PropType.PropertyFloat:
-    //            success = target.FloatValues.TryGetValue((FloatId)key, out var targetFloat);
-    //            val = targetFloat.ToString();
-    //            break;
-    //        case PropType.PropertyInstanceId:
-    //            success = target.InstanceValues.TryGetValue((InstanceId)key, out var targetIID);
-    //            val = targetIID.ToString();
-    //            break;
-    //        case PropType.PropertyInt:
-    //            success = target.IntValues.TryGetValue((IntId)key, out var targetInt);
-    //            val = targetInt.ToString();
-    //            break;
-    //        case PropType.PropertyInt64:
-    //            success = target.Int64Values.TryGetValue((Int64Id)key, out var targetInt64);
-    //            val = targetInt64.ToString();
-    //            break;
-    //        case PropType.PropertyString:
-    //            success = target.StringValues.TryGetValue((StringId)key, out var targetString);
-    //            val = targetString.ToString();
-    //            break;
-    //        case PropType.Unknown:
-    //        default:
-    //            success = false;
-    //            val = null;
-    //            break;
-    //    }
-
-
-    //    return success;
-    //}
-
     public static bool TryGetValue(this PropType propType, int key, PropertyData target, out string val)
     {
         val = null;
@@ -194,6 +150,78 @@ public static class PropertyTypeExtensions
         return success;
     }
 
+    /// <summary>
+    /// Tries to find a string version of a value key for a PropType
+    /// </summary>
+    public static bool TryGetValue(this WorldObject target, PropType propType, int key, out string val)
+    {
+        val = null;
+
+        bool success = true;
+        switch (propType)
+        {
+            case PropType.Bool:
+                success = target.BoolValues.TryGetValue((BoolId)key, out var targetBool);
+                val = targetBool.ToString();
+                break;
+            case PropType.DataId:
+                success = target.DataValues.TryGetValue((DataId)key, out var targetDID);
+                val = targetDID.ToString();
+                break;
+            case PropType.Float:
+                success = target.FloatValues.TryGetValue((FloatId)key, out var targetFloat);
+                val = targetFloat.ToString();
+                break;
+            case PropType.InstanceId:
+                success = target.InstanceValues.TryGetValue((InstanceId)key, out var targetIID);
+                val = targetIID.ToString();
+                break;
+            case PropType.Int:
+                success = target.IntValues.TryGetValue((IntId)key, out var targetInt);
+                val = targetInt.ToString();
+                break;
+            case PropType.Int64:
+                success = target.Int64Values.TryGetValue((Int64Id)key, out var targetInt64);
+                val = targetInt64.ToString();
+                break;
+            case PropType.String:
+                success = target.StringValues.TryGetValue((StringId)key, out var targetString);
+                val = targetString.ToString();
+                break;
+            case PropType.Unknown:
+            default:
+                success = false;
+                val = null;
+                break;
+        }
+
+        return success;
+    }
+    public static bool TryGetValue(this WorldObject target, BoolId key, out string val) =>target.TryGetValue(PropType.Bool, (int)key, out val);
+    public static bool TryGetValue(this WorldObject target, DataId key, out string val) => target.TryGetValue(PropType.DataId, (int)key, out val);
+    public static bool TryGetValue(this WorldObject target, FloatId key, out string val) => target.TryGetValue(PropType.Float, (int)key, out val);
+    public static bool TryGetValue(this WorldObject target, InstanceId key, out string val) => target.TryGetValue(PropType.InstanceId, (int)key, out val);
+    public static bool TryGetValue(this WorldObject target,IntId key, out string val) => target.TryGetValue(PropType.Int, (int)key, out val);
+    public static bool TryGetValue(this WorldObject target,Int64Id key, out string val) => target.TryGetValue(PropType.Int64, (int)key, out val);
+    public static bool TryGetValue(this WorldObject target, StringId key, out string val) => target.TryGetValue(PropType.String, (int)key, out val);
+
+    /// <summary>
+    /// Matching Enum name for a prop/key
+    /// </summary>
+    public static string EnumName(this PropType propType, int key)
+    {
+        return propType switch
+        {
+            PropType.Bool => Enum.IsDefined(typeof(BoolId), key) ? $"{(BoolId)key}" : $"BoolId.{key}",
+            PropType.DataId => Enum.IsDefined(typeof(DataId), key) ? $"{(DataId)key}" : $"DataId.{key}",
+            PropType.Float => Enum.IsDefined(typeof(FloatId), key) ? $"{(FloatId)key}" : $"Float.{key}",
+            PropType.InstanceId => Enum.IsDefined(typeof(InstanceId), key) ? $"{(InstanceId)key}" : $"InstanceId.{key}",
+            PropType.Int => Enum.IsDefined(typeof(IntId), key) ? $"{(IntId)key}" : $"Int.{key}",
+            PropType.Int64 => Enum.IsDefined(typeof(Int64Id), key) ? $"{(Int64Id)key}" : $"Int64.{key}",
+            PropType.String => Enum.IsDefined(typeof(StringId), key) ? $"{(StringId)key}" : $"String.{key}",
+            _ => $"Unknown",
+        };
+    }
 
     #region Enum Helpers
     public static List<TEnum> GetEnumList<TEnum>() where TEnum : Enum
@@ -225,5 +253,4 @@ public static class PropertyTypeExtensions
         return intValues;
     }
     #endregion
-
 }

@@ -455,7 +455,6 @@ public class InventoryHud : IDisposable
         Index = 0;
         var width = Math.Max(1, ImGui.GetContentRegionAvail().X - IconSize.X / 2);
         int columns = Math.Max(1,(int)(width / ICON_COL_WIDTH));
-        //Log.Error($"Width: {width} - Cols {columns}");
 
         int index = 0;
         foreach (var wo in filteredItems)

@@ -87,7 +87,7 @@ internal class PropertyEditor : IDisposable
         }
         catch (Exception ex)
         {
-            PluginCore.Log(ex);
+            Log.Error(ex);
         }
     }
 
