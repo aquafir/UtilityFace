@@ -28,12 +28,27 @@ public static class DescriptionHelper
         ImGui.SetNextWindowSizeConstraints(MIN_WIDTH, MAX_WIDTH);
         ImGui.BeginTooltip();
         //Icon
-        //var texture = wo.GetOrCreateTexture();
-        //ImGui.TextureButton($"{wo.Id}", texture, Settings.IconSize);
-        //ImGui.SameLine();
+        var texture = wo.GetOrCreateTexture();
+        ImGui.TextureButton($"{wo.Id}", texture, Settings.IconSize);
+        ImGui.SameLine();
 
         ImGui.TextWrapped(desc);
+
+
+        if (wo.ValidWieldedLocations.TryGetSlotEquipment(out var equipped) && equipped.Id != wo.Id)
+        {            
+            ImGui.NewLine();
+            ImGui.Text("-------------------Equipped-------------------");
+            //Icon
+            texture = equipped.GetOrCreateTexture();
+            ImGui.TextureButton($"{wo.Id}", texture, Settings.IconSize);
+            ImGui.SameLine();
+
+            ImGui.TextWrapped(equipped.Describe());
+        }
+
         ImGui.EndTooltip();
+
     }
 
     /// <summary>
@@ -112,29 +127,6 @@ public static class DescriptionHelper
 
     public static string DescribeMeleeWeapon(this WorldObject wo)
         => wo.Describe(ComputedProperty.WeaponProps);
-    //=> new string[]
-    //{
-    //    wo.Describe(ComputedProperty.EquipmentSet),
-    //    wo.Describe(IntId.Value, "Value: "),
-    //    wo.Describe(IntId.EncumbranceVal, "Burden: "),
-    //    wo.Describe(ComputedProperty.Skill, "Skill: "),
-    //    (wo.TryDescribe(ComputedProperty.MeleeDamage, out var dmg) && wo.TryDescribe(ComputedProperty.DamageType,out var dType)) ? $"{dmg}, {dType}" : "",
-    //    wo.Describe(IntId.WeaponTime, "Speed: "),
-    //    (wo.TryDescribe(FloatId.WeaponOffense, out var wOff)) ? $"Attack Skill: {wOff}%" : "",
-    //    wo.Describe(FloatId.WeaponOffense, "Attack: "),
-    //    wo.Describe(FloatId.WeaponDefense, "Melee Defense: "),
-    //    wo.Describe(FloatId.WeaponMagicDefense, "Magic Defense: "),
-    //    wo.Describe(FloatId.WeaponMissileDefense, "Missile Defense: "),
-    //    wo.Describe(ComputedProperty.SlayerType, "Slayer: "),
-    //    wo.Describe(ComputedProperty.CastOnStrike, "Cast On Strike: "),
-    //    wo.Describe(ComputedProperty.ResistanceCleaving, "Resistance Cleaving: "),
-    //    wo.Describe(ComputedProperty.ImbuedEffects, "Imbues: "),
-    //    wo.DescribeSpells("Spells: "),
-    //    wo.Describe(ComputedProperty.Properties, "Properties: "),
-    //    wo.Describe(ComputedProperty.ItemLevel),
-    //    wo.Describe(IntId.RareId, "Rare #"),
-    //    wo.Describe(IntId.ItemSpellcraft, "Spellcraft: "),
-    //}.DescribeGroup();
     public static string DescribeMissileWeapon(this WorldObject wo)
         => wo.Describe(ComputedProperty.WeaponProps);
     public static string DescribeWand(this WorldObject wo)
@@ -217,6 +209,7 @@ public static class DescriptionHelper
             case ComputedProperty.WeaponProps:
                 return new string[]
             {
+                wo.Describe(StringId.Name),
                 wo.Describe(ComputedProperty.EquipmentSet),
                 wo.Describe(IntId.Value, "Value: "),
                 wo.Describe(IntId.EncumbranceVal, "Burden: "),

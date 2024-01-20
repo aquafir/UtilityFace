@@ -14,9 +14,9 @@ public static class EquipmentHelper
         //Misc
         [EquipSlots.Trinket] = Texture.EquipTrinket.IconId(),
         [EquipSlots.Cloak] = Texture.EquipCloak.IconId(),
-        [EquipSlots.BlueAetheria] = Texture.EquipShield.IconId(),
-        [EquipSlots.YellowAetheria] = Texture.EquipShield.IconId(),
-        [EquipSlots.RedAetheria] = Texture.EquipShield.IconId(),
+        [EquipSlots.BlueAetheria] = Texture.EquipBlueAetheria.IconId(),
+        [EquipSlots.YellowAetheria] = Texture.EquipYellowAetheria.IconId(),
+        [EquipSlots.RedAetheria] = Texture.EquipRedAetheria.IconId(),
         //Jewelry
         [EquipSlots.Necklace] = Texture.EquipNecklace.IconId(),
         [EquipSlots.LeftBracelet] = Texture.EquipLeftBracelet.IconId(),
@@ -91,6 +91,12 @@ public static class EquipmentHelper
     public static bool TryGetSlotEquipment(this EquipSlots slot, out WorldObject wo)
     {
         wo = game.Character.Equipment.Where(x => x.GetSlots().Contains(slot)).FirstOrDefault();
+
+        return wo is not null;
+    }
+    public static bool TryGetSlotEquipment(this EquipMask slot, out WorldObject wo)
+    {
+        wo = game.Character.Equipment.Where(x => ((x.ValidWieldedLocations & slot) != 0)).FirstOrDefault();
 
         return wo is not null;
     }

@@ -27,7 +27,10 @@ public static class TextureManager
         [Texture.EquipHead]			    = 0x06006D7F,
         [Texture.EquipHands]			= 0x06006D7D,
         [Texture.EquipChest]			= 0x06006D7B,
-        [Texture.EquipAbdomen]			= 0x06006D79,
+        [Texture.EquipAbdomen]          = 0x06006D79,
+        [Texture.EquipBlueAetheria]     = 0x06006BEF,
+        [Texture.EquipYellowAetheria]   = 0x06006BF0,
+        [Texture.EquipRedAetheria]      = 0x06006BF1,
 
         //TODO:
         [Texture.EquipCloak]			= 0x0600708F,
@@ -111,6 +114,9 @@ public enum Texture
     EquipPants,
     EquipShirt,
     EquipCloak,
+    EquipBlueAetheria,
+    EquipYellowAetheria,
+    EquipRedAetheria,
 
 
     ShortcutA0,
