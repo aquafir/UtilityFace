@@ -17,81 +17,13 @@ public static class DescriptionHelper
     static readonly Vector2 MIN_WIDTH = new(500f, 0);
     static readonly Vector2 MAX_WIDTH = new(1000f, float.MaxValue);
 
+
+    static uint _lastTooltipId = 0;
+    static string _cachedTooltip = "";
+
     public static void DrawTooltip(this WorldObject wo)
     {
-        var desc = wo.ObjectClass switch
-        {
-            ObjectClass.MeleeWeapon => wo.DescribeMeleeWeapon(),
-            ObjectClass.MissileWeapon => wo.DescribeMissileWeapon(),
-            ObjectClass.WandStaffOrb => wo.DescribeWand(),
-            ObjectClass.Armor => wo.DescribeArmor(),
-            ObjectClass.Clothing => wo.DescribeClothing(),
-            ObjectClass.Jewelry => wo.DescribeJewelry(),
-            //    ObjectClass.Monster => throw new NotImplementedException(),
-            //    ObjectClass.Food => throw new NotImplementedException(),
-            //    ObjectClass.Money => throw new NotImplementedException(),
-            //ObjectClass.Misc => throw new NotImplementedException(),
-            ObjectClass.Container => $"""
-                    {wo.Name}
-                    {wo.Describe(IntId.Value)}
-                    Burden: {wo.Burden}
-                    Capacity: {wo.Items.Count}/{wo.IntValues[IntId.ItemsCapacity]}
-                    """,
-            //    //ObjectClass.Gem => throw new NotImplementedException(),
-            //    //ObjectClass.SpellComponent => throw new NotImplementedException(),
-            //    //ObjectClass.Key => throw new NotImplementedException(),
-            //    //ObjectClass.Portal => throw new NotImplementedException(),
-            //    //ObjectClass.TradeNote => throw new NotImplementedException(),
-            //    //ObjectClass.ManaStone => throw new NotImplementedException(),
-            //    //ObjectClass.Plant => throw new NotImplementedException(),
-            //    //ObjectClass.BaseCooking => throw new NotImplementedException(),
-            //    //ObjectClass.BaseAlchemy => throw new NotImplementedException(),
-            //    //ObjectClass.BaseFletching => throw new NotImplementedException(),
-            //    //ObjectClass.CraftedCooking => throw new NotImplementedException(),
-            //    //ObjectClass.CraftedAlchemy => throw new NotImplementedException(),
-            //    //ObjectClass.CraftedFletching => throw new NotImplementedException(),
-            //    ObjectClass.Player => throw new NotImplementedException(),
-            //    ObjectClass.Vendor => throw new NotImplementedException(),
-            //    ObjectClass.Door => throw new NotImplementedException(),
-            //    ObjectClass.Corpse => throw new NotImplementedException(),
-            //    ObjectClass.Lifestone => throw new NotImplementedException(),
-            //    ObjectClass.HealingKit => throw new NotImplementedException(),
-            //    ObjectClass.Lockpick => throw new NotImplementedException(),
-            //    //ObjectClass.Bundle => throw new NotImplementedException(),
-            //    //ObjectClass.Book => throw new NotImplementedException(),
-            //    //ObjectClass.Journal => throw new NotImplementedException(),
-            //    //ObjectClass.Sign => throw new NotImplementedException(),
-            //    //ObjectClass.Housing => throw new NotImplementedException(),
-            //    //ObjectClass.Npc => throw new NotImplementedException(),
-            //    //ObjectClass.Foci => throw new NotImplementedException(),
-            //    //ObjectClass.Salvage => throw new NotImplementedException(),
-            //    //ObjectClass.Ust => throw new NotImplementedException(),
-            //    //ObjectClass.Services => throw new NotImplementedException(),
-            //    //ObjectClass.Scroll => throw new NotImplementedException(),
-            //    //ObjectClass.NumObjectClasses => throw new NotImplementedException(),
-            _ => $"""
-                {wo.Name}
-                {wo.Describe(IntId.Value)}
-                ObjectClass: {wo.ObjectClass}
-                """,
-        };
-
-        //var desc = wo.ObjectType switch
-        //    {
-        //        ObjectType.MeleeWeapon => wo.WeaponDescription(),
-        //        ObjectType.Caster => wo.WeaponDescription(),
-        //        ObjectType.MissileWeapon => wo.WeaponDescription(),
-        //        ObjectType.Armor => $"{wo.Name}",
-        //        ObjectType.Clothing => $"{wo.Name}",
-        //        ObjectType.Jewelry => $"{wo.Name}",
-        //        ObjectType.Container => $"""
-        //        {wo.Name}
-        //        Value: {wo.Value(IntId.Value)}
-        //        Burden: {wo.Burden}
-        //        Capacity: {wo.Items.Count}/{wo.IntValues[IntId.ItemsCapacity]}
-        //        """,
-        //        _ => $"{wo.Name}\nValue: {wo.Value(IntId.Value)}\nObjectClass: {wo.ObjectClass}",
-        //    };
+        var desc = wo.Describe();
 
         ImGui.SetNextWindowSizeConstraints(MIN_WIDTH, MAX_WIDTH);
         ImGui.BeginTooltip();
@@ -104,127 +36,117 @@ public static class DescriptionHelper
         ImGui.EndTooltip();
     }
 
-    public static string DescribeMeleeWeapon(this WorldObject wo)
-        => new string[]
+    /// <summary>
+    /// Returns a string description of a world object
+    /// </summary>
+    public static string Describe(this WorldObject wo)
+    {
+        string desc;
+        if (wo.Id == _lastTooltipId)
+            desc = _cachedTooltip;
+        else
         {
-            wo.Describe(ComputedProperty.ItemLevel),
-
-
-            wo.Describe(IntId.Value, "Value: "),
-            wo.Describe(IntId.EncumbranceVal, "Burden: "),
-            wo.Describe(ComputedProperty.Skill, "Skill: "),
-            (wo.TryDescribe(ComputedProperty.MeleeDamage, out var dmg) && wo.TryDescribe(ComputedProperty.DamageType,out var dType)) ? $"{dmg}, {dType}" : "",
-            wo.Describe(IntId.WeaponTime, "Speed: "),
-            (wo.TryDescribe(FloatId.WeaponOffense, out var wOff)) ? $"Attack Skill: {wOff}%" : "",
-            wo.Describe(FloatId.WeaponOffense, "Attack: "),
-            wo.Describe(FloatId.WeaponDefense, "Melee Defense: "),
-            wo.Describe(FloatId.WeaponMagicDefense, "Magic Defense: "),
-            wo.Describe(FloatId.WeaponMissileDefense, "Missile Defense: "),
-            wo.Describe(ComputedProperty.SlayerType, "Slayer: "),
-            wo.Describe(ComputedProperty.CastOnStrike, "Cast On Strike: "),
-            wo.Describe(ComputedProperty.ResistanceCleaving, "Resistance Cleaving: "),
-            wo.Describe(ComputedProperty.ImbuedEffects, "Imbues: "),
-            wo.Describe(ComputedProperty.Properties, "Properties: "),
-            wo.DescribeSpells("Spells: "),
-        }.DescribeGroup();
-
-    public static string DescribeMissileWeapon(this WorldObject wo)
-            => new string[]
+            desc = wo.ObjectClass switch
             {
-            wo.Describe(IntId.Value, "Value: "),
-            wo.Describe(IntId.EncumbranceVal, "Burden: "),
-            wo.Describe(ComputedProperty.Skill, "Skill: "),
-            (wo.TryDescribe(ComputedProperty.MeleeDamage, out var dmg) && wo.TryDescribe(ComputedProperty.DamageType,out var dType)) ? $"{dmg}, {dType}" : "",
-            wo.Describe(IntId.WeaponTime, "Speed: "),
-            (wo.TryDescribe(FloatId.WeaponOffense, out var wOff)) ? $"Attack Skill: {wOff}%" : "",
-            wo.Describe(FloatId.WeaponOffense, "Attack: "),
-            wo.Describe(FloatId.WeaponDefense, "Melee Defense: "),
-            wo.Describe(FloatId.WeaponMagicDefense, "Magic Defense: "),
-            wo.Describe(FloatId.WeaponMissileDefense, "Missile Defense: "),
-            wo.Describe(ComputedProperty.SlayerType, "Slayer: "),
-            wo.Describe(ComputedProperty.CastOnStrike, "Cast On Strike: "),
-            wo.Describe(ComputedProperty.ResistanceCleaving, "Resistance Cleaving: "),
-            wo.Describe(ComputedProperty.ImbuedEffects, "Imbues: "),
-            wo.Describe(ComputedProperty.Properties, "Properties: "),
-            wo.DescribeSpells("Spells: "),
-            }.DescribeGroup();
+                ObjectClass.MeleeWeapon => wo.DescribeMeleeWeapon(),
+                ObjectClass.MissileWeapon => wo.DescribeMissileWeapon(),
+                ObjectClass.WandStaffOrb => wo.DescribeWand(),
+                ObjectClass.Armor => wo.DescribeArmor(),
+                ObjectClass.Clothing => wo.DescribeClothing(),
+                ObjectClass.Jewelry => wo.DescribeJewelry(),
+                //    ObjectClass.Monster => throw new NotImplementedException(),
+                //    ObjectClass.Food => throw new NotImplementedException(),
+                //    ObjectClass.Money => throw new NotImplementedException(),
+                //ObjectClass.Misc => throw new NotImplementedException(),
+                ObjectClass.Container => $"""
+                    {wo.Name}
+                    {wo.Describe(IntId.Value)}
+                    Burden: {wo.Burden}
+                    Capacity: {wo.Items.Count}/{wo.IntValues[IntId.ItemsCapacity]}
+                    """,
+                //    //ObjectClass.Gem => throw new NotImplementedException(),
+                //    //ObjectClass.SpellComponent => throw new NotImplementedException(),
+                //    //ObjectClass.Key => throw new NotImplementedException(),
+                //    //ObjectClass.Portal => throw new NotImplementedException(),
+                //    //ObjectClass.TradeNote => throw new NotImplementedException(),
+                //    //ObjectClass.ManaStone => throw new NotImplementedException(),
+                //    //ObjectClass.Plant => throw new NotImplementedException(),
+                //    //ObjectClass.BaseCooking => throw new NotImplementedException(),
+                //    //ObjectClass.BaseAlchemy => throw new NotImplementedException(),
+                //    //ObjectClass.BaseFletching => throw new NotImplementedException(),
+                //    //ObjectClass.CraftedCooking => throw new NotImplementedException(),
+                //    //ObjectClass.CraftedAlchemy => throw new NotImplementedException(),
+                //    //ObjectClass.CraftedFletching => throw new NotImplementedException(),
+                //    ObjectClass.Player => throw new NotImplementedException(),
+                //    ObjectClass.Vendor => throw new NotImplementedException(),
+                //    ObjectClass.Door => throw new NotImplementedException(),
+                //    ObjectClass.Corpse => throw new NotImplementedException(),
+                //    ObjectClass.Lifestone => throw new NotImplementedException(),
+                //    ObjectClass.HealingKit => throw new NotImplementedException(),
+                //    ObjectClass.Lockpick => throw new NotImplementedException(),
+                //    //ObjectClass.Bundle => throw new NotImplementedException(),
+                //    //ObjectClass.Book => throw new NotImplementedException(),
+                //    //ObjectClass.Journal => throw new NotImplementedException(),
+                //    //ObjectClass.Sign => throw new NotImplementedException(),
+                //    //ObjectClass.Housing => throw new NotImplementedException(),
+                //    //ObjectClass.Npc => throw new NotImplementedException(),
+                //    //ObjectClass.Foci => throw new NotImplementedException(),
+                //    //ObjectClass.Salvage => throw new NotImplementedException(),
+                //    //ObjectClass.Ust => throw new NotImplementedException(),
+                //    //ObjectClass.Services => throw new NotImplementedException(),
+                //    //ObjectClass.Scroll => throw new NotImplementedException(),
+                //    //ObjectClass.NumObjectClasses => throw new NotImplementedException(),
+                _ => $"""
+                {wo.Name}
+                {wo.Describe(IntId.Value)}
+                ObjectClass: {wo.ObjectClass}
+                {wo.Describe(ComputedProperty.Properties)}
+                """,
+            };
 
+            _cachedTooltip = desc;
+            _lastTooltipId = wo.Id;
+        }
+        return desc;
+    }
+
+    public static string DescribeMeleeWeapon(this WorldObject wo)
+        => wo.Describe(ComputedProperty.WeaponProps);
+    //=> new string[]
+    //{
+    //    wo.Describe(ComputedProperty.EquipmentSet),
+    //    wo.Describe(IntId.Value, "Value: "),
+    //    wo.Describe(IntId.EncumbranceVal, "Burden: "),
+    //    wo.Describe(ComputedProperty.Skill, "Skill: "),
+    //    (wo.TryDescribe(ComputedProperty.MeleeDamage, out var dmg) && wo.TryDescribe(ComputedProperty.DamageType,out var dType)) ? $"{dmg}, {dType}" : "",
+    //    wo.Describe(IntId.WeaponTime, "Speed: "),
+    //    (wo.TryDescribe(FloatId.WeaponOffense, out var wOff)) ? $"Attack Skill: {wOff}%" : "",
+    //    wo.Describe(FloatId.WeaponOffense, "Attack: "),
+    //    wo.Describe(FloatId.WeaponDefense, "Melee Defense: "),
+    //    wo.Describe(FloatId.WeaponMagicDefense, "Magic Defense: "),
+    //    wo.Describe(FloatId.WeaponMissileDefense, "Missile Defense: "),
+    //    wo.Describe(ComputedProperty.SlayerType, "Slayer: "),
+    //    wo.Describe(ComputedProperty.CastOnStrike, "Cast On Strike: "),
+    //    wo.Describe(ComputedProperty.ResistanceCleaving, "Resistance Cleaving: "),
+    //    wo.Describe(ComputedProperty.ImbuedEffects, "Imbues: "),
+    //    wo.DescribeSpells("Spells: "),
+    //    wo.Describe(ComputedProperty.Properties, "Properties: "),
+    //    wo.Describe(ComputedProperty.ItemLevel),
+    //    wo.Describe(IntId.RareId, "Rare #"),
+    //    wo.Describe(IntId.ItemSpellcraft, "Spellcraft: "),
+    //}.DescribeGroup();
+    public static string DescribeMissileWeapon(this WorldObject wo)
+        => wo.Describe(ComputedProperty.WeaponProps);
     public static string DescribeWand(this WorldObject wo)
-        => new string[]
-        {
-            wo.Describe(IntId.Value, "Value: "),
-            wo.Describe(IntId.EncumbranceVal, "Burden: "),
-            wo.Describe(ComputedProperty.Skill, "Skill: "),
-            (wo.TryDescribe(ComputedProperty.MeleeDamage, out var dmg) && wo.TryDescribe(ComputedProperty.DamageType,out var dType)) ? $"{dmg}, {dType}" : "",
-            wo.Describe(IntId.WeaponTime, "Speed: "),
-            (wo.TryDescribe(FloatId.WeaponOffense, out var wOff)) ? $"Attack Skill: {wOff}%" : "",
-            wo.Describe(FloatId.WeaponOffense, "Attack: "),
-            wo.Describe(FloatId.WeaponDefense, "Melee Defense: "),
-            wo.Describe(FloatId.WeaponMagicDefense, "Magic Defense: "),
-            wo.Describe(FloatId.WeaponMissileDefense, "Missile Defense: "),
-            wo.Describe(ComputedProperty.SlayerType, "Slayer: "),
-            wo.Describe(ComputedProperty.CastOnStrike, "Cast On Strike: "),
-            wo.Describe(ComputedProperty.ResistanceCleaving, "Resistance Cleaving: "),
-            wo.Describe(ComputedProperty.ImbuedEffects, "Imbues: "),
-            wo.Describe(ComputedProperty.Properties, "Properties: "),
-            wo.DescribeSpells("Spells: "),
-        }.DescribeGroup();
-
+        => wo.Describe(ComputedProperty.WeaponProps);
     public static string DescribeJewelry(this WorldObject wo)
-        => new string[]
-        {
-            wo.Describe(IntId.Value, "Value: "),
-            wo.Describe(IntId.EncumbranceVal, "Burden: "),
-            wo.Describe(ComputedProperty.Skill, "Skill: "),
-            (wo.TryDescribe(ComputedProperty.MeleeDamage, out var dmg) && wo.TryDescribe(ComputedProperty.DamageType,out var dType)) ? $"{dmg}, {dType}" : "",
-            wo.Describe(IntId.WeaponTime, "Speed: "),
-            (wo.TryDescribe(FloatId.WeaponOffense, out var wOff)) ? $"Attack Skill: {wOff}%" : "",
-            wo.Describe(FloatId.WeaponOffense, "Attack: "),
-            wo.Describe(FloatId.WeaponDefense, "Melee Defense: "),
-            wo.Describe(FloatId.WeaponMagicDefense, "Magic Defense: "),
-            wo.Describe(FloatId.WeaponMissileDefense, "Missile Defense: "),
-            wo.Describe(ComputedProperty.SlayerType, "Slayer: "),
-            wo.Describe(ComputedProperty.CastOnStrike, "Cast On Strike: "),
-            wo.Describe(ComputedProperty.ResistanceCleaving, "Resistance Cleaving: "),
-            wo.Describe(ComputedProperty.ImbuedEffects, "Imbues: "),
-            wo.Describe(ComputedProperty.Properties, "Properties: "),
-            wo.DescribeSpells("Spells: "),
-        }.DescribeGroup();
+        => wo.Describe(ComputedProperty.WeaponProps);
     public static string DescribeArmor(this WorldObject wo)
-        => new string[]
-        {
-            wo.Describe(IntId.Value, "Value: "),
-            wo.Describe(IntId.EncumbranceVal, "Burden: "),
-            wo.Describe(ComputedProperty.Skill, "Skill: "),
-
-            wo.Describe(ComputedProperty.ArmorResistance),
-            wo.Describe(ComputedProperty.ImbuedEffects, "Imbues: "),
-            wo.Describe(ComputedProperty.Properties, "Properties: "),
-            wo.DescribeSpells("Spells: "),
-        }.DescribeGroup();
+        => wo.Describe(ComputedProperty.WearableProps);
     public static string DescribeClothing(this WorldObject wo)
-        => new string[]
-        {
-            wo.Describe(IntId.Value, "Value: "),
-            wo.Describe(IntId.EncumbranceVal, "Burden: "),
-            wo.Describe(ComputedProperty.Skill, "Skill: "),
-            (wo.TryDescribe(ComputedProperty.MeleeDamage, out var dmg) && wo.TryDescribe(ComputedProperty.DamageType,out var dType)) ? $"{dmg}, {dType}" : "",
-            wo.Describe(IntId.WeaponTime, "Speed: "),
-            (wo.TryDescribe(FloatId.WeaponOffense, out var wOff)) ? $"Attack Skill: {wOff}%" : "",
-            wo.Describe(FloatId.WeaponOffense, "Attack: "),
-            wo.Describe(FloatId.WeaponDefense, "Melee Defense: "),
-            wo.Describe(FloatId.WeaponMagicDefense, "Magic Defense: "),
-            wo.Describe(FloatId.WeaponMissileDefense, "Missile Defense: "),
-            wo.Describe(ComputedProperty.SlayerType, "Slayer: "),
-            wo.Describe(ComputedProperty.CastOnStrike, "Cast On Strike: "),
-            wo.Describe(ComputedProperty.ResistanceCleaving, "Resistance Cleaving: "),
-            wo.Describe(ComputedProperty.ImbuedEffects, "Imbues: "),
-            wo.Describe(ComputedProperty.Properties, "Properties: "),
-            wo.DescribeSpells("Spells: "),
-        }.DescribeGroup();
+        => wo.Describe(ComputedProperty.WeaponProps);
 
 
-    #region Describe Extensions
     public static string Describe(this WorldObject wo, PropType propType, int key, string prefix = "")
          => wo.TryGetValue(propType, key, out var value) ? $"{prefix}{value}" : "";
     public static string Describe(this WorldObject wo, BoolId key, string prefix = "")
@@ -261,19 +183,63 @@ public static class DescriptionHelper
     public static bool TryDescribe(this WorldObject wo, ComputedProperty key, out string value, string prefix = "") =>
         !String.IsNullOrEmpty(value = wo.Describe(key, prefix));
 
-    //Todo: think of a smarter way of doing this
+    //Todo: think of a smarter way of doing this for reusable names
     static int _int;
     static string _string;
     static float _float;
     static long _long;
     static List<ImbuedEffectType> _imbues = Enum.GetValues(typeof(ImbuedEffectType)).Cast<ImbuedEffectType>().ToList();
+    static List<EquipMask> _equipSlots = Enum.GetValues(typeof(EquipMask)).Cast<EquipMask>().ToList();
     public static string Describe(this WorldObject wo, ComputedProperty key, string prefix = "")
     {
         switch (key)
         {
+            //case ComputedProperty.StandardProps:
+
+            //    return "";
+
+            //Ammo type
 
 
+            case ComputedProperty.WearableProps:
+                return new string[]
+                {
+                    wo.Describe(IntId.Value, "Value: "),
+                    wo.Describe(IntId.EncumbranceVal, "Burden: "),
+                    wo.Describe(ComputedProperty.EquipmentCoverage, "Covers "),
+                    wo.Describe(ComputedProperty.Skill, "Skill: "),
+                    wo.Describe(ComputedProperty.ArmorResistancePercent),
+                    wo.Describe(ComputedProperty.ImbuedEffects, "Imbues: "),
+                    wo.Describe(ComputedProperty.Properties, "Properties: "),
+                    wo.DescribeSpells("Spells: "),
+                }.DescribeGroup();
 
+            case ComputedProperty.WeaponProps:
+                return new string[]
+            {
+                wo.Describe(ComputedProperty.EquipmentSet),
+                wo.Describe(IntId.Value, "Value: "),
+                wo.Describe(IntId.EncumbranceVal, "Burden: "),
+                wo.Describe(ComputedProperty.Skill, "Skill: "),
+                (wo.TryDescribe(ComputedProperty.MeleeDamage, out var dmg) && wo.TryDescribe(ComputedProperty.DamageType,out var dType)) ? $"{dmg}, {dType}" : "",
+                wo.Describe(IntId.WeaponTime, "Speed: "),
+                wo.Describe(IntId.WeaponRange, "Range: "),
+                wo.Describe(ComputedProperty.AmmoType),
+                (wo.TryDescribe(FloatId.WeaponOffense, out var wOff)) ? $"Attack Skill: {wOff}%" : "",
+                wo.Describe(FloatId.WeaponOffense, "Attack: "),
+                $"{wo.Describe(FloatId.WeaponDefense, "Melee Defense: "):P2}",
+                wo.Describe(FloatId.WeaponMagicDefense, "Magic Defense: "),
+                wo.Describe(FloatId.WeaponMissileDefense, "Missile Defense: "),
+                wo.Describe(ComputedProperty.SlayerType, "Slayer: "),
+                wo.Describe(ComputedProperty.CastOnStrike, "Cast On Strike: "),
+                wo.Describe(ComputedProperty.ResistanceCleaving, "Resistance Cleaving: "),
+                wo.Describe(ComputedProperty.ImbuedEffects, "Imbues: "),
+                wo.DescribeSpells("Spells: "),
+                wo.Describe(ComputedProperty.Properties, "Properties: "),
+                wo.Describe(ComputedProperty.ItemLevel),
+                wo.Describe(IntId.RareId, "Rare #"),
+                wo.Describe(IntId.ItemSpellcraft, "Spellcraft: "),
+            }.DescribeGroup();
 
             case ComputedProperty.ItemLevel:
                 if (!(wo.IntValues.TryGetValue(IntId.ItemMaxLevel, out var maxLevel)
@@ -289,20 +255,15 @@ public static class DescriptionHelper
                 var nextLevelXp = ExperienceSystem.ItemLevelToTotalXP(level + 1, (ulong)baseXp, maxLevel, (ItemXpStyle)xpStyle);
                 return $"Item Level: {level}/{maxLevel}\nItem XP: {totalXp:N00}/{nextLevelXp:N00}";
 
+            case ComputedProperty.AmmoType:
+                return wo.IntValues.TryGetValue(IntId.AmmoType, out var _int) ? $"Uses {(AmmoType)_int} for ammunition" : "";
+
             case ComputedProperty.EquipmentSet:
+                return wo.IntValues.TryGetValue(IntId.EquipmentSetId, out var setId) ? $"Set: {(EquipmentSet)setId}" : "";
 
-                return "";
-
-
-            //Mana rate
-
-
-
-
-
-
-
-
+            case ComputedProperty.EquipmentCoverage:
+                return !wo.IntValues.TryGetValue(IntId.ValidLocations, out _int) || _int == 0 ? "" :
+                    $"{prefix}{String.Join(", ", _equipSlots.Where(x => ((uint)x & _int) != 0))}";
 
             case ComputedProperty.ArmorResistance:
                 if (!wo.IntValues.TryGetValue(IntId.ArmorLevel, out var armorLevel))
@@ -316,24 +277,59 @@ public static class DescriptionHelper
                     wo.FloatValues.TryGetValue(FloatId.ArmorModVsCold, out var cMod) ? $"Cold: {cMod * armorLevel}" : "",
                     wo.FloatValues.TryGetValue(FloatId.ArmorModVsElectric, out var eMod) ? $"Electricity: {eMod * armorLevel}" : "",
                     wo.FloatValues.TryGetValue(FloatId.ArmorModVsFire, out var fMod) ? $"Fire: {fMod * armorLevel}" : "",
-                    wo.FloatValues.TryGetValue(FloatId.ArmorModVsNether, out var nMod) ? $"Nether: {nMod * armorLevel}" : "",
                     wo.FloatValues.TryGetValue(FloatId.ArmorModVsPierce, out var pMod) ? $"Pierce: {pMod * armorLevel}" : "",
                     wo.FloatValues.TryGetValue(FloatId.ArmorModVsSlash, out var sMod) ? $"Slash: {sMod * armorLevel}" : "",
+                    wo.FloatValues.TryGetValue(FloatId.ArmorModVsNether, out var nMod) ? $"Nether: {nMod * armorLevel}" : "",
                 }.DescribeGroup("\n");
 
                 return String.IsNullOrWhiteSpace(armorRes) ? "" : $"{prefix}{armorRes}";
+
+            case ComputedProperty.ArmorResistancePercent:
+                if (!wo.IntValues.TryGetValue(IntId.ArmorLevel, out var armorLevelP))
+                    return "";
+
+                var armorResP = new string[]
+                {
+                    $"Armor: {armorLevelP}",
+                    wo.FloatValues.TryGetValue(FloatId.ArmorModVsAcid, out var apMod) ? $"Acid: {apMod * armorLevelP} ({ Formulas.ArmorReduction(apMod * armorLevelP):P2}%)" : "",
+                    wo.FloatValues.TryGetValue(FloatId.ArmorModVsBludgeon, out var bpMod) ? $"Bludgeon: {bpMod * armorLevelP} ({ Formulas.ArmorReduction(bpMod * armorLevelP):P2}%)" : "",
+                    wo.FloatValues.TryGetValue(FloatId.ArmorModVsCold, out var cpMod) ? $"Cold: {cpMod * armorLevelP} ({ Formulas.ArmorReduction(cpMod * armorLevelP):P2}%)" : "",
+                    wo.FloatValues.TryGetValue(FloatId.ArmorModVsElectric, out var epMod) ? $"Electricity: {epMod * armorLevelP} ({ Formulas.ArmorReduction(epMod * armorLevelP):P2}%)" : "",
+                    wo.FloatValues.TryGetValue(FloatId.ArmorModVsFire, out var fpMod) ? $"Fire: {fpMod * armorLevelP} ({ Formulas.ArmorReduction(fpMod * armorLevelP):P2}%)" : "",
+                    wo.FloatValues.TryGetValue(FloatId.ArmorModVsPierce, out var ppMod) ? $"Pierce: {ppMod * armorLevelP} ({ Formulas.ArmorReduction(ppMod * armorLevelP):P2}%)" : "",
+                    wo.FloatValues.TryGetValue(FloatId.ArmorModVsSlash, out var spMod) ? $"Slash: {spMod * armorLevelP} ({ Formulas.ArmorReduction(spMod * armorLevelP):P2}%)" : "",
+                    wo.FloatValues.TryGetValue(FloatId.ArmorModVsNether, out var npMod) ? $"Nether: {npMod * armorLevelP} ({ Formulas.ArmorReduction(npMod * armorLevelP):P2}%)" : "",
+                }.DescribeGroup("\n");
+
+                return String.IsNullOrWhiteSpace(armorResP) ? "" : $"{prefix}{armorResP}";
 
             case ComputedProperty.Properties:
                 var props = new string[]
                 {
                     wo.IntValues.TryGetValue(IntId.Attuned, out var attuned) ? $"Attuned" : "",
-                    wo.IntValues.TryGetValue(IntId.Bonded, out var bonded) ? $"Bonded" : "",
+                    //wo.IntValues.TryGetValue(IntId.Bonded, out var bonded) ? $"Bonded" : "",
+                    wo.Describe(ComputedProperty.BondedStatus),
                     wo.BoolValues.TryGetValue(BoolId.Ivoryable, out var ivory) ? $"Ivoryable" : "",
                     wo.BoolValues.TryGetValue(BoolId.Dyable, out var dye) ? $"Dyable" : "",
                     wo.IntValues.TryGetValue(IntId.ResistMagic, out var mRes) && mRes >=9999  ? $"Unenchantable" : "",
+                    wo.BoolValues.TryGetValue(BoolId.IsSellable, out var sellable) ? $"Unsellable" : "",
                 }.DescribeGroup(", ");
 
                 return String.IsNullOrWhiteSpace(props) ? "" : $"{prefix}{props}";
+
+            case ComputedProperty.BondedStatus:
+                if (!wo.IntValues.TryGetValue(IntId.Bonded, out var bonded))
+                    return "";
+
+                return bonded switch
+                {
+                    -2 => "Destroyed on Death",
+                    -1 => "Dropped on Death",
+                    //0 => normal
+                    1 => "Bonded",
+                    2 => "Sticky", //sticky??
+                    _ => ""
+                };
 
             case ComputedProperty.CastOnStrike:
                 return wo.DataValues.TryGetValue(DataId.ProcSpell, out var procSpell) && wo.FloatValues.TryGetValue(FloatId.ProcSpellRate, out var procRate) ?
@@ -343,7 +339,6 @@ public static class DescriptionHelper
                 return wo.IntValues.TryGetValue(IntId.ResistanceModifierType, out var resType) && wo.FloatValues.TryGetValue(FloatId.ResistanceModifier, out var rMod) ?
                     $"{prefix}{(DamageType)resType} ({rMod})" : "";
 
-
             case ComputedProperty.ImbuedEffects:
                 return wo.IntValues.TryGetValue(IntId.ImbuedEffect, out _int) || _int == 0 ? "" :
                     $"{prefix}{String.Join(", ", _imbues.Where(x => ((uint)x & _int) != 0))}";
@@ -351,6 +346,7 @@ public static class DescriptionHelper
                 return (
                     wo.IntValues.TryGetValue(IntId.Damage, out _int)
                     && wo.FloatValues.TryGetValue(FloatId.DamageVariance, out _float)
+                    && _int != 0    //Can have missing damage on bows
                     ) ? $"{prefix}{_int * _float}-{_int}" : "";
             case ComputedProperty.CreatureType:
                 break;
@@ -406,7 +402,6 @@ public static class DescriptionHelper
     public static string DescribeGroup(this string[] descriptions, string join = "\n") => String.Join(join, descriptions.Where(x => !String.IsNullOrEmpty(x)));
 
     public static string SpellName(uint id) => g.Character.SpellBook.TryGet(id, out var s) ? s.Name : "";
-    #endregion
 }
 
 
@@ -445,6 +440,18 @@ public enum ComputedProperty
     ArmorResistance,
     EquipmentSet,
     ItemLevel,
+    /// <summary>
+    /// Bonded status determines if it is destroyed, dropped, or always retained on death
+    /// </summary>
+    BondedStatus,
+    /// <summary>
+    /// All properties unique to magic/melee/missile weapons
+    /// </summary>
+    WeaponProps,
+    EquipmentCoverage,
+    WearableProps,
+    AmmoType,
+    ArmorResistancePercent,
 }
 
 public enum CleanImbue : uint
