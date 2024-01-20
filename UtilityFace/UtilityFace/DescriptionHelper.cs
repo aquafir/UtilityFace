@@ -107,6 +107,9 @@ public static class DescriptionHelper
     public static string DescribeMeleeWeapon(this WorldObject wo)
         => new string[]
         {
+            wo.Describe(ComputedProperty.ItemLevel),
+
+
             wo.Describe(IntId.Value, "Value: "),
             wo.Describe(IntId.EncumbranceVal, "Burden: "),
             wo.Describe(ComputedProperty.Skill, "Skill: "),
@@ -221,7 +224,6 @@ public static class DescriptionHelper
         }.DescribeGroup();
 
 
-
     #region Describe Extensions
     public static string Describe(this WorldObject wo, PropType propType, int key, string prefix = "")
          => wo.TryGetValue(propType, key, out var value) ? $"{prefix}{value}" : "";
@@ -263,11 +265,44 @@ public static class DescriptionHelper
     static int _int;
     static string _string;
     static float _float;
+    static long _long;
     static List<ImbuedEffectType> _imbues = Enum.GetValues(typeof(ImbuedEffectType)).Cast<ImbuedEffectType>().ToList();
     public static string Describe(this WorldObject wo, ComputedProperty key, string prefix = "")
     {
         switch (key)
         {
+
+
+
+
+            case ComputedProperty.ItemLevel:
+                if (!(wo.IntValues.TryGetValue(IntId.ItemMaxLevel, out var maxLevel)
+                    && wo.IntValues.TryGetValue(IntId.ItemXpStyle, out var xpStyle)
+                    //&& wo.Int64Values.TryGetValue(Int64Id.ItemTotalXp, out var totalXp)
+                    && wo.Int64Values.TryGetValue(Int64Id.ItemBaseXp, out var baseXp)))
+                    return "";
+                //Todo: Find if total xp always there
+                if (!wo.Int64Values.TryGetValue(Int64Id.ItemTotalXp, out var totalXp))
+                    totalXp = 0;
+
+                var level = ExperienceSystem.ItemLevel(totalXp, baseXp, maxLevel, (ItemXpStyle)xpStyle);
+                var nextLevelXp = ExperienceSystem.ItemLevelToTotalXP(level + 1, (ulong)baseXp, maxLevel, (ItemXpStyle)xpStyle);
+                return $"Item Level: {level}/{maxLevel}\nItem XP: {totalXp:N00}/{nextLevelXp:N00}";
+
+            case ComputedProperty.EquipmentSet:
+
+                return "";
+
+
+            //Mana rate
+
+
+
+
+
+
+
+
 
             case ComputedProperty.ArmorResistance:
                 if (!wo.IntValues.TryGetValue(IntId.ArmorLevel, out var armorLevel))
@@ -284,27 +319,9 @@ public static class DescriptionHelper
                     wo.FloatValues.TryGetValue(FloatId.ArmorModVsNether, out var nMod) ? $"Nether: {nMod * armorLevel}" : "",
                     wo.FloatValues.TryGetValue(FloatId.ArmorModVsPierce, out var pMod) ? $"Pierce: {pMod * armorLevel}" : "",
                     wo.FloatValues.TryGetValue(FloatId.ArmorModVsSlash, out var sMod) ? $"Slash: {sMod * armorLevel}" : "",
-                    //wo.Describe(FloatId.ArmorModVsBludgeon,  "Bludgeon: "),
-                    //wo.Describe(FloatId.ArmorModVsCold, "Cold: "),
-                    //wo.Describe(FloatId.ArmorModVsElectric, "Electricity: "),
-                    //wo.Describe(FloatId.ArmorModVsFire, "Fire: "),
-                    //wo.Describe(FloatId.ArmorModVsNether, "Nether: "),
-                    //wo.Describe(FloatId.ArmorModVsPierce, "Pierce: "),
-                    //wo.Describe(FloatId.ArmorModVsSlash, "Slash: "),
-
-                    //wo.Describe(FloatId.ArmorModVsAcid, "Acid: "),
-                    //wo.Describe(FloatId.ArmorModVsBludgeon,  "Bludgeon: "),
-                    //wo.Describe(FloatId.ArmorModVsCold, "Cold: "),
-                    //wo.Describe(FloatId.ArmorModVsElectric, "Electricity: "),
-                    //wo.Describe(FloatId.ArmorModVsFire, "Fire: "),
-                    //wo.Describe(FloatId.ArmorModVsNether, "Nether: "),
-                    //wo.Describe(FloatId.ArmorModVsPierce, "Pierce: "),
-                    //wo.Describe(FloatId.ArmorModVsSlash, "Slash: "),
                 }.DescribeGroup("\n");
 
                 return String.IsNullOrWhiteSpace(armorRes) ? "" : $"{prefix}{armorRes}";
-
-                break;
 
             case ComputedProperty.Properties:
                 var props = new string[]
@@ -337,6 +354,7 @@ public static class DescriptionHelper
                     ) ? $"{prefix}{_int * _float}-{_int}" : "";
             case ComputedProperty.CreatureType:
                 break;
+
             case ComputedProperty.SlayerType:
                 return (
                         wo.IntValues.TryGetValue(IntId.SlayerCreatureType, out _int)
@@ -354,7 +372,6 @@ public static class DescriptionHelper
                 return "";
                 break;
         }
-
         return "";
     }
 
@@ -426,6 +443,8 @@ public enum ComputedProperty
     /// </summary>
     ResistanceCleaving,
     ArmorResistance,
+    EquipmentSet,
+    ItemLevel,
 }
 
 public enum CleanImbue : uint
