@@ -186,7 +186,7 @@ public static class PropertyTypeExtensions
                 break;
             case PropType.String:
                 success = target.StringValues.TryGetValue((StringId)key, out var targetString);
-                val = targetString.ToString();
+                val = targetString ?? "";
                 break;
             case PropType.Unknown:
             default:

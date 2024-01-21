@@ -98,6 +98,26 @@ internal class InterfaceController : IDisposable
         hud.OnPreRender += Hud_OnPreRender;
         hud.OnRender += Hud_OnRender;
         g.World.OnChatInput += World_OnChatInput;
+        //g.World.OnChatNameClicked += World_OnChatNameClicked;
+        //g.World.OnChatText += World_OnChatText;
+    }
+
+    private async void World_OnChatText(object sender, UtilityBelt.Scripting.Events.ChatEventArgs e)
+    {
+        if (!uint.TryParse(e.Message, out var id))
+            return;
+
+        //var wo = g.Actions.ObjectAppraise(id, new() { MaxRetryCount = 1, TimeoutMilliseconds = 100}, x => x.id);
+        if (!g.World.TryGet(id, out var wo))
+            return;
+        //if (wo is null || !wo.Success)
+        //    return;
+
+        UBService.Huds.Toaster.Add(wo.Name);
+    }
+
+    private void World_OnChatNameClicked(object sender, UtilityBelt.Scripting.Events.ChatNameClickedEventArgs e)
+    {
     }
 
     private void RemoveEvents()

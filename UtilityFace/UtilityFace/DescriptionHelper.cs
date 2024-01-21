@@ -113,7 +113,7 @@ public static class DescriptionHelper
                 //    //ObjectClass.NumObjectClasses => throw new NotImplementedException(),
                 _ => $"""
                 {wo.Name}
-                {wo.Describe(IntId.Value)}
+                {wo.Describe(ComputedProperty.StandardProps)}
                 ObjectClass: {wo.ObjectClass}
                 {wo.Describe(ComputedProperty.Properties)}
                 """,
@@ -186,12 +186,21 @@ public static class DescriptionHelper
     {
         switch (key)
         {
-            //case ComputedProperty.StandardProps:
+            #region Collections of Properties
+            case ComputedProperty.StandardProps:
+                return new string[]
+                {
+                    wo.Describe(IntId.Value, "Value: "),
+                    wo.Describe(StringId.Use),
+                    wo.Describe(ComputedProperty.HealKitProps),
+                }.DescribeGroup();
 
-            //    return "";
-
-            //Ammo type
-
+            case ComputedProperty.HealKitProps:
+                return new string[]
+                {
+                    wo.Describe(IntId.BoostValue, "Bonus to Healing Skill: "),
+                    wo.FloatValues.TryGetValue(FloatId.HealkitMod, out var boostValue) ? $"Restoration Bonus: {boostValue:P0}%" : "",
+                }.DescribeGroup();
 
             case ComputedProperty.WearableProps:
                 return new string[]
@@ -233,6 +242,21 @@ public static class DescriptionHelper
                 wo.Describe(IntId.RareId, "Rare #"),
                 wo.Describe(IntId.ItemSpellcraft, "Spellcraft: "),
             }.DescribeGroup();
+            #endregion
+
+            //Ammo type
+
+
+            case ComputedProperty.StackCount:
+                return (wo.IntValues.TryGetValue(IntId.StackSize, out var stack)
+                    && wo.IntValues.TryGetValue(IntId.MaxStackSize, out var maxStack)) ?
+                   $"{prefix} {stack}/{maxStack}" : "";
+
+            case ComputedProperty.Uses:
+                return (wo.IntValues.TryGetValue(IntId.Structure, out var structure)
+                    && wo.IntValues.TryGetValue(IntId.MaxStructure, out var maxStructure)) ?
+                   $"{prefix} {structure}/{maxStructure}" : "";
+
 
             case ComputedProperty.ItemLevel:
                 if (!(wo.IntValues.TryGetValue(IntId.ItemMaxLevel, out var maxLevel)
@@ -445,6 +469,13 @@ public enum ComputedProperty
     WearableProps,
     AmmoType,
     ArmorResistancePercent,
+    Uses,
+    StackCount,
+    StandardProps,
+    /// <summary>
+    /// Heal/Mana/Stamina kit?
+    /// </summary>
+    HealKitProps,
 }
 
 public enum CleanImbue : uint

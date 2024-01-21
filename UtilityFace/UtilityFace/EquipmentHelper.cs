@@ -94,9 +94,11 @@ public static class EquipmentHelper
 
         return wo is not null;
     }
+    //Mask for overlapping unused spots (e.g., clothes)
+    const EquipMask MASK = 0xFFFFFFFF - EquipMask.AbdomenUnderwear;
     public static bool TryGetSlotEquipment(this EquipMask slot, out WorldObject wo)
     {
-        wo = game.Character.Equipment.Where(x => ((x.ValidWieldedLocations & slot) != 0)).FirstOrDefault();
+        wo = game.Character.Equipment.Where(x => ((x.ValidWieldedLocations & slot & MASK) != 0)).FirstOrDefault();
 
         return wo is not null;
     }

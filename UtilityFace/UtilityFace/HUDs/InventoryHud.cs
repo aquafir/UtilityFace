@@ -188,7 +188,10 @@ public class InventoryHud : IDisposable
     void DrawItemIcon(WorldObject wo)
     {
         var texture = wo.GetOrCreateTexture();
-        ImGui.TextureButton($"{wo.Id}", texture, IconSize);
+        if(ImGui.TextureButton($"{wo.Id}", texture, IconSize))
+        {
+            game.Actions.InvokeChat($"{wo.Id}");
+        }
 
         DrawItemTooltip(wo);
         DrawItemContextMenu(wo);
