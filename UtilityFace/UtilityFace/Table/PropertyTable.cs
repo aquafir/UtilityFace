@@ -56,7 +56,7 @@ public class PropertyTable
             //Try to find the value corresponding to the Type if it exists in the Target
             var name = Filter.Props[i];
             var key = Filter.PropKeys[i];
-            if (!Type.TryGetValue(key, Target, out var val))
+            if (!Type.TryGetString(key, Target, out var val))
                 continue;
 
             //Add it to the table

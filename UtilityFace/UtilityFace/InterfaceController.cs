@@ -94,7 +94,7 @@ internal class InterfaceController : IDisposable
     }
 
     private void AddEvents()
-    {
+    {        
         hud.OnPreRender += Hud_OnPreRender;
         hud.OnRender += Hud_OnRender;
         g.World.OnChatInput += World_OnChatInput;

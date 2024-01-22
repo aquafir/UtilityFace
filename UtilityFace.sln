@@ -3,9 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34310.174
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilityFace.Loader", "UtilityFace\UtilityFace.Loader\UtilityFace.Loader.csproj", "{0964CD03-8FA2-4584-BBBD-A1AF191FEA0E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UtilityFace.Loader", "UtilityFace\UtilityFace.Loader\UtilityFace.Loader.csproj", "{0964CD03-8FA2-4584-BBBD-A1AF191FEA0E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilityFace", "UtilityFace\UtilityFace\UtilityFace.csproj", "{5F9E30D9-90E4-405B-AFB8-CD202DA201C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UtilityFace", "UtilityFace\UtilityFace\UtilityFace.csproj", "{5F9E30D9-90E4-405B-AFB8-CD202DA201C8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A2E2C385-B9C3-426D-9D8C-EA13BC73D32B}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

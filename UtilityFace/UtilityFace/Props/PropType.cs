@@ -105,7 +105,7 @@ public static class PropertyTypeExtensions
         return props;
     }
 
-    public static bool TryGetValue(this PropType propType, int key, PropertyData target, out string val)
+    public static bool TryGetString(this PropType propType, int key, PropertyData target, out string val)
     {
         val = null;
 
@@ -153,7 +153,7 @@ public static class PropertyTypeExtensions
     /// <summary>
     /// Tries to find a string version of a value key for a PropType
     /// </summary>
-    public static bool TryGetValue(this WorldObject target, PropType propType, int key, out string val)
+    public static bool TryGetString(this WorldObject target, PropType propType, int key, out string val)
     {
         val = null;
 
@@ -197,13 +197,72 @@ public static class PropertyTypeExtensions
 
         return success;
     }
-    public static bool TryGetValue(this WorldObject target, BoolId key, out string val) =>target.TryGetValue(PropType.Bool, (int)key, out val);
-    public static bool TryGetValue(this WorldObject target, DataId key, out string val) => target.TryGetValue(PropType.DataId, (int)key, out val);
-    public static bool TryGetValue(this WorldObject target, FloatId key, out string val) => target.TryGetValue(PropType.Float, (int)key, out val);
-    public static bool TryGetValue(this WorldObject target, InstanceId key, out string val) => target.TryGetValue(PropType.InstanceId, (int)key, out val);
-    public static bool TryGetValue(this WorldObject target,IntId key, out string val) => target.TryGetValue(PropType.Int, (int)key, out val);
-    public static bool TryGetValue(this WorldObject target,Int64Id key, out string val) => target.TryGetValue(PropType.Int64, (int)key, out val);
-    public static bool TryGetValue(this WorldObject target, StringId key, out string val) => target.TryGetValue(PropType.String, (int)key, out val);
+    public static bool TryGetString(this WorldObject target, BoolId key, out string val) =>target.TryGetString(PropType.Bool, (int)key, out val);
+    public static bool TryGetString(this WorldObject target, DataId key, out string val) => target.TryGetString(PropType.DataId, (int)key, out val);
+    public static bool TryGetString(this WorldObject target, FloatId key, out string val) => target.TryGetString(PropType.Float, (int)key, out val);
+    public static bool TryGetString(this WorldObject target, InstanceId key, out string val) => target.TryGetString(PropType.InstanceId, (int)key, out val);
+    public static bool TryGetString(this WorldObject target,IntId key, out string val) => target.TryGetString(PropType.Int, (int)key, out val);
+    public static bool TryGetString(this WorldObject target,Int64Id key, out string val) => target.TryGetString(PropType.Int64, (int)key, out val);
+    public static bool TryGetString(this WorldObject target, StringId key, out string val) => target.TryGetString(PropType.String, (int)key, out val);
+
+    /// <summary>
+    /// Tries to return property value
+    /// </summary>
+    public static bool TryGet(this WorldObject target, BoolId key, out bool val) => target.BoolValues.TryGetValue(key, out val);
+    /// <summary>
+    /// Tries to return property value
+    /// </summary>
+    public static bool TryGet(this WorldObject target, DataId key, out uint val) => target.DataValues.TryGetValue(key, out val);
+    /// <summary>
+    /// Tries to return property value
+    /// </summary>
+    public static bool TryGet(this WorldObject target, FloatId key, out float val) => target.FloatValues.TryGetValue(key, out val);
+    /// <summary>
+    /// Tries to return property value
+    /// </summary>
+    public static bool TryGet(this WorldObject target, InstanceId key, out uint val) => target.InstanceValues.TryGetValue(key, out val);
+    /// <summary>
+    /// Tries to return property value
+    /// </summary>
+    public static bool TryGet(this WorldObject target, IntId key, out int val) => target.IntValues.TryGetValue(key, out val);
+    /// <summary>
+    /// Tries to return property value
+    /// </summary>
+    public static bool TryGet(this WorldObject target, Int64Id key, out long val) => target.Int64Values.TryGetValue(key, out val);
+    /// <summary>
+    /// Tries to return property value
+    /// </summary>
+    public static bool TryGet(this WorldObject target, StringId key, out string val) => target.StringValues.TryGetValue(key, out val);
+
+    /// <summary>
+    /// Returns the value of the property if found or null if missing
+    /// </summary>
+    public static bool? Get(this WorldObject target, BoolId key) => target.BoolValues.TryGetValue(key, out var val) ? val : null;
+    /// <summary>
+    /// Returns the value of the property if found or null if missing
+    /// </summary>
+    public static uint? Get(this WorldObject target, DataId key) => target.DataValues.TryGetValue(key, out var val) ? val : null;
+    /// <summary>
+    /// Returns the value of the property if found or null if missing
+    /// </summary>
+    public static float? Get(this WorldObject target, FloatId key) => target.FloatValues.TryGetValue(key, out var val) ? val : null;
+    /// <summary>
+    /// Returns the value of the property if found or null if missing
+    /// </summary>
+    public static uint? Get(this WorldObject target, InstanceId key) => target.InstanceValues.TryGetValue(key, out var val) ? val : null;
+    /// <summary>
+    /// Returns the value of the property if found or null if missing
+    /// </summary>
+    public static int? Get(this WorldObject target, IntId key) => target.IntValues.TryGetValue(key, out var val) ? val : null;
+    /// <summary>
+    /// Returns the value of the property if found or null if missing
+    /// </summary>
+    public static long? Get(this WorldObject target, Int64Id key) => target.Int64Values.TryGetValue(key, out var val) ? val : null;
+    /// <summary>
+    /// Returns the value of the property if found or null if missing
+    /// </summary>
+    public static string Get(this WorldObject target, StringId key) => target.StringValues.TryGetValue(key, out var val) ? val : null;
+
 
     /// <summary>
     /// Matching Enum name for a prop/key

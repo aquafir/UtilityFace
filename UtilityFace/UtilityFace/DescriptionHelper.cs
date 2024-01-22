@@ -1,9 +1,14 @@
-﻿using ACE.DatLoader;
+﻿using AcClient;
+using ACE.DatLoader;
 using ACEditor.Props;
 using System;
+using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Runtime.Remoting.Channels;
 using System.Text;
 using UtilityBelt.Common.Lib;
+using WattleScript.Interpreter;
 using Spell = UtilityBelt.Scripting.Interop.Spell;
 
 namespace UtilityFace;
@@ -50,6 +55,8 @@ public static class DescriptionHelper
         ImGui.EndTooltip();
 
     }
+
+
 
     /// <summary>
     /// Returns a string description of a world object
@@ -140,21 +147,21 @@ public static class DescriptionHelper
 
 
     public static string Describe(this WorldObject wo, PropType propType, int key, string prefix = "")
-         => wo.TryGetValue(propType, key, out var value) ? $"{prefix}{value}" : "";
+         => wo.TryGetString(propType, key, out var value) ? $"{prefix}{value}" : "";
     public static string Describe(this WorldObject wo, BoolId key, string prefix = "")
-        => wo.TryGetValue(key, out var value) ? $"{prefix}{value}" : "";
+        => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
     public static string Describe(this WorldObject wo, DataId key, string prefix = "")
-        => wo.TryGetValue(key, out var value) ? $"{prefix}{value}" : "";
+        => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
     public static string Describe(this WorldObject wo, FloatId key, string prefix = "")
-        => wo.TryGetValue(key, out var value) ? $"{prefix}{value}" : "";
+        => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
     public static string Describe(this WorldObject wo, InstanceId key, string prefix = "")
-        => wo.TryGetValue(key, out var value) ? $"{prefix}{value}" : "";
+        => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
     public static string Describe(this WorldObject wo, IntId key, string prefix = "")
-        => wo.TryGetValue(key, out var value) ? $"{prefix}{value}" : "";
+        => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
     public static string Describe(this WorldObject wo, Int64Id key, string prefix = "")
-        => wo.TryGetValue(key, out var value) ? $"{prefix}{value}" : "";
+        => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
     public static string Describe(this WorldObject wo, StringId key, string prefix = "")
-        => wo.TryGetValue(key, out var value) ? $"{prefix}{value}" : "";
+        => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
 
     public static bool TryDescribe(this WorldObject wo, PropType propType, int key, out string value, string prefix = "") =>
         !String.IsNullOrEmpty(value = wo.Describe(propType, key, prefix));
@@ -499,12 +506,3 @@ public enum CleanImbue : uint
     AlwaysCritical = 1073741824u,
     IgnoreAllArmor = 2147483648u,
 }
-
-
-//Todo: think about cacheing
-//public class Description
-//{
-//    DateTime CacheTime;
-//    string LongDesc = "";
-//    string Desc = "";
-//}
