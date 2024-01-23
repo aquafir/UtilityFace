@@ -47,7 +47,7 @@ public static class FloatIdExtensions
     public static string Format(this FloatId prop, params object[] values)
     {
         //Prefer friendly name if available?
-        if (prop.TryGetFriendly((int)values[0], out var friendly))
+        if (prop.TryGetFriendly((float)values[0], out var friendly))
             values[0] = friendly;
 
         //Use a format string if it exists?
