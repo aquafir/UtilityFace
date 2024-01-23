@@ -63,6 +63,18 @@ public static class DescriptionHelper
     /// </summary>
     public static string Describe(this WorldObject wo)
     {
+        return new string[]
+        {
+                    wo.Describe(IntId.CreationTimestamp),
+                    wo.Describe(StringId.LongDesc),
+                    wo.Describe(Int64Id.ItemBaseXp),
+                    wo.Describe(FloatId.CriticalMultiplier),
+                    wo.Describe(DataId.Spell),
+                    //wo.Describe(InstanceId.Container),
+                    wo.Describe(BoolId.Inscribable),
+                    //wo.Describe(ComputedProperty.HealKitProps),
+        }.DescribeGroup();
+
         string desc;
         if (wo.Id == _lastTooltipId)
             desc = _cachedTooltip;
@@ -146,25 +158,42 @@ public static class DescriptionHelper
         => wo.Describe(ComputedProperty.WeaponProps);
 
 
-    public static string Describe(this WorldObject wo, PropType propType, int key, string prefix = "")
-         => wo.TryGetString(propType, key, out var value) ? $"{prefix}{value}" : "";
-    public static string Describe(this WorldObject wo, BoolId key, string prefix = "")
-        => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
-    public static string Describe(this WorldObject wo, DataId key, string prefix = "")
-        => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
-    public static string Describe(this WorldObject wo, FloatId key, string prefix = "")
-        => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
-    public static string Describe(this WorldObject wo, InstanceId key, string prefix = "")
-        => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
-    public static string Describe(this WorldObject wo, IntId key, string prefix = "")
-        => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
-    public static string Describe(this WorldObject wo, Int64Id key, string prefix = "")
-        => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
-    public static string Describe(this WorldObject wo, StringId key, string prefix = "")
-        => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
+    //public static string Describe(this WorldObject wo, PropType propType, int key, string prefix = "")
+    //     => wo.TryGetString(propType, key, out var value) ? $"{prefix}{value}" : "";
+    //public static string Describe(this WorldObject wo, BoolId key, string prefix = "")
+    //    => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
+    //public static string Describe(this WorldObject wo, DataId key, string prefix = "")
+    //    => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
+    //public static string Describe(this WorldObject wo, FloatId key, string prefix = "")
+    //    => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
+    //public static string Describe(this WorldObject wo, InstanceId key, string prefix = "")
+    //    => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
+    //public static string Describe(this WorldObject wo, IntId key, string prefix = "")
+    //    => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
+    //public static string Describe(this WorldObject wo, Int64Id key, string prefix = "")
+    //    => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
+    //public static string Describe(this WorldObject wo, StringId key, string prefix = "")
+    //    => wo.TryGetString(key, out var value) ? $"{prefix}{value}" : "";
 
-    public static bool TryDescribe(this WorldObject wo, PropType propType, int key, out string value, string prefix = "") =>
-        !String.IsNullOrEmpty(value = wo.Describe(propType, key, prefix));
+    //public static string Describe(this WorldObject wo, PropType propType, int key, string prefix = "")
+    // => wo.TryGetString(propType, key, out var value) ? $"{prefix}{value}" : "";
+    public static string Describe(this WorldObject wo, BoolId key, string prefix = "")
+        => wo.TryGet(key, out var value) ? $"{key.Label(),-20}: {key.Format(value)}" : "";
+    public static string Describe(this WorldObject wo, DataId key, string prefix = "")
+        => wo.TryGet(key, out var value) ? $"{key.Label(),-20}: {key.Format(value)}" : "";
+    public static string Describe(this WorldObject wo, FloatId key, string prefix = "")
+        => wo.TryGet(key, out var value) ? $"{key.Label(),-20}: {key.Format(value)}" : "";
+    public static string Describe(this WorldObject wo, InstanceId key, string prefix = "")
+        => wo.TryGet(key, out var value) ? $"{key.Label(),-20}: {key.Format(value)}" : "";
+    public static string Describe(this WorldObject wo, IntId key, string prefix = "")
+        => wo.TryGet(key, out var value) ? $"{key.Label(),-20}: {key.Format(value)}" : "";
+    public static string Describe(this WorldObject wo, Int64Id key, string prefix = "")
+        => wo.TryGet(key, out var value) ? $"{key.Label(),-20}: {key.Format(value)}" : "";
+    public static string Describe(this WorldObject wo, StringId key, string prefix = "")
+        => wo.TryGet(key, out var value) ? $"{key.Label(),-20}: {key.Format(value)}" : "";
+
+    //public static bool TryDescribe(this WorldObject wo, PropType propType, int key, out string value, string prefix = "") =>
+    //    !String.IsNullOrEmpty(value = wo.Describe(propType, key, prefix));
     public static bool TryDescribe(this WorldObject wo, BoolId key, out string value, string prefix = "") =>
         !String.IsNullOrEmpty(value = wo.Describe(key, prefix));
     public static bool TryDescribe(this WorldObject wo, DataId key, out string value, string prefix = "") =>
@@ -179,8 +208,8 @@ public static class DescriptionHelper
         !String.IsNullOrEmpty(value = wo.Describe(key, prefix));
     public static bool TryDescribe(this WorldObject wo, StringId key, out string value, string prefix = "") =>
         !String.IsNullOrEmpty(value = wo.Describe(key, prefix));
-    public static bool TryDescribe(this WorldObject wo, ComputedProperty key, out string value, string prefix = "") =>
-        !String.IsNullOrEmpty(value = wo.Describe(key, prefix));
+    public static bool TryDescribe(this WorldObject wo, ComputedProperty key, out string value, string prefix = "") => (value = "") == "a";
+        //!String.IsNullOrEmpty(value = wo.Describe(key, prefix));
 
     //Todo: think of a smarter way of doing this for reusable names
     static int _int;
@@ -190,7 +219,8 @@ public static class DescriptionHelper
     static List<ImbuedEffectType> _imbues = Enum.GetValues(typeof(ImbuedEffectType)).Cast<ImbuedEffectType>().ToList();
     static List<EquipMask> _equipSlots = Enum.GetValues(typeof(EquipMask)).Cast<EquipMask>().ToList();
     public static string Describe(this WorldObject wo, ComputedProperty key, string prefix = "")
-    {
+    {        
+        return "";
         switch (key)
         {
             #region Collections of Properties

@@ -12,6 +12,14 @@ public static class IntIdExtensions
     /// <summary>
     /// Returns the friendly name for a property, such as an Enum name or DateTime.  If missing returns null
     /// </summary>
+    public static string Friendly(this WorldObject wo, IntId key) => wo.TryGet(key, out var value) ? key.Friendly(value) : null;
+    public static bool TryGetFriendly(this WorldObject wo, IntId key, out string friendly) => wo.TryGet(key, out var value) ?
+        (friendly = key.Friendly(value)) is not null :
+        (friendly = null) is not null;
+
+    /// <summary>
+    /// Returns the friendly name for a property, such as an Enum name or DateTime.  If missing returns null
+    /// </summary>
     public static string Friendly(this IntId key, int value) => key switch
     {
         IntId.GeneratorEndTime => DateTimeOffset.FromUnixTimeSeconds(value).DateTime.ToString(CultureInfo.InvariantCulture),

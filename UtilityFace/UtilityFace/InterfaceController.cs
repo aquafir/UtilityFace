@@ -40,6 +40,23 @@ internal class InterfaceController : IDisposable
 
     unsafe private void World_OnChatInput(object sender, UtilityBelt.Scripting.Events.ChatInputEventArgs e)
     {
+        if (!int.TryParse(e.Text, out var result))
+            return;
+
+        e.Eat = true;
+
+        try
+        {
+            var wo = g.Character.Weenie;
+            var desc = wo.Describe((StringId)result);
+
+            Log.Chat(desc);
+
+        }catch(Exception ex)
+        {
+            Log.Chat(ex.Message);
+        }
+
         //if (e.Text != "/t1")
         //    return;
 
