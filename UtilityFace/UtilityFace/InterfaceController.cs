@@ -44,6 +44,8 @@ internal class InterfaceController : SizedHud
         Huds = new()
         {
             new InventoryHud("Inventory"),
+            new NetworkHud("Network"),
+            new ChatHud("Chat"),
         };
 
         base.Init();
