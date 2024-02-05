@@ -10,7 +10,7 @@ public abstract class SizedHud : HudBase
     Vector2 MIN_SIZE = new(200, 400);
     Vector2 MAX_SIZE = new(1000, 900);
 
-    public SizedHud(string name) : base(name) { }
+    public SizedHud(string name, bool showInBar = false, bool visible = false) : base(name, showInBar, visible) { }
 
     private void Hud_OnPreRender(object sender, EventArgs e)
     {
@@ -19,13 +19,13 @@ public abstract class SizedHud : HudBase
 
     protected override void AddEvents()
     {
-        hud.OnPreRender += Hud_OnPreRender; 
+        ubHud.OnPreRender += Hud_OnPreRender; 
         base.AddEvents();
     }
 
     protected override void RemoveEvents()
     {
-        hud.OnPreRender -= Hud_OnPreRender;
+        ubHud.OnPreRender -= Hud_OnPreRender;
         base.RemoveEvents();
     }
 }

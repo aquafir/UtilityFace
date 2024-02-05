@@ -6,7 +6,7 @@ namespace UtilityFace;
 /// <summary>
 /// Controls what UIs are shown
 /// </summary>
-internal class InterfaceController : HudBase
+internal class InterfaceController : SizedHud
 {
     /// <summary>
     /// The UBService Hud
@@ -14,17 +14,14 @@ internal class InterfaceController : HudBase
     readonly Hud hud;
     readonly Game g = new();
 
-    Vector2 MIN_SIZE = new(200, 400);
-    Vector2 MAX_SIZE = new(1000, 900);
-
     List<HudBase> Huds = new ();
 
     readonly InventoryHud backpack;
     readonly PropertyEditor propertyEditor;
 
-    public InterfaceController()
-    {
 
+    public InterfaceController(string name) : base(name, true, true)
+    {
         // Create a new UBService Hud
         //hud = UBService.Huds.CreateHud("Inventory");
         //hud.WindowSettings = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoScrollbar;
@@ -34,34 +31,40 @@ internal class InterfaceController : HudBase
         //hud.Visible = true;
 
         //backpack = new(hud);
-        backpack = new("Inventory");
+        //backpack = new("Inventory");
 
         //propertyEditor = new();
 
-        AddEvents();
+        //AddEvents();
     }
 
-    public InterfaceController(string name) : base(name)
+    public override void Init()
     {
-        // Create a new UBService Hud
-        //hud = UBService.Huds.CreateHud("Inventory");
-        //hud.WindowSettings = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoScrollbar;
+        //Set up UIs?
+        Huds = new()
+        {
+            new InventoryHud("Inventory"),
+        };
 
-        //// set to show our icon in the UBService HudBar
-        //hud.ShowInBar = true;
-        //hud.Visible = true;
+        base.Init();
+    }
 
-        //backpack = new(hud);
-        backpack = new("Inventory");
+    public override void Draw(object sender, EventArgs e)
+    {
+        ImGui.Text("UIs");
 
-        //propertyEditor = new();
-
-        AddEvents();
+        foreach(var  hud in Huds)
+        {
+            bool vis = hud.ubHud.Visible;
+            if (ImGui.Checkbox(hud.Name, ref vis))
+                hud.ubHud.Visible = vis;
+        }
+        base.Draw(sender, e);
     }
 
     unsafe private void World_OnChatInput(object sender, UtilityBelt.Scripting.Events.ChatInputEventArgs e)
     {
-        
+
 
         e.Eat = false;
         return;
@@ -78,7 +81,8 @@ internal class InterfaceController : HudBase
 
             Log.Chat(desc);
 
-        }catch(Exception ex)
+        }
+        catch (Exception ex)
         {
             Log.Chat(ex.Message);
         }
@@ -116,35 +120,6 @@ internal class InterfaceController : HudBase
         //}
     }
 
-    private void Hud_OnPreRender(object sender, EventArgs e)
-    {
-        ImGui.SetNextWindowSizeConstraints(MIN_SIZE, MAX_SIZE);
-    }
-
-    /// <summary>
-    /// Called every time the ui is redrawing.
-    /// </summary>
-    private void Hud_OnRender(object sender, EventArgs e)
-    {
-        try
-        {
-            backpack?.Draw();
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex);
-        }
-    }
-
-    private void AddEvents()
-    {        
-        hud.OnPreRender += Hud_OnPreRender;
-        hud.OnRender += Hud_OnRender;
-        g.World.OnChatInput += World_OnChatInput;
-        //g.World.OnChatNameClicked += World_OnChatNameClicked;
-        //g.World.OnChatText += World_OnChatText;
-    }
-
     private async void World_OnChatText(object sender, UtilityBelt.Scripting.Events.ChatEventArgs e)
     {
         if (!uint.TryParse(e.Message, out var id))
@@ -163,7 +138,16 @@ internal class InterfaceController : HudBase
     {
     }
 
-    private void RemoveEvents()
+    protected override void AddEvents()
+    {
+        //hud.OnRender += Hud_OnRender;
+        g.World.OnChatInput += World_OnChatInput;
+        //g.World.OnChatNameClicked += World_OnChatNameClicked;
+        //g.World.OnChatText += World_OnChatText;
+        base.AddEvents();
+    }
+
+    protected override void RemoveEvents()
     {
         try
         {
@@ -173,20 +157,27 @@ internal class InterfaceController : HudBase
             //hud.OnRender -= Hud_OnRender;
         }
         catch (Exception ex) { }
+
+        base.RemoveEvents();
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
         try
         {
-            RemoveEvents();
-            backpack?.Dispose();
-            hud?.Dispose();
-            //propertyEditor?.Dispose();
+            //Dispose all UIs?
+            foreach(var hud in Huds)
+            {
+                hud?.Dispose();
+            }
+            Huds.Clear();
+
         }
         catch (Exception ex)
         {
             Log.Error(ex);
         }
+
+        base.Dispose();
     }
 }

@@ -45,7 +45,7 @@ public class PluginCore : PluginBase
     {
         try
         {
-            ui = new InterfaceController();
+            ui = new InterfaceController("UIs");
         }
         catch (Exception ex)
         {

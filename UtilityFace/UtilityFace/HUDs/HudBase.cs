@@ -11,12 +11,15 @@ public abstract class HudBase : IDisposable
     public readonly string Name = nameof(HudBase);
 
     protected Game game = new();
-    protected Hud hud;
+    public Hud ubHud;
 
-    public HudBase(string name)
+    public HudBase(string name, bool showInBar = false, bool visible = false)
     {
         Name = name;
-        hud = UBService.Huds.CreateHud(name);
+        ubHud = UBService.Huds.CreateHud(name);
+
+        ubHud.ShowInBar = showInBar;
+        ubHud.Visible = visible;
 
         Init();
     }
@@ -24,11 +27,35 @@ public abstract class HudBase : IDisposable
     /// <summary>
     /// Render loop
     /// </summary>
-    public virtual void Draw() { }
+    public virtual void Draw(object sender, EventArgs e) { }
 
-            
-    protected virtual void AddEvents() { }
-    protected virtual void RemoveEvents() { }
+
+    protected virtual void AddEvents()
+    {
+        try
+        {
+            Log.Chat($"Adding events for {Name}");
+            ubHud.OnRender += Draw;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex);
+        }
+
+    }
+
+    protected virtual void RemoveEvents()
+    {
+        try
+        {
+            Log.Chat($"Removing events for {Name}");
+            ubHud.OnRender -= Draw;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex);
+        }
+    }
 
     /// <summary>
     /// Adds events if any
@@ -37,6 +64,7 @@ public abstract class HudBase : IDisposable
     {
         try
         {
+            Log.Chat($"Initializing {Name}");
             AddEvents();
         }
         catch (Exception ex)
@@ -52,7 +80,9 @@ public abstract class HudBase : IDisposable
     {
         try
         {
+            Log.Chat($"Disposing {Name}");
             RemoveEvents();
+            ubHud?.Dispose();
         }
         catch (Exception ex)
         {

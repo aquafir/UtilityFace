@@ -1,6 +1,6 @@
 ## UtilityFace
 
-`InterfaceController` controls a number of replacement UIs.
+`InterfaceController` starts and controls a number of replacement UIs.
 
 
 

@@ -1,11 +1,11 @@
 ﻿namespace UtilityFace.HUDs;
 
-public class InventoryHud : SizedHud
+public class InventoryHud(string name) : SizedHud(name)
 {
     #region State / Config
     ScriptHudManager sHud = new();
-    readonly Hud hud;
-    Game game = new();
+    //readonly Hud ubHud;
+    //Game game = new();
     private float Index = 0;
     uint SelectedBag = 0;
     uint SelectedItem = 0;
@@ -73,18 +73,8 @@ public class InventoryHud : SizedHud
     {
         Icon, Name, Value
     }
+
     #endregion
-
-    //public InventoryHud(Hud hud)
-    //{
-    //    SelectedBag = game.CharacterId;
-    //    this.hud = hud;
-    //    UpdateFilters();
-
-    //    AddEvents();
-    //}
-
-    public InventoryHud(string name) : base(name) { }
 
     #region Event Handling
     private void Hud_OnShow(object sender, EventArgs e)
@@ -120,7 +110,7 @@ public class InventoryHud : SizedHud
 
     private void CheckHotkeys()
     {
-        if (hud is null)
+        if (ubHud is null)
             return;
 
         if (ImGui.IsKeyDown(ImGuiKey.LeftCtrl))
@@ -133,21 +123,21 @@ public class InventoryHud : SizedHud
             if (ImGui.IsKeyPressed(ImGuiKey.I))
             {
                 //ShowIcons = !ShowIcons;
-                hud.Visible = !hud.Visible;
+                ubHud.Visible = !ubHud.Visible;
             }
             if (ImGui.IsKeyPressed(ImGuiKey.F))
             {
                 focusFilter = true;
 
-                if (!hud.Visible)
-                    hud.Visible = true;
+                if (!ubHud.Visible)
+                    ubHud.Visible = true;
             }
         }
     }
     #endregion
 
     #region Draw
-    public void Draw()
+    public override void Draw(object sender, EventArgs e)
     {
         try
         {
@@ -781,7 +771,7 @@ public class InventoryHud : SizedHud
             game.OnRender2D += Game_OnRender2D;
             //game.World.OnChatInput += World_OnChatInput;
 
-            hud.OnShow += Hud_OnShow;
+            ubHud.OnShow += Hud_OnShow;
 
             game.Messages.Incoming.Qualities_UpdateInstanceID += Incoming_Qualities_UpdateInstanceID;
             game.Messages.Incoming.Qualities_PrivateUpdateInstanceID += Incoming_Qualities_PrivateUpdateInstanceID;
@@ -800,7 +790,7 @@ public class InventoryHud : SizedHud
             game.OnRender2D -= Game_OnRender2D;
             //game.World.OnChatInput -= World_OnChatInput;
 
-            hud.OnShow -= Hud_OnShow;
+            ubHud.OnShow -= Hud_OnShow;
 
             game.Messages.Incoming.Qualities_UpdateInstanceID -= Incoming_Qualities_UpdateInstanceID;
             game.Messages.Incoming.Qualities_PrivateUpdateInstanceID -= Incoming_Qualities_PrivateUpdateInstanceID;
@@ -820,7 +810,6 @@ public class InventoryHud : SizedHud
 
         base.Init();
     }
-
 
     public override void Dispose()
     {
