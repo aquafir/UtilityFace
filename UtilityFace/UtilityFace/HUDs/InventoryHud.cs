@@ -1,6 +1,6 @@
 ﻿namespace UtilityFace.HUDs;
 
-public class InventoryHud : IDisposable
+public class InventoryHud : SizedHud
 {
     #region State / Config
     ScriptHudManager sHud = new();
@@ -75,15 +75,16 @@ public class InventoryHud : IDisposable
     }
     #endregion
 
-    public InventoryHud(Hud hud)
-    {
-        SelectedBag = game.CharacterId;
-        this.hud = hud;
+    //public InventoryHud(Hud hud)
+    //{
+    //    SelectedBag = game.CharacterId;
+    //    this.hud = hud;
+    //    UpdateFilters();
 
-        UpdateFilters();
+    //    AddEvents();
+    //}
 
-        AddEvents();
-    }
+    public InventoryHud(string name) : base(name) { }
 
     #region Event Handling
     private void Hud_OnShow(object sender, EventArgs e)
@@ -188,7 +189,7 @@ public class InventoryHud : IDisposable
     void DrawItemIcon(WorldObject wo)
     {
         var texture = wo.GetOrCreateTexture();
-        if(ImGui.TextureButton($"{wo.Id}", texture, IconSize))
+        if (ImGui.TextureButton($"{wo.Id}", texture, IconSize))
         {
             game.Actions.InvokeChat($"{wo.Id}");
         }
@@ -338,8 +339,8 @@ public class InventoryHud : IDisposable
 
         //Filter by regex
         //if (!string.IsNullOrEmpty(FilterText))
-            if (!FilterRegex.IsMatch(wo.Name))
-                return true;
+        if (!FilterRegex.IsMatch(wo.Name))
+            return true;
 
         //Filter by prop
         if (!showExtraFilter)
@@ -457,7 +458,7 @@ public class InventoryHud : IDisposable
         //Available width divided into columns
         Index = 0;
         var width = Math.Max(1, ImGui.GetContentRegionAvail().X - IconSize.X / 2);
-        int columns = Math.Max(1,(int)(width / ICON_COL_WIDTH));
+        int columns = Math.Max(1, (int)(width / ICON_COL_WIDTH));
 
         int index = 0;
         foreach (var wo in filteredItems)
@@ -765,8 +766,6 @@ public class InventoryHud : IDisposable
     #endregion
 
     #region Utility
-
-
     private bool TryGetNearest(out WorldObject wo)
     {
         wo = game.World.GetNearest(ObjectClass.Player);
@@ -775,7 +774,7 @@ public class InventoryHud : IDisposable
     #endregion
 
     #region Disposal
-    private void AddEvents()
+    protected override void AddEvents()
     {
         try
         {
@@ -791,9 +790,10 @@ public class InventoryHud : IDisposable
         {
             Log.Error(ex);
         }
-    }
 
-    private void RemoveEvents()
+        base.AddEvents();
+    }
+    protected override void RemoveEvents()
     {
         try
         {
@@ -809,18 +809,22 @@ public class InventoryHud : IDisposable
         {
             Log.Error(ex);
         }
+
+        base.RemoveEvents();
     }
 
-    public void Dispose()
+    public override void Init()
     {
-        try
-        {
-            RemoveEvents();
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex);
-        }
+        SelectedBag = game.CharacterId;
+        UpdateFilters();
+
+        base.Init();
+    }
+
+
+    public override void Dispose()
+    {
+        base.Dispose();
     }
     #endregion
 }

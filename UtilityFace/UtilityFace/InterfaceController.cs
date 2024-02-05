@@ -6,7 +6,7 @@ namespace UtilityFace;
 /// <summary>
 /// Controls what UIs are shown
 /// </summary>
-internal class InterfaceController : IDisposable
+internal class InterfaceController : HudBase
 {
     /// <summary>
     /// The UBService Hud
@@ -17,6 +17,8 @@ internal class InterfaceController : IDisposable
     Vector2 MIN_SIZE = new(200, 400);
     Vector2 MAX_SIZE = new(1000, 900);
 
+    List<HudBase> Huds = new ();
+
     readonly InventoryHud backpack;
     readonly PropertyEditor propertyEditor;
 
@@ -24,14 +26,33 @@ internal class InterfaceController : IDisposable
     {
 
         // Create a new UBService Hud
-        hud = UBService.Huds.CreateHud("Inventory");
-        hud.WindowSettings = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoScrollbar;
+        //hud = UBService.Huds.CreateHud("Inventory");
+        //hud.WindowSettings = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoScrollbar;
 
-        // set to show our icon in the UBService HudBar
-        hud.ShowInBar = true;
-        hud.Visible = true;
+        //// set to show our icon in the UBService HudBar
+        //hud.ShowInBar = true;
+        //hud.Visible = true;
 
-        backpack = new(hud);
+        //backpack = new(hud);
+        backpack = new("Inventory");
+
+        //propertyEditor = new();
+
+        AddEvents();
+    }
+
+    public InterfaceController(string name) : base(name)
+    {
+        // Create a new UBService Hud
+        //hud = UBService.Huds.CreateHud("Inventory");
+        //hud.WindowSettings = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoScrollbar;
+
+        //// set to show our icon in the UBService HudBar
+        //hud.ShowInBar = true;
+        //hud.Visible = true;
+
+        //backpack = new(hud);
+        backpack = new("Inventory");
 
         //propertyEditor = new();
 
@@ -40,6 +61,11 @@ internal class InterfaceController : IDisposable
 
     unsafe private void World_OnChatInput(object sender, UtilityBelt.Scripting.Events.ChatInputEventArgs e)
     {
+        
+
+        e.Eat = false;
+        return;
+
         if (!int.TryParse(e.Text, out var result))
             return;
 

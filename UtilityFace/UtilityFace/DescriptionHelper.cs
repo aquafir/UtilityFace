@@ -65,6 +65,7 @@ public static class DescriptionHelper
     {
         return new string[]
         {
+            wo.Describe(IntId.AmmoType),
                     wo.Describe(IntId.CreationTimestamp),
                     wo.Describe(StringId.LongDesc),
                     wo.Describe(Int64Id.ItemBaseXp),
