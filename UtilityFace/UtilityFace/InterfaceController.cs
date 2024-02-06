@@ -17,7 +17,7 @@ internal class InterfaceController : SizedHud
     List<HudBase> Huds = new ();
 
     readonly InventoryHud backpack;
-    readonly PropertyEditor propertyEditor;
+    readonly PropertyEditorHud propertyEditor;
 
 
     public InterfaceController(string name) : base(name, true, true)
@@ -46,6 +46,7 @@ internal class InterfaceController : SizedHud
             new InventoryHud("Inventory"),
             new NetworkHud("Network"),
             new ChatHud("Chat"),
+            //new PropertyEditorHud("PropertyEditor"),
         };
 
         base.Init();
@@ -66,8 +67,6 @@ internal class InterfaceController : SizedHud
 
     unsafe private void World_OnChatInput(object sender, UtilityBelt.Scripting.Events.ChatInputEventArgs e)
     {
-
-
         e.Eat = false;
         return;
 
@@ -122,7 +121,7 @@ internal class InterfaceController : SizedHud
         //}
     }
 
-    private async void World_OnChatText(object sender, UtilityBelt.Scripting.Events.ChatEventArgs e)
+    private void World_OnChatText(object sender, UtilityBelt.Scripting.Events.ChatEventArgs e)
     {
         if (!uint.TryParse(e.Message, out var id))
             return;
@@ -158,7 +157,7 @@ internal class InterfaceController : SizedHud
             //hud.OnPreRender -= Hud_OnPreRender;
             //hud.OnRender -= Hud_OnRender;
         }
-        catch (Exception ex) { }
+        catch (Exception ex) { Log.Error(ex); }
 
         base.RemoveEvents();
     }

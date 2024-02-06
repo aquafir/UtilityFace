@@ -1,17 +1,16 @@
 ﻿
 namespace UtilityFace.HUDs;
-internal class PropertyEditor : IDisposable
+internal class PropertyEditorHud(string name) : SizedHud(name, false, true)
 {
     /// <summary>
     /// The UBService Hud
     /// </summary>
-    readonly UtilityBelt.Service.Views.Hud hud;
-    readonly Game game = new();
     readonly List<PropertyTable> propTables = new()
     {
         new (PropType.Int),
         new (PropType.Int64),
         new (PropType.Float),
+        new (PropType.Bool),
         new (PropType.String),
         new (PropType.DataId),
         new (PropType.InstanceId),
@@ -21,37 +20,32 @@ internal class PropertyEditor : IDisposable
     /// Original clone of the WorldObject
     /// </summary>
     PropertyData Original = new();
+
     /// <summary>
     /// Current version of property data
     /// </summary>
     //PropertyData Current = new();
 
-    public PropertyEditor()
+    protected override void AddEvents()
     {
-        // Create a new UBService Hud
-        hud = UBService.Huds.CreateHud("ACEditor");
-
-        hud.Visible = true;
-        
-        //hud.WindowSettings = ImGuiWindowFlags.AlwaysAutoResize;
-
-        // set to show our icon in the UBService HudBar
-        hud.ShowInBar = true;
-
-        // subscribe to the hud render event so we can draw some controls
-        hud.OnRender += Hud_OnRender;
-
         game.World.OnObjectSelected += OnSelected;
+        base.AddEvents();
+    }
+
+    protected override void RemoveEvents()
+    {
+        game.World.OnObjectSelected -= OnSelected;
+
+        base.RemoveEvents();
     }
 
     private Task OnSelected(object sender, UtilityBelt.Scripting.Events.ObjectSelectedEventArgs e)
     {
-        return Task.CompletedTask;
         var wo = game.World.Get(e.ObjectId);
-
         if (wo is null)
             return Task.CompletedTask;
 
+        Log.Chat($"Selected: {wo.Name}");
         SetTarget(wo);
 
         return Task.CompletedTask;
@@ -71,11 +65,10 @@ internal class PropertyEditor : IDisposable
         }
     }
 
-    /// <summary>
-    /// Called every time the ui is redrawing.
-    /// </summary>
-    private void Hud_OnRender(object sender, EventArgs e)
+    public override void Draw(object sender, EventArgs e)
     {
+        ImGui.Text("FOOOO");
+        return;
         try
         {
             DrawMenu();
@@ -119,7 +112,7 @@ internal class PropertyEditor : IDisposable
             {
                 if (ImGui.BeginTabItem($"{table.Name}"))
                 {
-                   // ImGui.Text($"Testing {table.Type}");
+                    // ImGui.Text($"Testing {table.Type}");
 
                     table.Render();
 
@@ -128,20 +121,5 @@ internal class PropertyEditor : IDisposable
             }
             ImGui.EndTabBar();
         }
-    }
-
-    public void Dispose()
-    {
-        try
-        {
-            game.World.OnObjectSelected -= OnSelected;
-            //hud.OnRender -= Hud_OnRender;
-        }
-        catch (Exception)
-        {
-            throw;
-        }
-
-        hud?.Dispose();
     }
 }

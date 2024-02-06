@@ -35,7 +35,6 @@ public class ChatHud(string name) : SizedHud(name)
             }
 
             ImGui.EndChild();
-
             ImGui.SetNextItemWidth(400);
             if (focusChat)
             {
@@ -61,13 +60,6 @@ public class ChatHud(string name) : SizedHud(name)
         }
     }
 
-    private void SendMessage()
-    {
-        game.Actions.InvokeChat(chatMessage);
-        //AddMessage(new ChatLog(game.CharacterId, game.chara))
-    }
-
-
     private void World_OnChatText(object sender, UtilityBelt.Scripting.Events.ChatEventArgs e)
     {
         // Format the chat message (customize as needed)
@@ -88,9 +80,18 @@ public class ChatHud(string name) : SizedHud(name)
         }
     }
 
+    private void SendMessage()
+    {
+        game.Actions.InvokeChat(chatMessage);
+        //AddMessage(new ChatLog(game.CharacterId, game.chara))
+    }
+
     protected override void AddEvents()
     {
-        game.World.OnChatText -= World_OnChatText;
+        game.World.OnChatText += World_OnChatText;
+        //game.World.OnChannelMessage += World_OnChatText;
+        //game.World.OnLocalMessage += World_OnChatText;
+        //game.World.OnTell += World_OnChatText;
 
         base.AddEvents();
     }
@@ -98,6 +99,9 @@ public class ChatHud(string name) : SizedHud(name)
     protected override void RemoveEvents()
     {
         game.World.OnChatText -= World_OnChatText;
+        //game.World.OnChannelMessage -= World_OnChatText;
+        //game.World.OnLocalMessage -= World_OnChatText;
+        //game.World.OnTell -= World_OnChatText;
 
         base.RemoveEvents();
     }

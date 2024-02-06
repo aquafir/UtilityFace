@@ -29,7 +29,7 @@ public class PropertyTable
 
     #endregion
 
-    unsafe public PropertyTable(PropType type)
+    public PropertyTable(PropType type)
     {
         Type = type;
         Name = type.ToString().Replace("Property", "");
@@ -49,7 +49,7 @@ public class PropertyTable
         tableData = new TableRow[Filter.Props.Length];
 
         //Todo: how to preserve existing edit data
-
+        return;
         //For each filtered property...
         for (var i = 0; i < Filter.Props.Length; i++)
         {
