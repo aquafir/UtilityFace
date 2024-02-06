@@ -46,7 +46,7 @@ internal class InterfaceController : SizedHud
             new InventoryHud("Inventory"),
             new NetworkHud("Network"),
             new ChatHud("Chat"),
-            //new PropertyEditorHud("PropertyEditor"),
+            new PropertyEditorHud("PropertyEditor"),
         };
 
         base.Init();

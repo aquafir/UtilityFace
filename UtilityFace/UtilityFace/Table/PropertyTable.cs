@@ -36,46 +36,58 @@ public class PropertyTable
 
         //Setup filter
         Filter = new(type);
-        Filter?.UpdateFilter();
+        Filter.IncludeMissing = false;
+        Filter.ShowIncludeMissing = false;
+        Filter.Width = 120;
 
         //Build table data
+        Filter?.UpdateFilter();
         UpdateTable();
     }
 
     public void UpdateTable()
     {
-        //Get keys from filter
-        //tableData.Clear();
-        tableData = new TableRow[Filter.Props.Length];
-
         //Todo: how to preserve existing edit data
-        return;
-        //For each filtered property...
-        for (var i = 0; i < Filter.Props.Length; i++)
+        try
         {
-            //Try to find the value corresponding to the Type if it exists in the Target
-            var name = Filter.Props[i];
-            var key = Filter.PropKeys[i];
-            if (!Type.TryGetString(key, Target, out var val))
-                continue;
+            if (Filter is null)
+                return;
 
-            //Add it to the table
-            tableData[i] = new()
+            //Get keys from filter
+            //tableData.Clear();
+            tableData = new TableRow[Filter.Props.Length];
+
+            //ImGui.Text($"{Filter.Props.Length}");
+
+            //For each filtered property...
+            for (var i = 0; i < Filter.Props.Length; i++)
             {
-                Key = key,
-                Property = name,
-                OriginalValue = val,
-                CurrentValue = val,
-            };
+                //Try to find the value corresponding to the Type if it exists in the Target
+                var name = Filter.Props[i];
+                var key = Filter.PropKeys[i];
+                if (!Type.TryGetString(key, Target, out var val))
+                    continue;
 
-            //tableData.Add(new()
-            //{
-            //    Key = key,
-            //    Property = name,
-            //    OriginalValue = val,
-            //    CurrentValue = val,
-            //});
-        }
+                //Add it to the table
+                tableData[i] = new()
+                {
+                    Key = key,
+                    Property = name,
+                    OriginalValue = val,
+                    CurrentValue = val,
+                };
+
+                //tableData.Add(new()
+                //{
+                //    Key = key,
+                //    Property = name,
+                //    OriginalValue = val,
+                //    CurrentValue = val,
+                //});
+            }
+            //Log.Chat($"{tableData.Length}");
+        }catch(Exception ex) { Log.Error(ex); }
+        
     }
 
     public void SetTarget(PropertyData target)
@@ -83,6 +95,8 @@ public class PropertyTable
         //Todo: clone?
         Target = target;
         Filter?.SetTarget(target);
+
+        Log.Chat($"Table: {target.IntValues.Count} -- Filter: {Filter.Props.Length}");
 
         UpdateTable();
     }
@@ -122,18 +136,19 @@ public class PropertyTable
     {
         if (Target is null || tableData.Length == 0)
         {
-            //ImGui.Text($"{Type} - {Filter.Props.Length} - {tableData.Length}");
+            ImGui.Text($"{Type} - {Filter.Props.Length} - {tableData.Length}");
             return;
         }
-
         Filter.Render();
-        if (Filter.Changed)
-        {
-            UpdateTable();
-        }
 
-        //return;
-        if (ImGui.BeginTable("MyTable", 4, TABLE_FLAGS))
+
+        if (Filter.Changed)
+            UpdateTable();
+
+
+        ImGui.Text($"Data: {tableData.Length}");
+
+        if (ImGui.BeginTable($"{Type}", 4, TABLE_FLAGS))
         {
             // Set up columns
             uint columnIndex = 0;
@@ -152,7 +167,10 @@ public class PropertyTable
             ImGui.TableHeadersRow();
 
             //Sort if needed
-            Sort();
+            //Sort();
+
+            //ImGui.EndTable();
+            //return;
 
             for (int i = 0; i < tableData.Length; i++)
             {
@@ -178,6 +196,7 @@ public class PropertyTable
                 ImGui.InputText($"###{Type}{i}", ref tableData[i].CurrentValue, 300);
 
                 //ImGui.Text($"{tableData[i].CurrentValue}");
+                //break;
             }
 
             ImGui.EndTable();

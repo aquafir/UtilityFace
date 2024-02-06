@@ -13,6 +13,10 @@ public abstract class HudBase : IDisposable
     protected Game game = new();
     public Hud ubHud;
 
+    //Defaults?
+    const ImGuiWindowFlags CHAT_WINDOW_FLAGS = ImGuiWindowFlags.HorizontalScrollbar | ImGuiWindowFlags.AlwaysAutoResize;
+
+
     public HudBase(string name, bool showInBar = false, bool visible = false)
     {
         Name = name;
@@ -20,6 +24,7 @@ public abstract class HudBase : IDisposable
 
         ubHud.ShowInBar = showInBar;
         ubHud.Visible = visible;
+        ubHud.WindowSettings = CHAT_WINDOW_FLAGS;
 
         Init();
     }

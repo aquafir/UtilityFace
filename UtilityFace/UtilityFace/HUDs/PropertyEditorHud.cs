@@ -28,7 +28,7 @@ internal class PropertyEditorHud(string name) : SizedHud(name, false, true)
 
     protected override void AddEvents()
     {
-        game.World.OnObjectSelected += OnSelected;
+        game.World.OnObjectSelected += OnSelected; ;
         base.AddEvents();
     }
 
@@ -39,16 +39,14 @@ internal class PropertyEditorHud(string name) : SizedHud(name, false, true)
         base.RemoveEvents();
     }
 
-    private Task OnSelected(object sender, UtilityBelt.Scripting.Events.ObjectSelectedEventArgs e)
+    private void OnSelected(object sender, UtilityBelt.Scripting.Events.ObjectSelectedEventArgs e)
     {
         var wo = game.World.Get(e.ObjectId);
         if (wo is null)
-            return Task.CompletedTask;
+            return;
 
         Log.Chat($"Selected: {wo.Name}");
         SetTarget(wo);
-
-        return Task.CompletedTask;
     }
 
     //Change the target being edited
@@ -67,16 +65,12 @@ internal class PropertyEditorHud(string name) : SizedHud(name, false, true)
 
     public override void Draw(object sender, EventArgs e)
     {
-        ImGui.Text("FOOOO");
-        return;
         try
         {
             DrawMenu();
-
-            //ImGui.SetNextWindowSize(new System.Numerics.Vector2(400, 300), ImGuiCond.FirstUseEver);
-            ImGui.BeginChild("Editor");
+            //ImGui.BeginChild("Editor");
             DrawTabBar();
-            ImGui.EndChild();
+            //ImGui.EndChild();
         }
         catch (Exception ex)
         {
@@ -107,18 +101,15 @@ internal class PropertyEditorHud(string name) : SizedHud(name, false, true)
     {
         if (ImGui.BeginTabBar("PropertyTab"))
         {
-            //ImGui.Text($"Tabs: {propTables.Count}");
             foreach (var table in propTables)
             {
                 if (ImGui.BeginTabItem($"{table.Name}"))
                 {
-                    // ImGui.Text($"Testing {table.Type}");
-
                     table.Render();
 
                     ImGui.EndTabItem();
                 }
-            }
+        }
             ImGui.EndTabBar();
         }
     }

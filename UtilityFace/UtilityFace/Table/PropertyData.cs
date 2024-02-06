@@ -36,7 +36,25 @@ public class PropertyData
         Skills = new(wo.Skills);
         Attributes = new(wo.Attributes);
         Vitals = new(wo.Vitals);
+
+        //Log.Chat($"{this}");
     }
 
     public PropertyData() { }
+
+    public override string ToString()
+    {
+        return $"""
+Int - {IntValues.Count}
+Int64 - {Int64Values.Count}
+Float - {FloatValues.Count}
+String - {StringValues.Count}
+Bool - {BoolValues.Count}
+IID - {InstanceValues.Count}
+DID - {DataValues.Count}
+Skills - {Skills.Count}
+Attrs - {Attributes.Count}
+Vitals - {Vitals.Count}
+""";
+    }
 }

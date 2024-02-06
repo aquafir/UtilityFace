@@ -1,7 +1,4 @@
-﻿//using Decal.Adapter;
-//using Decal.Adapter.Wrappers;
-
-namespace UtilityFace.Table;
+﻿namespace UtilityFace.Table;
 
 public class PropertyFilter
 {
@@ -13,10 +10,10 @@ public class PropertyFilter
 
     public bool ShowName { get; set; } = false;
 
-    public bool ShowIncludeMissing { get; set; } = false;
+    public bool ShowIncludeMissing { get; set; } = true;
 
     public int Width = 80;
-    public bool IncludeMissing = true;
+    public bool IncludeMissing = false;
 
     public bool UseFilter { get; set; } = true;
     //public bool UseRegex { get; set; } = true;
