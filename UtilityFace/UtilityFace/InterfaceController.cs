@@ -47,6 +47,7 @@ internal class InterfaceController : SizedHud
             new NetworkHud("Network"),
             new ChatHud("Chat"),
             new PropertyEditorHud("PropertyEditor"),
+            new NavHud("Navs"),
         };
 
         base.Init();

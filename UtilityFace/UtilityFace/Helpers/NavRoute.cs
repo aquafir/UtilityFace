@@ -10,6 +10,8 @@ using WattleScript.Interpreter;
 using AcClient;
 using static AcClient.LandDefs;
 using UtilityBelt.Common.Enums;
+using UtilityBelt.Common.Messages.Types;
+using UtilityBelt.Service.Lib.ACClientModule;
 
 namespace UtilityFace.Helpers;
 internal class NavRoute
@@ -19,17 +21,34 @@ internal class NavRoute
 
 public class VTWaypoint
 {
-    WaypointType Type { get; set; }
-    double NorthSouth { get; set; }
-    double EastWest { get; set; }
-    double Z { get; set; }
+    static ACDecalD3D ac = new();
 
-    public VTWaypoint(WaypointType type, double ns, double ew, double z)
+    public WaypointType Type { get; set; }
+    public float NorthSouth { get; set; }
+    public float EastWest { get; set; }
+    public float Z { get; set; }
+
+    public VTWaypoint(WaypointType type, float ns, float ew, float z)
     {
         Type = type;
         NorthSouth = ns;
         EastWest = ew;
         Z = z;
+    }
+
+    public DecalD3DObj Mark(VTWaypoint prevPoint)
+    {
+        var obj = ac.NewD3DObj();
+        obj.Visible = false;
+        obj.Color = 0xAA55ff55;
+        obj.SetShape(DecalD3DShape.Cube);
+        obj.Anchor((prevPoint.EastWest + EastWest) / 2, (prevPoint.NorthSouth + NorthSouth) / 2, (prevPoint.Z + Z) * 120 + 0.05f);
+        obj.OrientToCoords(EastWest, NorthSouth, Z * 240 + 0.05f, true);
+        obj.ScaleX = 0.25f;
+        obj.ScaleZ = 0.25f;
+        obj.ScaleY = (float)DistanceTo(prevPoint);
+        obj.Visible = true;
+        return obj;
     }
 
     public double DistanceTo(VTWaypoint waypoint)
@@ -57,9 +76,12 @@ public class VTNavRoute
         //Waypoints = waypoints;
     }
 
+    public static bool TryParseRouteFromName(string navName, out VTNavRoute route) => TryParseRoute(Path.Combine(NAV_DIR, $"{navName}.nav"), out route);
     public static bool TryParseRoute(string path, out VTNavRoute route)
     {
         route = new(path);
+
+        Log.Chat($"Parsing {path}");
 
         try
         {
@@ -67,6 +89,7 @@ public class VTNavRoute
                 return false;
 
             var lines = File.ReadAllLines(path);
+            Log.Chat($"Read {lines.Length}");
             route.Parse(lines);
         }
         catch (Exception ex)
@@ -93,7 +116,7 @@ public class VTNavRoute
         if (lines.Count == 0)
             throw new Exception("File ended prematurely");
 
-        if (!TryParseNumber(lines, out var nav) || !Enum.IsDefined(typeof(NavType), nav))
+        if (!TryParseInt(lines, out var nav) || !Enum.IsDefined(typeof(NavType), nav))
             throw new Exception("Bad NavType");
 
         Type = (NavType)nav;
@@ -123,12 +146,12 @@ public class VTNavRoute
     /// </summary>
     void ParseCircularLines(Queue<string> lines)
     {
-        if (!TryParseNumber(lines, out var records))
+        if (!TryParseFloat(lines, out var records))
             throw new Exception("Invalid Record Count");
 
         for (var i = 0; i < records; i++)
         {
-            if (!TryParseNumber(lines, out var record) || Enum.IsDefined(typeof(WaypointType), record))
+            if (!TryParseInt(lines, out var record))// || Enum.IsDefined(typeof(WaypointType), record))
                 throw new Exception("Invalid Record Type");
 
             var recordType = (WaypointType)record;
@@ -140,32 +163,53 @@ public class VTNavRoute
                 Waypoints.Add(new(WaypointType.Point, ns, ew, z));
             }
         }
+        Log.Chat($"Finished!");
     }
 
     /// <summary>
     /// Try and parse a number from nav file lines
     /// </summary>
-    bool TryParseNumber(Queue<string> lines, out double number)
+    bool TryParseFloat(Queue<string> lines, out float number)
     {
         number = 0;
         if (lines.Count == 0)
             return false;
 
-        return double.TryParse(lines.Dequeue(), out number);
+        return float.TryParse(lines.Dequeue(), out number);
+    }
+    bool TryParseInt(Queue<string> lines, out int number)
+    {
+        number = 0;
+        if (lines.Count == 0)
+            return false;
+
+        return int.TryParse(lines.Dequeue(), out number);
     }
 
     /// <summary>
     /// Try and parse coordinates from nav file
     /// </summary>
-    bool TryParseCoords(Queue<string> lines, out double ns, out double ew, out double z)
+    bool TryParseCoords(Queue<string> lines, out float ns, out float ew, out float z)
     {
         ns = 0; ew = 0; z = 0;
 
-        bool success = TryParseNumber(lines, out ns) && TryParseNumber(lines, out ew) && TryParseNumber(lines, out z);
+        bool success = TryParseFloat(lines, out ns) && TryParseFloat(lines, out ew) && TryParseFloat(lines, out z);
         lines.Dequeue();    //  -- extra 0 at end of coords, not sure what it is...
 
         return success;
     }
+
+
+    const string NAV_DIR = @"C:\Games\VirindiPlugins\VirindiTank\";
+    /// <summary>
+    /// Returns full path of all .nav files
+    /// </summary>
+    public static List<string> GetNavFiles() => Directory.GetFiles(NAV_DIR, "*.nav").Where(x => !x.Contains("--")).ToList();
+
+    /// <summary>
+    /// Returns file name without extention all .nav files
+    /// </summary>
+    public static List<string> GetNavFileNames() => GetNavFiles().Select(x => Path.GetFileNameWithoutExtension(x)).ToList();
 }
 
 public enum WaypointType
@@ -185,8 +229,8 @@ public enum WaypointType
 
 public enum NavType
 {
-    Linear = 2,
     Circular = 1,
+    Linear = 2,
     Target = 3,
     Once = 4
 }
