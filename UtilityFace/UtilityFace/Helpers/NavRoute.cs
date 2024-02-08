@@ -1,17 +1,4 @@
-﻿using ACE.DatLoader;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using WattleScript.Interpreter;
-using AcClient;
-using static AcClient.LandDefs;
-using UtilityBelt.Common.Enums;
-using UtilityBelt.Common.Messages.Types;
-using UtilityBelt.Service.Lib.ACClientModule;
+﻿using UtilityBelt.Service.Lib.ACClientModule;
 
 namespace UtilityFace.Helpers;
 internal class NavRoute
@@ -60,20 +47,16 @@ public class VTWaypoint
 public class VTNavRoute
 {
     public string NavFile { get; set; }
+    public string NavName => Path.Combine(NAV_DIR, NavFile);
+
     public NavType Type { get; set; }
     public uint? FollowId { get; set; }
     public string FollowName { get; set; }
     public List<VTWaypoint> Waypoints { get; set; } = new();
 
-    //    public VTNavRoute() { }
     public VTNavRoute(string navFile)
     {
         NavFile = navFile;
-
-        //Type = type;
-        //FollowId = followId;
-        //FollowName = followName;
-        //Waypoints = waypoints;
     }
 
     public static bool TryParseRouteFromName(string navName, out VTNavRoute route) => TryParseRoute(Path.Combine(NAV_DIR, $"{navName}.nav"), out route);
@@ -128,7 +111,7 @@ public class VTNavRoute
 
         if (Type == NavType.Target)
             ParseTarget(lines);
-        else if (Type == NavType.Circular || Type == NavType.Linear)
+        else if (Type == NavType.Circular || Type == NavType.Linear || Type == NavType.Once)
             ParseCircularLines(lines);
     }
 
@@ -152,7 +135,7 @@ public class VTNavRoute
         for (var i = 0; i < records; i++)
         {
             if (!TryParseInt(lines, out var record))// || Enum.IsDefined(typeof(WaypointType), record))
-                throw new Exception("Invalid Record Type");
+                throw new Exception($"Invalid Record Type: {record} - {lines.Count} - {lines.Dequeue()}\n{lines.Dequeue()}\n{lines.Dequeue()}\n{lines.Dequeue()}\n - {this.NavName}");
 
             var recordType = (WaypointType)record;
             if (recordType == WaypointType.Point)

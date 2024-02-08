@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace UtilityFace;
+﻿namespace UtilityFace;
 
 public static class Log
 {

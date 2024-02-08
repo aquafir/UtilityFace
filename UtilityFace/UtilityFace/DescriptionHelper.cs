@@ -1,14 +1,4 @@
-﻿using AcClient;
-using ACE.DatLoader;
-using ACEditor.Props;
-using System;
-using System.ComponentModel;
-using System.Globalization;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Runtime.Remoting.Channels;
-using System.Text;
-using UtilityBelt.Common.Lib;
-using WattleScript.Interpreter;
+﻿using System.Text;
 using Spell = UtilityBelt.Scripting.Interop.Spell;
 
 namespace UtilityFace;

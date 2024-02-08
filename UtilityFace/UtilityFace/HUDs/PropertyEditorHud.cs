@@ -1,6 +1,6 @@
 ﻿
 namespace UtilityFace.HUDs;
-internal class PropertyEditorHud(string name) : SizedHud(name, false, true)
+internal class PropertyEditorHud(string name) : SizedHud(name, false, false)
 {
     /// <summary>
     /// The UBService Hud

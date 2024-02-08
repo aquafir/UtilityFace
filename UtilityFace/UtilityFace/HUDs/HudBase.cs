@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UtilityBelt.Scripting.Interop;
-
-namespace UtilityFace.HUDs;
+﻿namespace UtilityFace.HUDs;
 public abstract class HudBase : IDisposable
 {
     public readonly string Name = nameof(HudBase);

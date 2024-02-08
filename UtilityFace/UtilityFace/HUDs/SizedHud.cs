@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace UtilityFace.HUDs;
+﻿namespace UtilityFace.HUDs;
 public abstract class SizedHud(string name, bool showInBar = false, bool visible = false) : HudBase(name, showInBar, visible)
 {
     Vector2 MIN_SIZE = new(200, 400);

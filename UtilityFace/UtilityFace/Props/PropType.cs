@@ -2,9 +2,6 @@
 //using ACE.Server.WorldObjects;
 //using PropertyBool = ACEditor.Props.PropertyBool;
 
-using AcClient;
-using UtilityBelt.Service.Views;
-
 namespace ACEditor.Props;
 
 public enum PropType

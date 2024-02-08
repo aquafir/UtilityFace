@@ -1,12 +1,4 @@
-﻿using Decal.Adapter;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-
-namespace UtilityFace;
+﻿namespace UtilityFace;
 /// <summary>
 /// This is the main plugin class. When your plugin is loaded, Startup() is called, and when it's unloaded Shutdown() is called.
 /// </summary>

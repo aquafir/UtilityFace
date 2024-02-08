@@ -1,35 +1,68 @@
-﻿using Decal.Adapter.Wrappers;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using KdTree.Math;
+using KdTree;
 using UtilityBelt.Service.Lib.ACClientModule;
-using UtilityBelt.Service.Lib.Settings;
-using UtilityFace.Helpers;
-using WattleScript.Interpreter;
+using System.Diagnostics;
 
 namespace UtilityFace.HUDs;
 public class NavHud(string name) : SizedHud(name, false, true)
 {
-    ACDecalD3D ac = new();
+    //ACDecalD3D ac = new();
     VTNavRoute route;
+    VTWaypoint prevPoint;
     List<DecalD3DObj> markers = new();
     string[] NavNames;
     int selected = 0;
-    VTWaypoint prevPoint;
+
+    List<VTNavRoute> routes;
+    KdTree<float, VTNavRoute> tree;
+
+    public void LoadNavs()
+    {
+        NavNames = VTNavRoute.GetNavFileNames().ToArray();
+        Log.Chat($"Found {NavNames.Length} navs");
+    }
+
     public override void Draw(object sender, EventArgs e)
     {
-        if (ImGui.Button("Load") || NavNames is null)
-        {
-            NavNames = VTNavRoute.GetNavFileNames().ToArray();
-            Log.Chat($"Found {NavNames.Length} navs");
-        }
-        if(NavNames.Length == 0)
+        if (ImGui.Button("Refresh") || NavNames is null)
+            LoadNavs();
+
+        if (NavNames.Length == 0)
         {
             ImGui.Text("No navs found.");
             return;
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button("Load All"))
+        {
+            var watch = Stopwatch.StartNew();
+
+            routes = new();
+            tree = new(3, new FloatMath(), AddDuplicateBehavior.Skip);
+            foreach (var routeName in NavNames)
+            {
+                if (!VTNavRoute.TryParseRouteFromName(routeName, out var route))
+                    continue;
+
+                //Load all points
+                routes.Add(route);
+                foreach (var point in route.Waypoints)
+                {
+                    if (point.Type == WaypointType.Point)
+                        tree.Add(new[] { point.NorthSouth, point.EastWest, point.Z }, route);
+                }
+            }
+            watch.Stop();
+
+            Log.Chat($"Loaded {routes.Count} routes with {tree.Count} points in {watch.ElapsedMilliseconds}ms.");
+
+            var pos = game.Character.Weenie.ServerPosition;
+            var nearest = tree.GetNearestNeighbours(pos.ToArray(), 1).FirstOrDefault();
+            if (nearest is not null)
+            {
+                Log.Chat($"{nearest.Value.NavFile}");
+            }
         }
 
         if (ImGui.ListBox("Nav", ref selected, NavNames, NavNames.Length))
