@@ -314,6 +314,7 @@ public class ChatHud(string name) : SizedHud(name, false, true)
     protected override void AddEvents()
     {
         game.World.OnChatText += World_OnChatText;
+        //game.World.oncom += World_OnChatText;
 
         game.Messages.Incoming.Combat_HandleAttackerNotificationEvent += Incoming_Combat_HandleAttackerNotificationEvent;
         game.Messages.Incoming.Combat_HandleDefenderNotificationEvent += Incoming_Combat_HandleDefenderNotificationEvent;

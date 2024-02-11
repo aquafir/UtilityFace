@@ -182,11 +182,22 @@ public class NetworkHud(string name) : SizedHud(name)
         ImGui.EndChild();
     }
 
+    bool focusQuery = false;
     private void DrawFilter(bool modal = true)
     {
         ImGui.SameLine();
+        if(focusQuery)
+        {
+            focusQuery = false;
+            ImGui.SetKeyboardFocusHere();
+        }
         ImGui.SetItemDefaultFocus();
-        ImGui.InputText("##FilterQuery", ref filter.Query, 150);
+        if (ImGui.InputText("##FilterQuery", ref filter.Query, 150, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.AutoSelectAll))
+        {
+            filter.TypeFilters = filter.Types.Select(x => x.ToString().CaseInsensitiveContains(filter.Query)).ToArray();
+            UpdateFilteredMessages();
+            focusQuery = true;
+        }
         ImGui.SameLine();
         if (ImGui.Checkbox("In", ref filter.In)) UpdateFilteredMessages();
         ImGui.SameLine();
