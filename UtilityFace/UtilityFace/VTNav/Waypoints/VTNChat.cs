@@ -22,7 +22,7 @@ namespace UtilityBelt.Lib.VTNav.Waypoints
             file.WriteLine(Message);
         }
 
-        public override void Draw() {
+        //public override void Draw() {
             //if (!UtilityBeltPlugin.Instance.VisualNav.Display.ChatText.Enabled) return;
 
             //var rp = GetPreviousPoint();
@@ -32,6 +32,6 @@ namespace UtilityBelt.Lib.VTNav.Waypoints
             //    Message = Message.Substring(0, 47) + "...";
 
             //DrawText($"Chat: {Message}", rp, 0, Color.FromArgb(UtilityBeltPlugin.Instance.VisualNav.Display.ChatText.Color));
-        }
+        //}
     }
 }

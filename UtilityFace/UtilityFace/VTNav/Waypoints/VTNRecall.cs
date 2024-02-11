@@ -27,7 +27,7 @@ namespace UtilityBelt.Lib.VTNav.Waypoints
             file.WriteLine(RecallSpellId);
         }
 
-        public override void Draw() {
+        //public override void Draw() {
             //FileService service = CoreManager.Current.Filter<FileService>();
             //var spell = service.SpellTable.GetById(RecallSpellId);
 
@@ -39,6 +39,6 @@ namespace UtilityBelt.Lib.VTNav.Waypoints
             //    DrawText(spell.Name, point, 0.25f, color);
             //    DrawIcon(spell.IconId, 0.35f, point);
             //}
-        }
+       // }
     }
 }

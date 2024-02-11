@@ -36,7 +36,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Resources\" />
+    <None Update="Resources\Commands.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="powershell -ExecutionPolicy RemoteSigned -NoProfile $(ProjectDir)scripts\post-build.ps1 -NuGetPackageRoot $(NuGetPackageRoot) -ProjectDir $(ProjectDir)" />

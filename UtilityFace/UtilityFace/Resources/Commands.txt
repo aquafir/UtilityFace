@@ -1,0 +1,484 @@
+/mt logout
+/ub giveprP $$ to $$
+/ub closestportal
+/ub ig Garbage.utl to Garbage Barrel
+/ub fellow create S
+/ub prepclick yes 999
+/ub swearallegiancep Aqua
+/ub propertydump
+/vwt capture ??
+/vwt apply ??
+/ub textures 4 0 4 0 1 1
+/ub followp ??
+/ub equip create ??
+/ub equip load ??
+/mt opt set AutoBuySell.Enabled ??
+/mt opt set AutoBuySell.TestMode ??
+/mt opt set AutoTradeAccept.Enabled ??
+/mt opt set AutoTradeAdd.Enabled ??
+/mt opt set ChatLogger.Persistent ??
+/mt opt set CombatTracker.ExportOnLogOff ??
+/mt opt set CombatTracker.Persistent ??
+/mt opt set CombatTracker.SortAlphabetically ??
+/mt opt set CorpseTracker.Enabled ??
+/mt opt set CorpseTracker.Persistent ??
+/mt opt set CorpseTracker.TrackAllCorpses ??
+/mt opt set CorpseTracker.TrackFellowCorpses ??
+/mt opt set CorpseTracker.TrackPermittedCorpses ??
+/mt opt set Filters.AllMasterArbitratorChat ??
+/mt opt set Filters.AttackEvades ??
+/mt opt set Filters.AttackResists ??
+/mt opt set Filters.AuraOfCraftman ??
+/mt opt set Filters.CompUsage ??
+/mt opt set Filters.DefenseEvades ??
+/mt opt set Filters.DefenseResists ??
+/mt opt set Filters.DirtyFighting ??
+/mt opt set Filters.FailedAssess ??
+/mt opt set Filters.HealingKitFail ??
+/mt opt set Filters.HealingKitSuccess ??
+/mt opt set Filters.KillTaskComplete ??
+/mt opt set Filters.ManaStoneUsage ??
+/mt opt set Filters.MasterArbitratorSpam ??
+/mt opt set Filters.MonsterDeaths ??
+/mt opt set Filters.MonsterTell ??
+/mt opt set Filters.NpcChatter ??
+/mt opt set Filters.NPKFails ??
+/mt opt set Filters.Salvaging ??
+/mt opt set Filters.SalvagingFails ??
+/mt opt set Filters.SpellCastFizzles ??
+/mt opt set Filters.SpellCastingMine ??
+/mt opt set Filters.SpellCastingOthers ??
+/mt opt set Filters.SpellExpires ??
+/mt opt set Filters.StatusTextAll ??
+/mt opt set Filters.StatusTextCasting ??
+/mt opt set Filters.StatusTextYoureTooBusy ??
+/mt opt set Filters.TradeBuffBotSpam ??
+/mt opt set Filters.VendorTells ??
+/mt opt set InventoryManagement.AetheriaRevealer ??
+/mt opt set InventoryManagement.HeartCarver ??
+/mt opt set InventoryManagement.InventoryLogger ??
+/mt opt set InventoryManagement.KeyDeringer ??
+/mt opt set InventoryManagement.KeyRinger ??
+/mt opt set InventoryManagement.ShatteredKeyFixer ??
+/mt opt set ItemInfoOnIdent.AutoClipboard ??
+/mt opt set ItemInfoOnIdent.Enabled ??
+/mt opt set ItemInfoOnIdent.LeftClickIdent ??
+/mt opt set ItemInfoOnIdent.ShowBuffedValues ??
+/mt opt set ItemInfoOnIdent.ShowValueAndBurden ??
+/mt opt set Looting.AutoLootChests ??
+/mt opt set Looting.AutoLootCorpses ??
+/mt opt set Looting.AutoLootMyCorpses ??
+/mt opt set Looting.LootSalvage ??
+/mt opt set ManaManagement.AutoRecharge ??
+/mt opt set Misc.DebuggingEnabled ??
+/mt opt set Misc.LogOutOnDeath ??
+/mt opt set Misc.MaxFPS ??
+/mt opt set Misc.MaximizeChatOnLogin ??
+/mt opt set Misc.NoFocusFPS ??
+/mt opt set Misc.OpenMainPackOnLogin ??
+/mt opt set Misc.OutputTargetWindow ??
+/mt opt set Misc.RemoveWindowFrame ??
+/mt opt set Misc.VerboseDebuggingEnabled ??
+/mt opt set PlayerTracker.Enabled ??
+/mt opt set PlayerTracker.Persistent ??
+/mt opt set Tinkering.AutoClickYes ??
+/ub playeroption AcceptLootPermits ??
+/ub playeroption AdvancedCombatUI ??
+/ub playeroption AllowGive ??
+/ub playeroption AppearOffline ??
+/ub playeroption AutoRepeatAttack ??
+/ub playeroption AutoTarget ??
+/ub playeroption ConfirmVolatileRareUse ??
+/ub playeroption CoordinatesOnRadar ??
+/ub playeroption DisableDistanceFog ??
+/ub playeroption DisableHouseRestrictionEffects ??
+/ub playeroption DisableMostWeatherEffects ??
+/ub playeroption DisplayAge ??
+/ub playeroption DisplayAllegianceLogonNotifications ??
+/ub playeroption DisplayChessRank ??
+/ub playeroption DisplayDateOfBirth ??
+/ub playeroption DisplayFishingSkill ??
+/ub playeroption DisplayNumberCharacterTitles ??
+/ub playeroption DisplayNumberDeaths ??
+/ub playeroption DisplayTimeStamps ??
+/ub playeroption DragItemOnPlayerOpensSecureTrade ??
+/ub playeroption FellowshipAutoAcceptRequests ??
+/ub playeroption FellowshipShareLoot ??
+/ub playeroption FellowshipShareXP ??
+/ub playeroption FilterLanguage ??
+/ub playeroption HearAllegianceChat ??
+/ub playeroption HearGeneralChat ??
+/ub playeroption HearLFGChat ??
+/ub playeroption HearRoleplayChat ??
+/ub playeroption HearSocietyChat ??
+/ub playeroption HearTradeChat ??
+/ub playeroption IgnoreAllegianceRequests ??
+/ub playeroption IgnoreFellowshipRequests ??
+/ub playeroption IgnoreTradeRequests ??
+/ub playeroption LeadMissileTargets ??
+/ub playeroption LockUI ??
+/ub playeroption MainPackPreferred ??
+/ub playeroption PersistentAtDay ??
+/ub playeroption SalvageMultiple ??
+/ub playeroption ShowCloak ??
+/ub playeroption ShowHelm ??
+/ub playeroption ShowTooltips ??
+/ub playeroption SideBySideVitals ??
+/ub playeroption SpellDuration ??
+/ub playeroption StayInChatMode ??
+/ub playeroption ToggleRun ??
+/ub playeroption UseChargeAttack ??
+/ub playeroption UseCraftSuccessDialog ??
+/ub playeroption UseDeception ??
+/ub playeroption UseFastMissiles ??
+/ub playeroption UseMouseTurning ??
+/ub playeroption ViewCombatTarget ??
+/ub playeroption VividTargetingIndicator ??
+/ub opt set Aliases.DefinedAliases ??
+/ub opt set Aliases.Enabled ??
+/ub opt set Aliases.Profile ??
+/ub opt set Arrow.Enabled ??
+/ub opt set Arrow.HudSize ??
+/ub opt set Arrow.HudX ??
+/ub opt set Arrow.HudY ??
+/ub opt set Arrow.TargetEW ??
+/ub opt set Arrow.TargetNS ??
+/ub opt set Arrow.Visible ??
+/ub opt set AutoSalvage.OnlyFromMainPack ??
+/ub opt set AutoSalvage.Think ??
+/ub opt set AutoTinker.MinPercentage ??
+/ub opt set AutoTrade.AutoAccept ??
+/ub opt set AutoTrade.AutoAcceptChars ??
+/ub opt set AutoTrade.Enabled ??
+/ub opt set AutoTrade.OnlyFromMainPack ??
+/ub opt set AutoTrade.TestMode ??
+/ub opt set AutoTrade.Think ??
+/ub opt set AutoVendor.EnableBuying ??
+/ub opt set AutoVendor.Enabled ??
+/ub opt set AutoVendor.EnableSelling ??
+/ub opt set AutoVendor.OnlyFromMainPack ??
+/ub opt set AutoVendor.ShowMerchantInfo ??
+/ub opt set AutoVendor.TestMode ??
+/ub opt set AutoVendor.Think ??
+/ub opt set AutoVendor.Tries ??
+/ub opt set AutoVendor.TriesTime ??
+/ub opt set ChatFilter.Enabled ??
+/ub opt set ChatLogger.Rules ??
+/ub opt set ChatLogger.SaveToFile ??
+/ub opt set Client.UIProfile ??
+/ub opt set DerethTime.Enabled ??
+/ub opt set DerethTime.HudX ??
+/ub opt set DerethTime.HudY ??
+/ub opt set DerethTime.ShowLabel ??
+/ub opt set DungeonMaps.Debug ??
+/ub opt set DungeonMaps.Display.Floors.Color ??
+/ub opt set DungeonMaps.Display.Floors.Enabled ??
+/ub opt set DungeonMaps.Display.InnerWalls.Color ??
+/ub opt set DungeonMaps.Display.InnerWalls.Enabled ??
+/ub opt set DungeonMaps.Display.Markers.Containers.Color ??
+/ub opt set DungeonMaps.Display.Markers.Containers.Enabled ??
+/ub opt set DungeonMaps.Display.Markers.Containers.ShowLabel ??
+/ub opt set DungeonMaps.Display.Markers.Containers.Size ??
+/ub opt set DungeonMaps.Display.Markers.Containers.UseIcon ??
+/ub opt set DungeonMaps.Display.Markers.Doors.Color ??
+/ub opt set DungeonMaps.Display.Markers.Doors.Enabled ??
+/ub opt set DungeonMaps.Display.Markers.Doors.ShowLabel ??
+/ub opt set DungeonMaps.Display.Markers.Doors.Size ??
+/ub opt set DungeonMaps.Display.Markers.Doors.UseIcon ??
+/ub opt set DungeonMaps.Display.Markers.EverythingElse.Color ??
+/ub opt set DungeonMaps.Display.Markers.EverythingElse.Enabled ??
+/ub opt set DungeonMaps.Display.Markers.EverythingElse.ShowLabel ??
+/ub opt set DungeonMaps.Display.Markers.EverythingElse.Size ??
+/ub opt set DungeonMaps.Display.Markers.EverythingElse.UseIcon ??
+/ub opt set DungeonMaps.Display.Markers.Items.Color ??
+/ub opt set DungeonMaps.Display.Markers.Items.Enabled ??
+/ub opt set DungeonMaps.Display.Markers.Items.ShowLabel ??
+/ub opt set DungeonMaps.Display.Markers.Items.Size ??
+/ub opt set DungeonMaps.Display.Markers.Items.UseIcon ??
+/ub opt set DungeonMaps.Display.Markers.Monsters.Color ??
+/ub opt set DungeonMaps.Display.Markers.Monsters.Enabled ??
+/ub opt set DungeonMaps.Display.Markers.Monsters.ShowLabel ??
+/ub opt set DungeonMaps.Display.Markers.Monsters.Size ??
+/ub opt set DungeonMaps.Display.Markers.Monsters.UseIcon ??
+/ub opt set DungeonMaps.Display.Markers.MyCorpse.Color ??
+/ub opt set DungeonMaps.Display.Markers.MyCorpse.Enabled ??
+/ub opt set DungeonMaps.Display.Markers.MyCorpse.ShowLabel ??
+/ub opt set DungeonMaps.Display.Markers.MyCorpse.Size ??
+/ub opt set DungeonMaps.Display.Markers.MyCorpse.UseIcon ??
+/ub opt set DungeonMaps.Display.Markers.NPCs.Color ??
+/ub opt set DungeonMaps.Display.Markers.NPCs.Enabled ??
+/ub opt set DungeonMaps.Display.Markers.NPCs.ShowLabel ??
+/ub opt set DungeonMaps.Display.Markers.NPCs.Size ??
+/ub opt set DungeonMaps.Display.Markers.NPCs.UseIcon ??
+/ub opt set DungeonMaps.Display.Markers.OtherCorpses.Color ??
+/ub opt set DungeonMaps.Display.Markers.OtherCorpses.Enabled ??
+/ub opt set DungeonMaps.Display.Markers.OtherCorpses.ShowLabel ??
+/ub opt set DungeonMaps.Display.Markers.OtherCorpses.Size ??
+/ub opt set DungeonMaps.Display.Markers.OtherCorpses.UseIcon ??
+/ub opt set DungeonMaps.Display.Markers.Others.Color ??
+/ub opt set DungeonMaps.Display.Markers.Others.Enabled ??
+/ub opt set DungeonMaps.Display.Markers.Others.ShowLabel ??
+/ub opt set DungeonMaps.Display.Markers.Others.Size ??
+/ub opt set DungeonMaps.Display.Markers.Others.UseIcon ??
+/ub opt set DungeonMaps.Display.Markers.Portals.Color ??
+/ub opt set DungeonMaps.Display.Markers.Portals.Enabled ??
+/ub opt set DungeonMaps.Display.Markers.Portals.ShowLabel ??
+/ub opt set DungeonMaps.Display.Markers.Portals.Size ??
+/ub opt set DungeonMaps.Display.Markers.Portals.UseIcon ??
+/ub opt set DungeonMaps.Display.Markers.You.Color ??
+/ub opt set DungeonMaps.Display.Markers.You.Enabled ??
+/ub opt set DungeonMaps.Display.Markers.You.ShowLabel ??
+/ub opt set DungeonMaps.Display.Markers.You.Size ??
+/ub opt set DungeonMaps.Display.Markers.You.UseIcon ??
+/ub opt set DungeonMaps.Display.RampedWalls.Color ??
+/ub opt set DungeonMaps.Display.RampedWalls.Enabled ??
+/ub opt set DungeonMaps.Display.Stairs.Color ??
+/ub opt set DungeonMaps.Display.Stairs.Enabled ??
+/ub opt set DungeonMaps.Display.VisualNavLines.Color ??
+/ub opt set DungeonMaps.Display.VisualNavLines.Enabled ??
+/ub opt set DungeonMaps.Display.VisualNavStickyPoint.Color ??
+/ub opt set DungeonMaps.Display.VisualNavStickyPoint.Enabled ??
+/ub opt set DungeonMaps.Display.Walls.Color ??
+/ub opt set DungeonMaps.Display.Walls.Enabled ??
+/ub opt set DungeonMaps.DrawWhenClosed ??
+/ub opt set DungeonMaps.DungeonName.Color ??
+/ub opt set DungeonMaps.DungeonName.Enabled ??
+/ub opt set DungeonMaps.Enabled ??
+/ub opt set DungeonMaps.LabelFontSize ??
+/ub opt set DungeonMaps.MapWindowHeight ??
+/ub opt set DungeonMaps.MapWindowWidth ??
+/ub opt set DungeonMaps.MapWindowX ??
+/ub opt set DungeonMaps.MapWindowY ??
+/ub opt set DungeonMaps.MapZoom ??
+/ub opt set DungeonMaps.Opacity ??
+/ub opt set DungeonMaps.ShowCompass ??
+/ub opt set DungeonMaps.ShowVisitedTiles ??
+/ub opt set DungeonMaps.VisitedTilesColor ??
+/ub opt set EquipmentManager.Think ??
+/ub opt set GameEvents.Enabled ??
+/ub opt set GameEvents.GameEventHandlers ??
+/ub opt set GameEvents.Profile ??
+/ub opt set HealthTracker.Enabled ??
+/ub opt set InventoryManager.AutoCram ??
+/ub opt set InventoryManager.AutoStack ??
+/ub opt set InventoryManager.IGBusyCount ??
+/ub opt set InventoryManager.IGFailure ??
+/ub opt set InventoryManager.IGRange ??
+/ub opt set InventoryManager.IGThink ??
+/ub opt set InventoryManager.IGUIEnabled ??
+/ub opt set InventoryManager.IGWindowX ??
+/ub opt set InventoryManager.IGWindowY ??
+/ub opt set InventoryManager.TreatStackAsSingleItem ??
+/ub opt set InventoryManager.WatchLootProfile ??
+/ub opt set Jumper.Attempts ??
+/ub opt set Jumper.PauseNav ??
+/ub opt set Jumper.ThinkComplete ??
+/ub opt set Jumper.ThinkFail ??
+/ub opt set LandscapeMaps.Enabled ??
+/ub opt set LandscapeMaps.MapWindowHeight ??
+/ub opt set LandscapeMaps.MapWindowWidth ??
+/ub opt set LandscapeMaps.MapWindowX ??
+/ub opt set LandscapeMaps.MapWindowY ??
+/ub opt set LandscapeMaps.Opacity ??
+/ub opt set LSD.Enabled ??
+/ub opt set LSD.LSDCacheSeconds ??
+/ub opt set LSD.LSDWebRoot ??
+/ub opt set Nametags.Enabled ??
+/ub opt set Nametags.MaxRange ??
+/ub opt set Nametags.Monster.Color ??
+/ub opt set Nametags.Monster.Enabled ??
+/ub opt set Nametags.Npc.Color ??
+/ub opt set Nametags.Npc.Enabled ??
+/ub opt set Nametags.Player.Color ??
+/ub opt set Nametags.Player.Enabled ??
+/ub opt set Nametags.Portal.Color ??
+/ub opt set Nametags.Portal.Enabled ??
+/ub opt set Nametags.Vendor.Color ??
+/ub opt set Nametags.Vendor.Enabled ??
+/ub opt set Networking.ServerHost ??
+/ub opt set Networking.ServerPort ??
+/ub opt set Networking.Tags ??
+/ub opt set NetworkUI.Enabled ??
+/ub opt set NetworkUI.ShowHudWhenClosed ??
+/ub opt set NetworkUI.TrackedItems ??
+/ub opt set NetworkUI.WindowPositionX ??
+/ub opt set NetworkUI.WindowPositionY ??
+/ub opt set PlayerOptions.Profile ??
+/ub opt set Plugin.BackgroundFrameLimit ??
+/ub opt set Plugin.CheckForUpdates ??
+/ub opt set Plugin.Debug ??
+/ub opt set Plugin.DebugMessageDisplay.Color ??
+/ub opt set Plugin.DebugMessageDisplay.Enabled ??
+/ub opt set Plugin.ErrorMessageDisplay.Color ??
+/ub opt set Plugin.ErrorMessageDisplay.Enabled ??
+/ub opt set Plugin.ExpressionMessageDisplay.Color ??
+/ub opt set Plugin.ExpressionMessageDisplay.Enabled ??
+/ub opt set Plugin.GenericMessageDisplay.Color ??
+/ub opt set Plugin.GenericMessageDisplay.Enabled ??
+/ub opt set Plugin.PCap ??
+/ub opt set Plugin.PCapBufferDepth ??
+/ub opt set Plugin.PortalAttempts ??
+/ub opt set Plugin.PortalThink ??
+/ub opt set Plugin.PortalTimeout ??
+/ub opt set Plugin.SettingsProfile ??
+/ub opt set Plugin.SettingsWindowPositionX ??
+/ub opt set Plugin.SettingsWindowPositionY ??
+/ub opt set Plugin.VideoPatch ??
+/ub opt set Plugin.VideoPatchFocus ??
+/ub opt set Plugin.WindowPositionX ??
+/ub opt set Plugin.WindowPositionY ??
+/ub opt set Professors.Timeout ??
+/ub opt set QuestTracker.AutoRequest ??
+/ub opt set VisualNav.Display.ChatText.Color ??
+/ub opt set VisualNav.Display.ChatText.Enabled ??
+/ub opt set VisualNav.Display.CurrentWaypoint.Color ??
+/ub opt set VisualNav.Display.CurrentWaypoint.Enabled ??
+/ub opt set VisualNav.Display.FollowArrow.Color ??
+/ub opt set VisualNav.Display.FollowArrow.Enabled ??
+/ub opt set VisualNav.Display.JumpArrow.Color ??
+/ub opt set VisualNav.Display.JumpArrow.Enabled ??
+/ub opt set VisualNav.Display.JumpText.Color ??
+/ub opt set VisualNav.Display.JumpText.Enabled ??
+/ub opt set VisualNav.Display.Lines.Color ??
+/ub opt set VisualNav.Display.Lines.Enabled ??
+/ub opt set VisualNav.Display.OpenVendor.Color ??
+/ub opt set VisualNav.Display.OpenVendor.Enabled ??
+/ub opt set VisualNav.Display.Pause.Color ??
+/ub opt set VisualNav.Display.Pause.Enabled ??
+/ub opt set VisualNav.Display.Portal.Color ??
+/ub opt set VisualNav.Display.Portal.Enabled ??
+/ub opt set VisualNav.Display.Recall.Color ??
+/ub opt set VisualNav.Display.Recall.Enabled ??
+/ub opt set VisualNav.Display.UseNPC.Color ??
+/ub opt set VisualNav.Display.UseNPC.Enabled ??
+/ub opt set VisualNav.Enabled ??
+/ub opt set VisualNav.LineOffset ??
+/ub opt set VisualNav.SaveNoneRoutes ??
+/ub opt set VisualNav.ScaleCurrentWaypoint ??
+/ub opt set VTank.FixPortalLoops ??
+/ub opt set VTank.PatchExpressionEngine ??
+/ub opt set VTank.PatchForClassic ??
+/ub opt set VTank.PortalLoopCount ??
+/ub opt set VTank.VitalSharing ??
+/vt opt set ApproachDistance ??
+/vt opt set ArcRange ??
+/vt opt set ArrowheadFletchDiffExcessTheshold ??
+/vt opt set AttackDistance ??
+/vt opt set AttackMinimumDistance ??
+/vt opt set AutoAttackPower ??
+/vt opt set AutoCraftItems ??
+/vt opt set AutoCram ??
+/vt opt set AutoFellowManagement ??
+/vt opt set AutoStack ??
+/vt opt set BlacklistCorpseOpenAttemptCount ??
+/vt opt set BlacklistCorpseOpenTimeoutSeconds ??
+/vt opt set BlacklistMonsterAttemptCount ??
+/vt opt set BlacklistMonsterTimeoutSeconds ??
+/vt opt set BuffCastRecast_Seconds ??
+/vt opt set BuffCastRecastReset_Seconds ??
+/vt opt set BuffProfile_Banes ??
+/vt opt set BuffProfile_Prots ??
+/vt opt set CastDispelSelf ??
+/vt opt set ClearLevelBoostFlagOnCast ??
+/vt opt set CombineSalvage ??
+/vt opt set CorpeApproachRange-Min ??
+/vt opt set CorpseApproachRange-Max ??
+/vt opt set CorpseApproachRange-Min ??
+/vt opt set CorpseCacheTimeoutMinutes ??
+/vt opt set CorpseItemAppearanceTimeoutSeconds ??
+/vt opt set CorpseItemIDTimeoutSeconds ??
+/vt opt set CorpseLootItemMaxAttempts ??
+/vt opt set CorpseOpenTimeoutSeconds ??
+/vt opt set DebuffEachFirst ??
+/vt opt set DebuffPrecastSeconds ??
+/vt opt set DebuffSelectionMethod ??
+/vt opt set DefaultMeleeAttackHeight ??
+/vt opt set DeleteGhostMonsterByHPTracker ??
+/vt opt set DeleteGhostMonsters ??
+/vt opt set DeleteGhostMonstersByHPTracker ??
+/vt opt set DoHelp ??
+/vt opt set DoJiggle ??
+/vt opt set DoorIDRange ??
+/vt opt set DoorLockpickDiffExcessThreshold ??
+/vt opt set DoorOpenRange ??
+/vt opt set DropToPeaceModeRetryCount ??
+/vt opt set EnableBuffing ??
+/vt opt set EnableCombat ??
+/vt opt set EnableLooting ??
+/vt opt set EnableMeta ??
+/vt opt set EnableNav ??
+/vt opt set FollowAroundCorners ??
+/vt opt set GhostDeleteHPTrackerSeconds ??
+/vt opt set GhostMonsterSpellAttemptCount ??
+/vt opt set GoToPeaceModeToUseKits ??
+/vt opt set HelperDistanceHitP ??
+/vt opt set HelperDistanceMana ??
+/vt opt set HelperDistanceStam ??
+/vt opt set IdleBuffTOpoff ??
+/vt opt set IdleBuffTopoffTimeSeconds ??
+/vt opt set IdleCraftCount_HealthFood ??
+/vt opt set IdleCraftCount_HealthKits ??
+/vt opt set IdleCraftCount_ManaFood ??
+/vt opt set IdleCraftCount_ManaKits ??
+/vt opt set IdleCraftCount_StamFood ??
+/vt opt set IdleCraftCount_StamKits ??
+/vt opt set IdlePeaceMode ??
+/vt opt set JumpOutWandCasting ??
+/vt opt set LootAllCorpses ??
+/vt opt set LootFellowCorpses ??
+/vt opt set LootOnlyRareCorpses ??
+/vt opt set LootPriorityBoost ??
+/vt opt set ManaChargesWhenOff ??
+/vt opt set ManaStoneLootCount ??
+/vt opt set ManaTankMinimumMana ??
+/vt opt set ManaToHealthMultiplier ??
+/vt opt set MinimumHealKitSuccessChance ??
+/vt opt set MinimumRingTargets ??
+/vt opt set NavCloseStopRange ??
+/vt opt set NavFarStopRange ??
+/vt opt set NavPriorityBoost ??
+/vt opt set OpenDoors ??
+/vt opt set PetCustomRange ??
+/vt opt set PetMonsterDensity ??
+/vt opt set PetRangeMode ??
+/vt opt set PetRefillCount-Idle ??
+/vt opt set PetRefillCount-Normal ??
+/vt opt set RandomHelperBuffs ??
+/vt opt set RandomHelperIntervalSeconds ??
+/vt opt set ReadUnknownScrolls ??
+/vt opt set RebuffTimeRemainingSeconds ??
+/vt opt set RechargeBoostAmount ??
+/vt opt set RechargeBoostTimeSeconds ??
+/vt opt set Recharge-Helper-HitP ??
+/vt opt set Recharge-Helper-Mana ??
+/vt opt set Recharge-Helper-Stam ??
+/vt opt set Recharge-Norm-HitP ??
+/vt opt set Recharge-Norm-Mana ??
+/vt opt set Recharge-Norm-Stam ??
+/vt opt set Recharge-NoTarg-HitP ??
+/vt opt set Recharge-NoTarg-Mana ??
+/vt opt set Recharge-NoTarg-Stam ??
+/vt opt set RefillWornMana ??
+/vt opt set RefillWornMana-Item-ManaPercent ??
+/vt opt set RingDistance ??
+/vt opt set SpellCompMin-Critical ??
+/vt opt set SpellCompMin-Idle ??
+/vt opt set SpellCompMin-Normal ??
+/vt opt set SpellDiffExcessThreshold-Buff ??
+/vt opt set SpellDiffExcessThreshold-Hunt ??
+/vt opt set SplitPeas ??
+/vt opt set StaminaToHealthMultiplier ??
+/vt opt set StopMacroOnDeath ??
+/vt opt set SummonPets ??
+/vt opt set SwitchWandToDebuff ??
+/vt opt set TargetLock ??
+/vt opt set TargetSelectAngleRange ??
+/vt opt set TargetSelectMethod ??
+/vt opt set UseArcs ??
+/vt opt set UseDispelDrum ??
+/vt opt set UseDispelItems ??
+/vt opt set UseHealersHeart ??
+/vt opt set UseKitsInMagicMode ??
+/vt opt set UsePortalDistance ??
+/vt opt set UseRecklessness ??
+/vt opt set UseSpecialAmmo ??

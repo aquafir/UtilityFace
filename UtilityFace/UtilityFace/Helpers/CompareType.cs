@@ -73,4 +73,8 @@ public static class CompareExtensions
     public static double? Normalize(this uint value) => Convert.ToDouble(value);
     public static double? Normalize(this float value) =>  Convert.ToDouble(value);
     public static double? Normalize(this double value) =>  Convert.ToDouble(value);
+
+
+    public static bool CaseInsensitiveContains(this string text, string value, StringComparison stringComparison = StringComparison.CurrentCultureIgnoreCase) => 
+        text.IndexOf(value, stringComparison) >= 0;
 }

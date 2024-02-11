@@ -83,7 +83,7 @@
             file.WriteLine(Name);
         }
 
-        public override void Draw() {
+        //public override void Draw() {
             ////base.Draw();
             //var rp = GetPreviousPoint();
             //var color = Color.FromArgb(UtilityBeltPlugin.Instance.VisualNav.Display.Lines.Color);
@@ -105,7 +105,7 @@
             //        DrawText("Vendor: " + Name, this, height, color);
             //    }
             //}
-        }
+        //}
 
         //protected override void Dispose(bool disposing) {
         //    if (!base.disposed) {

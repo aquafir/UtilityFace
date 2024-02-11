@@ -32,7 +32,7 @@ public abstract class HudBase : IDisposable
     {
         try
         {
-            Log.Chat($"Adding events for {Name}");
+            //Log.Chat($"Adding events for {Name}");
             ubHud.OnRender += Draw;
         }
         catch (Exception ex)
@@ -46,7 +46,7 @@ public abstract class HudBase : IDisposable
     {
         try
         {
-            Log.Chat($"Removing events for {Name}");
+            //Log.Chat($"Removing events for {Name}");
             ubHud.OnRender -= Draw;
         }
         catch (Exception ex)
@@ -62,7 +62,7 @@ public abstract class HudBase : IDisposable
     {
         try
         {
-            Log.Chat($"Initializing {Name}");
+            //Log.Chat($"Initializing {Name}");
             AddEvents();
         }
         catch (Exception ex)
@@ -78,7 +78,7 @@ public abstract class HudBase : IDisposable
     {
         try
         {
-            Log.Chat($"Disposing {Name}");
+            //Log.Chat($"Disposing {Name}");
             RemoveEvents();
             ubHud?.Dispose();
         }

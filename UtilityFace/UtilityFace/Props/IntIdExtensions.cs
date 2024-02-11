@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using DamageType = UtilityFace.Helpers.DamageType;
 
 namespace UtilityFace;
 

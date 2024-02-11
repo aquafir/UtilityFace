@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using DamageType = UtilityFace.Helpers.DamageType;
 using Spell = UtilityBelt.Scripting.Interop.Spell;
 
 namespace UtilityFace;

@@ -25,7 +25,7 @@
             file.WriteLine(Pause);
         }
 
-        public override void Draw() {
+        //public override void Draw() {
             //var rp = GetPreviousPoint();
             //var color = Color.FromArgb(UtilityBeltPlugin.Instance.VisualNav.Display.Pause.Color);
             //rp = rp == null ? GetNextPoint() : rp;
@@ -34,6 +34,6 @@
             //if (UtilityBeltPlugin.Instance.VisualNav.Display.Pause.Enabled) {
             //    DrawText($"Pause for {Pause / 1000} seconds", rp, 0, color);
             //}
-        }
+        //}
     }
 }

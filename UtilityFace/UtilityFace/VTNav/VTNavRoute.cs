@@ -17,10 +17,10 @@ public class VTNavRoute : IDisposable {
 
     public static string NoneNavName = " [None]";
 
-    public List<VTNPoint> points = new List<VTNPoint>();
+    public List<VTNPoint> Points = new List<VTNPoint>();
     public int NavOffset = 0;
-    public Dictionary<string, double> offsets = new Dictionary<string, double>();
-    public List<DecalD3DObj> shapes = new List<DecalD3DObj>();
+    public Dictionary<string, double> Offsets = new Dictionary<string, double>();
+    public List<DecalD3DObj> Shapes = new List<DecalD3DObj>();
     //private DecalD3DObj currentNavShape = null;
 
     static ACDecalD3D ac = new();
@@ -32,19 +32,19 @@ public class VTNavRoute : IDisposable {
     public void AddOffset(double ns, double ew, double offset) {
         var key = $"{ns},{ew}";
 
-        if (offsets.ContainsKey(key)) {
-            offsets[key] += offset;
+        if (Offsets.ContainsKey(key)) {
+            Offsets[key] += offset;
         }
         else {
-            offsets.Add(key, GetZOffset(ns, ew) + offset);
+            Offsets.Add(key, GetZOffset(ns, ew) + offset);
         }
     }
 
     public double GetZOffset(double ns, double ew) {
         var key = $"{ns},{ew}";
 
-        if (offsets.ContainsKey(key)) {
-            return offsets[key];
+        if (Offsets.ContainsKey(key)) {
+            return Offsets[key];
         }
         else {
             return 0.25;
@@ -91,7 +91,7 @@ public class VTNavRoute : IDisposable {
 
                 int x = 0;
                 VTNPoint previous = null;
-                while (!sr.EndOfStream && points.Count < RecordCount) {
+                while (!sr.EndOfStream && Points.Count < RecordCount) {
                     int recordType = 0;
                     var recordTypeLine = sr.ReadLine();
 
@@ -159,7 +159,7 @@ public class VTNavRoute : IDisposable {
 
                     if (point != null) {
                         point.Previous = previous;
-                        points.Add(point);
+                        Points.Add(point);
                         previous = point;
                         x++;
                     }
@@ -179,7 +179,7 @@ public class VTNavRoute : IDisposable {
         file.WriteLine((int)NavType);
         file.WriteLine(RecordCount);
 
-        foreach (var point in points) {
+        foreach (var point in Points) {
             point.Write(file);
         }
     }
@@ -194,7 +194,7 @@ public class VTNavRoute : IDisposable {
             if (e.Released.Id == TargetId) {
                 CoreManager.Current.WorldFilter.ReleaseObject -= WorldFilter_ReleaseObject;
                 CoreManager.Current.WorldFilter.CreateObject += WorldFilter_CreateObject;
-                foreach (var shape in shapes) {
+                foreach (var shape in Shapes) {
                     try {
                         shape.Visible = false;
                     }
@@ -202,7 +202,7 @@ public class VTNavRoute : IDisposable {
                         shape.Dispose();
                     }
                 }
-                shapes.Clear();
+                Shapes.Clear();
             }
         }
         catch (Exception ex) { Log.Error(ex); }
@@ -350,7 +350,7 @@ public class VTNavRoute : IDisposable {
             //    uTank2.PluginCore.PC.NavWaypointChanged -= PC_NavWaypointChanged;
             //}
 
-            foreach (var shape in shapes) {
+            foreach (var shape in Shapes) {
                 try {
                     shape.Visible = false;
                 }
@@ -362,7 +362,7 @@ public class VTNavRoute : IDisposable {
                 }
             }
 
-            shapes.Clear();
+            Shapes.Clear();
 
             //if (currentNavShape != null) {
             //    try {
@@ -372,7 +372,7 @@ public class VTNavRoute : IDisposable {
             //    catch { }
             //}
 
-            foreach (var point in points) {
+            foreach (var point in Points) {
                 point.Dispose();
             }
             disposed = true;
@@ -381,5 +381,42 @@ public class VTNavRoute : IDisposable {
 
     internal List<VTNPoint> GetAllNavPoints() {
         throw new NotImplementedException();
+    }
+
+
+    const string NAV_DIR = @"C:\Games\VirindiPlugins\VirindiTank\";
+    /// <summary>
+    /// Returns full path of all .nav files
+    /// </summary>
+    public static List<string> GetNavFiles() => Directory.GetFiles(NAV_DIR, "*.nav").Where(x => !x.Contains("--")).ToList();
+
+    /// <summary>
+    /// Returns file name without extention all .nav files
+    /// </summary>
+    public static List<string> GetNavFileNames() => GetNavFiles().Select(x => Path.GetFileNameWithoutExtension(x)).ToList();
+
+
+    public static bool TryParseRouteFromName(string navName, out VTNavRoute route) => TryParseRoute(Path.Combine(NAV_DIR, $"{navName}.nav"), out route);
+    public static bool TryParseRoute(string path, out VTNavRoute route)
+    {
+        route = new(path);
+        return route.Parse();
+        //Log.Chat($"Parsing {path}");
+
+        //try
+        //{
+        //    if (!File.Exists(path))
+        //        return false;
+
+        //    var lines = File.ReadAllLines(path);
+        //    Log.Chat($"Read {lines.Length}");
+        //    route.Parse(lines);
+        //}
+        //catch (Exception ex)
+        //{
+        //    Log.Error(ex);
+        //    return false;
+        //}
+        //return true;
     }
 }

@@ -11,9 +11,9 @@ namespace UtilityBelt.Lib.VTNav.Waypoints
         //public ObjectClass ObjectClass = ObjectClass.Unknown;
         public ObjectClass ObjectClass = ObjectClass.Unknown;
 
-        public double PortalNS = 0;
-        public double PortalEW = 0;
-        public double PortalZ = 0;
+        public float PortalNS = 0;
+        public float PortalEW = 0;
+        public float PortalZ = 0.0f;
 
         internal double closestDistance = double.MaxValue;
         //private LineMarker lineMarker;
@@ -72,17 +72,17 @@ namespace UtilityBelt.Lib.VTNav.Waypoints
             base.sr.ReadLine(); // true ?
 
             // these are portal exit coordinates
-            if (!double.TryParse(sr.ReadLine(), out PortalNS)) {
+            if (!float.TryParse(sr.ReadLine(), out PortalNS)) {
                 Log.Error("Could not parse PortalNS");
                 return false;
             }
 
-            if (!double.TryParse(sr.ReadLine(), out PortalEW)) {
+            if (!float.TryParse(sr.ReadLine(), out PortalEW)) {
                 Log.Error("Could not parse PortalEW");
                 return false;
             }
 
-            if (!double.TryParse(sr.ReadLine(), out PortalZ)) {
+            if (!float.TryParse(sr.ReadLine(), out PortalZ)) {
                 Log.Error("Could not parse PortalZ");
                 return false;
             }
@@ -124,7 +124,7 @@ namespace UtilityBelt.Lib.VTNav.Waypoints
             file.WriteLine(Z);
         }
 
-        public override void Draw() {
+        //public override void Draw() {
             //var rp = GetPreviousPoint();
             //var color = Color.FromArgb(UtilityBeltPlugin.Instance.VisualNav.Display.Lines.Color);
 
@@ -150,9 +150,9 @@ namespace UtilityBelt.Lib.VTNav.Waypoints
             //        DrawText("Use: " + Name, this, height, color);
             //    }
             //}
-        }
+        //}
 
-        protected override void Dispose(bool disposing) {
+        //protected override void Dispose(bool disposing) {
             //if (!base.disposed) {
             //    if (disposing) {
             //        foreach (var shape in shapes) {
@@ -163,6 +163,6 @@ namespace UtilityBelt.Lib.VTNav.Waypoints
             //    }
             //    base.disposed = true;
             //}
-        }
+        //}
     }
 }

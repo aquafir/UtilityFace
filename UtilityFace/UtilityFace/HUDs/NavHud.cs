@@ -2,13 +2,18 @@
 using KdTree;
 using UtilityBelt.Service.Lib.ACClientModule;
 using System.Diagnostics;
+using UtilityBelt.Lib.VTNav;
+using UtilityBelt.Lib.VTNav.Waypoints;
+using System.Drawing.Drawing2D;
+using Vector3 = System.Numerics.Vector3;
 
 namespace UtilityFace.HUDs;
 public class NavHud(string name) : SizedHud(name, false, true)
 {
-    //ACDecalD3D ac = new();
+    ACDecalD3D ac = new();
     VTNavRoute route;
-    VTWaypoint prevPoint;
+    //VTWaypoint prevPoint;
+    VTNPoint prevPoint;
     List<DecalD3DObj> markers = new();
     string[] NavNames;
     int selected = 0;
@@ -22,8 +27,31 @@ public class NavHud(string name) : SizedHud(name, false, true)
         Log.Chat($"Found {NavNames.Length} navs");
     }
 
+    DecalD3DObj mark = null;
+    Vector3 loc;
     public override void Draw(object sender, EventArgs e)
     {
+        if (mark is null)
+        {
+            loc = game.Character.Weenie.ServerPosition.ToVec();
+            loc.Y += .05f;
+            //mark = ac.NewD3DObj();
+            //mark.Visible = false;
+            //mark.Color = 0xAA55ff55;
+            //mark.SetShape(DecalD3DShape.Cube);
+            //mark.Anchor(loc.X, loc.Y, loc.Z +.05f);
+            ////mark.ScaleX = 5.25f;
+            ////mark.ScaleZ = 5.25f;
+            ////mark.ScaleY = 5f;
+            //mark.Visible = true;
+            mark = ac.MarkCoordsWithShape(loc.X, loc.Y, loc.Z, DecalD3DShape.Ring, 0xAA55ff55);
+            mark.Visible = true;
+        }
+        if(ImGui.DragFloat3("Marker", ref loc)) {
+            Log.Chat($"Marking: {loc}");
+            mark.Anchor(loc.X, loc.Y, loc.Z);
+        }
+
         if (ImGui.Button("Refresh") || NavNames is null)
             LoadNavs();
 
@@ -47,10 +75,10 @@ public class NavHud(string name) : SizedHud(name, false, true)
 
                 //Load all points
                 routes.Add(route);
-                foreach (var point in route.Waypoints)
+                foreach (var point in route.Points)
                 {
-                    if (point.Type == WaypointType.Point)
-                        tree.Add(new[] { point.NorthSouth, point.EastWest, point.Z }, route);
+                    //if (point.Type == eWaypointType.)
+                        tree.Add(new[] { point.NS, point.EW, point.Z }, route);
                 }
             }
             watch.Stop();
@@ -61,7 +89,7 @@ public class NavHud(string name) : SizedHud(name, false, true)
             var nearest = tree.GetNearestNeighbours(pos.ToArray(), 1).FirstOrDefault();
             if (nearest is not null)
             {
-                Log.Chat($"{nearest.Value.NavFile}");
+                Log.Chat($"{nearest.Value.NavPath}");
             }
         }
 
@@ -76,32 +104,46 @@ public class NavHud(string name) : SizedHud(name, false, true)
 
     private void RenderRoute()
     {
-        foreach (var marker in markers)
-            marker?.Dispose();
+        //foreach (var marker in markers)
+        //    marker?.Dispose();
 
         if (route is null)
             return;
 
-        foreach (var waypoint in route.Waypoints)
+        route.Dispose();
+        route.Draw();
+
+        //var s = ac.MarkObjectWithShape(game.CharacterId, DecalD3DShape.Ring, 0xAA55ff55);
+        var coords = game.Character.Weenie.ServerPosition.ToArray();
+        var s  = ac.MarkCoordsWithShape(coords[0], coords[1], coords[2]*240+.05f, DecalD3DShape.Ring, 0xAA55ff55);
+        
+        foreach (var point in route.Points)
         {
-            if (waypoint.Type == WaypointType.Point)
-            {
-                if (prevPoint is null)
-                    prevPoint = waypoint;
-                else
-                {
-                    var marker = waypoint.Mark(prevPoint);
-                    markers.Add(marker);
-                    prevPoint = waypoint;
-                }
-            }
+            Log.Chat($"Drawing {point.Type} at {point.NS}, {point.EW}, {point.Z}");
+            point.Draw();
         }
+        //foreach (var waypoint in route.Points)
+        //{
+        //    //if (waypoint.Type == WaypointType.Point)
+        //    //{
+        //        if (prevPoint is null)
+        //            prevPoint = waypoint;
+        //        else
+        //        {
+        //            var marker = waypoint.Mark(prevPoint);
+        //            markers.Add(marker);
+        //            prevPoint = waypoint;
+        //        }
+        //    //}
+        //}
     }
 
     public override void Dispose()
     {
         try
         {
+            route.Dispose();
+
             foreach (var marker in markers)
             {
                 marker?.Dispose();

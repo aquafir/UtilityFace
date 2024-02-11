@@ -1,12 +1,13 @@
 ﻿using Vector3 = System.Numerics.Vector3;
 using Position = UtilityBelt.Scripting.Interop.Position;
+using UtilityBelt.Lib;
 
 
 namespace UtilityFace.Helpers;
 public static class PositionExtensions
 {
     public static float C = (float)Position.C;
-    public static Vector3 DistancesTo3D(this Position start, Position end)
+    public static Vector3 Vector3To(this Position start, Position end)
     {
         float sx = Position.LandblockToEW(start.Landcell >> 16 << 16, start.Frame.Origin.X);
         float ex = Position.LandblockToEW(end.Landcell >> 16 << 16, end.Frame.Origin.X);
@@ -45,13 +46,22 @@ public static class PositionExtensions
     /// <summary>
     /// Converts a position to an x,y,z array
     /// </summary>
-    public static float[] ToArray(this Position position)
+    public static float[] ToArray(this Position position, bool d3dUnits = true)
     {
         float x = Position.LandblockToEW(position.Landcell >> 16 << 16, position.Frame.Origin.X);
         float y = Position.LandblockToNS(position.Landcell >> 16 << 16, position.Frame.Origin.Y);
         float z = position.Frame.Origin.Z;
 
-        return new float[] { x, y, z };
+        return new float[] { x, y, d3dUnits ? z / 240 : z };
+    }
+
+    public static Vector3 ToVec(this Position position, bool d3dUnits = true)
+    {
+        float x = Position.LandblockToEW(position.Landcell >> 16 << 16, position.Frame.Origin.X);
+        float y = Position.LandblockToNS(position.Landcell >> 16 << 16, position.Frame.Origin.Y);
+        float z = position.Frame.Origin.Z;
+
+        return new (x, y, d3dUnits ? z / 240 : z);
     }
 }
 

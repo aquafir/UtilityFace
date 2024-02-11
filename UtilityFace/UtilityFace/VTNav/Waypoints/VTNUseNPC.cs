@@ -118,7 +118,7 @@ namespace UtilityBelt.Lib.VTNav.Waypoints
             file.WriteLine(NpcZ);
         }
 
-        public override void Draw() {
+        //public override void Draw() {
             //var rp = GetPreviousPoint();
             //var color = Color.FromArgb(UtilityBeltPlugin.Instance.VisualNav.Display.Lines.Color);
 
@@ -139,9 +139,9 @@ namespace UtilityBelt.Lib.VTNav.Waypoints
             //        DrawText("Talk: " + Name, this, height, color);
             //    }
             //}
-        }
+        //}
 
-        protected override void Dispose(bool disposing) {
+       // protected override void Dispose(bool disposing) {
             //if (!base.disposed) {
             //    if (disposing) {
             //        foreach (var shape in shapes) {
@@ -152,6 +152,6 @@ namespace UtilityBelt.Lib.VTNav.Waypoints
             //    }
             //    base.disposed = true;
             //}
-        }
+       // }
     }
 }

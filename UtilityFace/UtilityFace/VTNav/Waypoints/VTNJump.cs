@@ -42,7 +42,7 @@ namespace UtilityBelt.Lib.VTNav.Waypoints
             file.WriteLine(Milliseconds);
         }
 
-        public override void Draw() {
+        //public override void Draw() {
             //var rp = GetPreviousPoint();
             //var textColor = Color.FromArgb(UtilityBeltPlugin.Instance.VisualNav.Display.JumpText.Color);
             //var arrowColor = Color.FromArgb(UtilityBeltPlugin.Instance.VisualNav.Display.JumpArrow.Color);
@@ -63,6 +63,6 @@ namespace UtilityBelt.Lib.VTNav.Waypoints
             //if (UtilityBeltPlugin.Instance.VisualNav.Display.JumpArrow.Enabled) {
             //    DrawText($"{(ShiftJump ? "Shift" : "")} Jump {Math.Round(Milliseconds / 10, 0)}%", tp, 0, textColor);
             //}
-        }
+        //}
     }
 }

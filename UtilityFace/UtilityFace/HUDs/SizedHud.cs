@@ -1,12 +1,12 @@
 ﻿namespace UtilityFace.HUDs;
 public abstract class SizedHud(string name, bool showInBar = false, bool visible = false) : HudBase(name, showInBar, visible)
 {
-    Vector2 MIN_SIZE = new(200, 400);
-    Vector2 MAX_SIZE = new(1000, 900);
+    public virtual Vector2 MinSize { get; set; } = new(200, 400);
+    public virtual Vector2 MaxSize { get; set; } = new(1000, 900);
 
     public virtual void PreRender(object sender, EventArgs e)
     {
-        ImGui.SetNextWindowSizeConstraints(MIN_SIZE, MAX_SIZE);
+        ImGui.SetNextWindowSizeConstraints(MinSize, MaxSize);
     }
 
     protected override void AddEvents()
