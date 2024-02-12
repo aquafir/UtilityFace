@@ -27,7 +27,7 @@ public class ChatOptions
 
     public bool Debug = true;
     public bool ShowModal = false;
-    public bool StayInChat = false;
+    public bool StayInChat = true;
 
     public string Query = "";
 
@@ -99,7 +99,6 @@ public class ChatHud(string name) : SizedHud(name, false, true)
         PendingFocus,
     }
     ChatState chatState = ChatState.Inactive;
-    bool focusChat = false;
 
     public override void Init()
     {
@@ -136,15 +135,18 @@ public class ChatHud(string name) : SizedHud(name, false, true)
             //If input is handled avoid reseting the chat message?
             HandleInput();
 
-            if (focusChat)
-            {
-                ImGui.SetKeyboardFocusHere();
-                focusChat = false;
-            }
             ImGui.SetNextItemWidth(region.X - CHAT_INPUT_HEIGHT);
 
-            unsafe
+            if (chatState == ChatState.PendingFocus)
             {
+                ImGui.SetKeyboardFocusHere();
+                chatState = ChatState.Active;
+            }
+            else 
+                chatState = ImGui.GetIO().WantCaptureKeyboard ? ChatState.Active : ChatState.Inactive;
+
+            unsafe
+            {           
                 if (ImGui.InputText("###ChatBox", ref chatMessage, 1000, CHAT_INPUT_FLAGS, this.CommandInputCallback))
                 {
                     SendMessage();
@@ -183,7 +185,7 @@ public class ChatHud(string name) : SizedHud(name, false, true)
             {
                 //Do something on name click
                 chatMessage = $"/t {chat.SenderName}, ";
-                focusChat = true;
+                chatState = ChatState.PendingFocus;
             }
             ImGui.PopStyleColor();
             ImGui.SameLine();
@@ -244,7 +246,12 @@ public class ChatHud(string name) : SizedHud(name, false, true)
     private void HandleInput()
     {
         if (ImGui.IsKeyPressed(ImGuiKey.Enter))
-            focusChat = true;
+        {
+            Log.Chat($"Enter - {chatState}");
+
+            if (chatState != ChatState.Active)
+                chatState = ChatState.PendingFocus;
+        }
     }
 
     private void World_OnChatText(object sender, UtilityBelt.Scripting.Events.ChatEventArgs e)
@@ -288,7 +295,7 @@ public class ChatHud(string name) : SizedHud(name, false, true)
 
         //Base off player setting?
         //focusChat = game.Character.Options1.HasFlag(CharacterOptions1.u_0x00000800);
-        focusChat = options.StayInChat;
+        chatState = options.StayInChat ? ChatState.PendingFocus : ChatState.Inactive;
         chatMessage = "";
     }
 
