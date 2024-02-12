@@ -17,18 +17,15 @@ public static class CommandHelper
     public static string[] Commands { get; set; }
     public static bool LoadCommands()
     {
-        Log.Chat($"{PluginCore.AssemblyDirectory}");
-        var FilePath = Path.Combine(PluginCore.AssemblyDirectory ?? "", "Resources", "Commands.txt");
+        var FilePath = Path.Combine(PluginCore.AssemblyDirectory, "Resources", "Commands.txt");
 
         Commands = new string[] { };
-        Log.Chat("???" + FilePath);
 
         try
         {
             if (!File.Exists(FilePath))
                 return false;
 
-            Log.Chat($"Loaded {Commands.Length} commands from {FilePath}");
             Commands = File.ReadAllLines(FilePath);
             Log.Chat($"Loaded {Commands.Length} commands from {FilePath}");
 

@@ -80,16 +80,16 @@ public class ChatOptions
 public class ChatHud(string name) : SizedHud(name, false, true)
 {
     readonly ChatOptions options = new();
-    readonly List<string> history = new()
-    {
-        "FOO","BAR", "ING?"
-    };
+    readonly List<string> history = new();
     readonly List<FilteredChat> chatBuffer = new();
+    List<string> omnibarResults = new();
 
     const ImGuiInputTextFlags CHAT_INPUT_FLAGS = ImGuiInputTextFlags.AutoSelectAll | ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.CallbackEdit | ImGuiInputTextFlags.CallbackAlways;
     private const int CHAT_INPUT_HEIGHT = 30;
-
+    private const string OMNIBAR_POPUP = "Omnibar";
     int historyIndex = 0;
+    int omniIndex = 0;
+
     string chatMessage = "";
 
     enum ChatState
@@ -97,8 +97,21 @@ public class ChatHud(string name) : SizedHud(name, false, true)
         Active,
         Inactive,
         PendingFocus,
+        StartOmnibar,
+        SearchOmnibar,
     }
-    ChatState chatState = ChatState.Inactive;
+
+    ChatState _chatState = ChatState.Inactive;
+    ChatState State
+    {
+        get => _chatState;
+        set
+        {
+            if (options.Debug && _chatState != value)
+                Log.Chat($"{_chatState}->{value}");
+            _chatState = value;
+        }
+    }
 
     public override void Init()
     {
@@ -137,21 +150,23 @@ public class ChatHud(string name) : SizedHud(name, false, true)
 
             ImGui.SetNextItemWidth(region.X - CHAT_INPUT_HEIGHT);
 
-            if (chatState == ChatState.PendingFocus)
+            if (State == ChatState.PendingFocus)
             {
                 ImGui.SetKeyboardFocusHere();
-                chatState = ChatState.Active;
+                State = ChatState.Active;
             }
-            else 
-                chatState = ImGui.GetIO().WantCaptureKeyboard ? ChatState.Active : ChatState.Inactive;
+            //else 
+            //    State = ImGui.GetIO().WantCaptureKeyboard ? ChatState.Active : ChatState.Inactive;
 
             unsafe
-            {           
+            {
                 if (ImGui.InputText("###ChatBox", ref chatMessage, 1000, CHAT_INPUT_FLAGS, this.CommandInputCallback))
                 {
                     SendMessage();
                 }
             }
+
+            DrawOmnibar();
 
             ImGui.SameLine();
             if (ImGui.ArrowButton("###OptionsButton", ImGuiDir.Right))
@@ -166,7 +181,6 @@ public class ChatHud(string name) : SizedHud(name, false, true)
             Log.Error(ex);
         }
     }
-
     private void DrawChatEntry(ChatLog chat)
     {
         //Get styles/defaults
@@ -185,7 +199,7 @@ public class ChatHud(string name) : SizedHud(name, false, true)
             {
                 //Do something on name click
                 chatMessage = $"/t {chat.SenderName}, ";
-                chatState = ChatState.PendingFocus;
+                State = ChatState.PendingFocus;
             }
             ImGui.PopStyleColor();
             ImGui.SameLine();
@@ -197,7 +211,6 @@ public class ChatHud(string name) : SizedHud(name, false, true)
         ImGui.TextColored(display.Color, $"{chat.Message}");
         //ImGui.PopStyleColor();
     }
-
     private void DrawModal()
     {
         // Always center this window when appearing
@@ -242,17 +255,50 @@ public class ChatHud(string name) : SizedHud(name, false, true)
             ImGui.EndPopup();
         }
     }
-
-    private void HandleInput()
+    private void DrawOmnibar()
     {
-        if (ImGui.IsKeyPressed(ImGuiKey.Enter))
-        {
-            Log.Chat($"Enter - {chatState}");
+        //if (State == ChatState.StartOmnibar)
+        //{
+        //    ImGui.OpenPopup(OMNIBAR_POPUP);
+        //    State = ChatState.SearchOmnibar;
+        //}
 
-            if (chatState != ChatState.Active)
-                chatState = ChatState.PendingFocus;
+        if (State != ChatState.StartOmnibar)
+            return;
+
+        // Showcase NOT relying on a IsItemHovered() to emit a tooltip.
+        //var center = ImGui.GetMainViewport().GetCenter();
+        //ImGui.SetNextWindowPos(center, ImGuiCond.Appearing, new(0.5f, 0.5f));
+        if (ImGui.BeginTooltip())
+        {
+            //ImGui.ProgressBar((float)Math.Sin(ImGui.GetTime()) * 0.5f + 0.5f, new Vector2(ImGui.GetFontSize() * 25, 0.0f));
+
+            for (var i = 0; i < omnibarResults.Count; i++)
+            {
+                var match = omnibarResults[i];
+
+                Vector4 col = omniIndex == i ? Color.Purple.ToVec4() : Color.Gray.ToVec4();
+                ImGui.TextColored(col, $"{i}: {match}");
+            }
+
+            ImGui.EndTooltip();
         }
+
+
+        //if (ImGui.BeginPopup(OMNIBAR_POPUP))
+        //{
+        //    for(var i = 0; i < omnibarResults.Count; i++)
+        //    {
+        //        var match = omnibarResults[i];
+
+        //        if (ImGui.Selectable($"{i}: {match}"))
+        //            Log.Chat($"Selected {match}");
+
+        //    }
+        //    ImGui.EndPopup();
+        //}
     }
+
 
     private void World_OnChatText(object sender, UtilityBelt.Scripting.Events.ChatEventArgs e)
     {
@@ -277,7 +323,6 @@ public class ChatHud(string name) : SizedHud(name, false, true)
             chatBuffer.RemoveAt(0);
         }
     }
-
     private void SendMessage()
     {
         game.Actions.InvokeChat(chatMessage);
@@ -295,7 +340,7 @@ public class ChatHud(string name) : SizedHud(name, false, true)
 
         //Base off player setting?
         //focusChat = game.Character.Options1.HasFlag(CharacterOptions1.u_0x00000800);
-        chatState = options.StayInChat ? ChatState.PendingFocus : ChatState.Inactive;
+        State = options.StayInChat ? ChatState.PendingFocus : ChatState.Inactive;
         chatMessage = "";
     }
 
@@ -316,70 +361,97 @@ public class ChatHud(string name) : SizedHud(name, false, true)
 
         if (ImGui.IsKeyPressed(ImGuiKey.UpArrow))
         {
-            historyIndex = Math.Min(historyIndex + 1, history.Count - 1);
-
-            if (historyIndex < history.Count)
+            if (State == ChatState.StartOmnibar)
             {
-                chatMessage = history[historyIndex];
-                ptr.SetText(chatMessage, true);
+                if (omnibarResults.Count == 0)
+                    return 0;
+
+                omniIndex = (omniIndex + omnibarResults.Count - 1) % omnibarResults.Count;
+                Log.Chat($"Omni: {omniIndex}");
             }
+            else
+            {
+                historyIndex = Math.Min(historyIndex + 1, history.Count - 1);
+
+                if (historyIndex < history.Count)
+                {
+                    chatMessage = history[historyIndex];
+                    ptr.SetText(chatMessage, true);
+                }
+            }
+            return 0;
         }
+
         if (ImGui.IsKeyPressed(ImGuiKey.DownArrow))
         {
-            historyIndex = Math.Max(historyIndex - 1, 0);
-
-            if (historyIndex >= 0)
+            if (State == ChatState.StartOmnibar)
             {
-                chatMessage = history[historyIndex];
-                ptr.SetText(chatMessage, true);
+                if (omnibarResults.Count == 0)
+                    return 0;
+
+                omniIndex = (omniIndex + 1) % omnibarResults.Count;
+                Log.Chat($"Omni: {omniIndex}");
             }
+            else
+            {
+                historyIndex = Math.Max(historyIndex - 1, 0);
+
+                if (historyIndex >= 0)
+                {
+                    chatMessage = history[historyIndex];
+                    ptr.SetText(chatMessage, true);
+                }
+            }
+            return 0;
         }
 
-        //switch (data->EventFlag)
-        //{
-        //    case ImGuiInputTextFlags.CallbackCompletion:
-        //        var textBytes = new byte[data->BufTextLen];
-        //        Marshal.Copy((IntPtr)data->Buf, textBytes, 0, data->BufTextLen);
-        //        var text = Encoding.UTF8.GetString(textBytes);
+        if (ptr.BufTextLen == 0 && ImGui.IsKeyPressed(ImGuiKey.Slash))
+        {
+            Log.Chat($"Start omnibar!");
+            State = ChatState.StartOmnibar;
+            
+            //Delete the slash?
+            chatMessage = "";
+            ptr.SetText(chatMessage);
 
-        //        break;
-        //    case ImGuiInputTextFlags.CallbackHistory:
-        //        Log.Chat("History?");
-        //        //var prevPos = this.historyPos;
+            return 0;
+        }
 
-        //        //if (ptr.EventKey == ImGuiKey.UpArrow)
-        //        //{
-        //        //    if (this.historyPos == -1)
-        //        //        this.historyPos = this.history.Count - 1;
-        //        //    else if (this.historyPos > 0)
-        //        //        this.historyPos--;
-        //        //}
-        //        //else if (data->EventKey == ImGuiKey.DownArrow)
-        //        //{
-        //        //    if (this.historyPos != -1)
-        //        //    {
-        //        //        if (++this.historyPos >= this.history.Count)
-        //        //        {
-        //        //            this.historyPos = -1;
-        //        //        }
-        //        //    }
-        //        //}
+        if (State == ChatState.StartOmnibar)
+        {
+            omnibarResults = CommandHelper.MatchCommands(chatMessage);
 
-        //        //if (prevPos != this.historyPos)
-        //        //{
-        //        //    var historyStr = this.historyPos >= 0 ? this.history[this.historyPos] : string.Empty;
+            //Zen mode to select only result?
+            if (omnibarResults.Count == 1)
+            {
+                ptr.SetText(omnibarResults[0], true);
+                return 0;
+            }
 
-        //        //    ptr.DeleteChars(0, ptr.BufTextLen);
-        //        //    ptr.InsertChars(0, historyStr);
-        //        //}
+            if(ImGui.IsKeyPressed(ImGuiKey.Enter))
+            {
+                chatMessage = omnibarResults[omniIndex];
+                Log.Chat($"Selected: {omniIndex} - {chatMessage}");
+                ptr.SetText(chatMessage, true);
+                return 0;
+            }
 
-        //        break;
-        //}
+            return 0;
+        }
 
 
         return 0;
     }
+    private void HandleInput()
+    {
+        if (ImGui.IsKeyPressed(ImGuiKey.Enter))
+        {
+            Log.Chat($"Enter - {State}");
 
+            if (State != ChatState.Active)
+                State = ChatState.PendingFocus;
+        }
+    }
 
     private void Incoming_Combat_HandleAttackerNotificationEvent(object sender, Combat_HandleAttackerNotificationEvent_S2C_EventArgs e) => AddMessage(e.GetChatLog());
     private void Incoming_Combat_HandleDefenderNotificationEvent(object sender, Combat_HandleDefenderNotificationEvent_S2C_EventArgs e) => AddMessage(e.GetChatLog());
@@ -402,7 +474,6 @@ public class ChatHud(string name) : SizedHud(name, false, true)
 
         base.AddEvents();
     }
-
     protected override void RemoveEvents()
     {
         game.World.OnChatText -= World_OnChatText;

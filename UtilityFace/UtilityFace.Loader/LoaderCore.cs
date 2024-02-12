@@ -170,11 +170,11 @@ public class LoaderCore : FilterBase
             pluginType = pluginAssembly.GetType($"{PluginAssemblyNamespace}.PluginCore");
             pluginInstance = Activator.CreateInstance(pluginType);
 
-            var startupMethod = pluginType.GetMethod("Startup", BindingFlags.NonPublic | BindingFlags.Instance);
-            startupMethod.Invoke(pluginInstance, new object[] { });
-
             var setupMethod = pluginType.GetMethod("FilterSetup", BindingFlags.NonPublic | BindingFlags.Instance);
             setupMethod.Invoke(pluginInstance, new object[] { AssemblyDirectory });
+
+            var startupMethod = pluginType.GetMethod("Startup", BindingFlags.NonPublic | BindingFlags.Instance);
+            startupMethod.Invoke(pluginInstance, new object[] { });
 
             IsPluginLoaded = true;
         }
