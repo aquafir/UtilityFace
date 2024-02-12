@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
-using DamageType = UtilityFace.Helpers.DamageType;
+using UtilityFace.Enums;
+using DamageType = UtilityFace.Enums.DamageType;
 
 namespace UtilityFace;
 

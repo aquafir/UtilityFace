@@ -1,4 +1,6 @@
-﻿namespace UtilityFace.Helpers;
+﻿using UtilityFace.Enums;
+
+namespace UtilityFace.Helpers;
 
 //Taken from ACE
 public static class ExperienceSystem
@@ -82,11 +84,4 @@ public static class ExperienceSystem
     {
             return ExperienceSystem.ItemTotalXPToLevel((ulong)ItemTotalXp, (ulong)ItemBaseXp, ItemMaxLevel, style);
     }
-}
-public enum ItemXpStyle
-{
-    Undef,
-    Fixed,
-    ScalesWithLevel,
-    FixedPlusBase   // unused?
 }

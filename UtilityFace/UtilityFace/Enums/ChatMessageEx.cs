@@ -1,0 +1,37 @@
+﻿namespace UtilityFace.Enums;
+
+public enum ChatMessageEx : uint
+{
+    Default = 0u,
+    Speech = 2u,
+    Tell = 3u,
+    OutgoingTell = 4u,
+    System = 5u,
+    Combat = 6u,
+    Magic = 7u,
+    Channels = 8u,
+    OutgoingChannel = 9u,
+    Social = 10u,
+    OutgoingSocial = 11u,
+    Emote = 12u,
+    Advancement = 13u,
+    Abuse = 14u,
+    Help = 15u,
+    Appraisal = 16u,
+    Spellcasting = 17u,
+    Allegiance = 18u,
+    Fellowship = 19u,
+    WorldBroadcast = 20u,
+    CombatEnemy = 21u,
+    CombatSelf = 22u,
+    Recall = 23u,
+    Craft = 24u,
+    Salvaging = 25u,
+    AdminTell = 31u,
+    CombatAttackerNotification = 32,
+    CombatDefenderNotification = 33,
+    CombatEvasionAttackNotification = 34,
+    CombatEvasionDefenderNotification = 35,
+    CombatVictimSelf = 36,
+    CombatVictimOther = 37
+}

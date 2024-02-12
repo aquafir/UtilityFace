@@ -1,4 +1,6 @@
-﻿namespace UtilityFace;
+﻿using UtilityFace.Enums;
+
+namespace UtilityFace;
 
 /// <summary>
 /// Draw equipped items

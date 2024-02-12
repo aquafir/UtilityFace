@@ -35,17 +35,6 @@ public class MessageFilter
     }
 }
 
-public record FilteredMessage
-{
-    public MessageEventArgs Message;
-    public bool Filtered;
-
-    public FilteredMessage(MessageEventArgs message, bool filtered)
-    {
-        Message = message;
-        Filtered = filtered;
-    }
-}
 
 public class NetworkHud(string name) : SizedHud(name)
 {
@@ -129,10 +118,6 @@ public class NetworkHud(string name) : SizedHud(name)
 
         DrawFilter(false);
 
-        // Always center this window when appearing
-        var center = ImGui.GetMainViewport().GetCenter();
-        ImGui.SetNextWindowPos(center, ImGuiCond.Appearing, new(0.5f, 0.5f));
-        ImGui.SetNextWindowSizeConstraints(new(500, 500), new(500, 800));
         DrawFilterModal();
 
         //--beginChild with a specified size makes the area scrollable
@@ -236,24 +221,13 @@ public class NetworkHud(string name) : SizedHud(name)
 
     private void DrawFilterModal()
     {
+        // Always center this window when appearing
+        var center = ImGui.GetMainViewport().GetCenter();
+        ImGui.SetNextWindowPos(center, ImGuiCond.Appearing, new(0.5f, 0.5f));
+        ImGui.SetNextWindowSizeConstraints(new(500, 500), new(500, 800));
         if (ImGui.BeginPopupModal(MODAL_NAME, ref showFilter, ImGuiWindowFlags.AlwaysAutoResize))
         {
             DrawFilter();
-            //ImGui.SetItemDefaultFocus();
-            //ImGui.InputText("##FilterQuery", ref filter.Query, 200);
-            //ImGui.SameLine();
-            //ImGui.Checkbox("In", ref filter.In);
-            //ImGui.SameLine();
-            //ImGui.Checkbox("Out", ref filter.Out);
-
-            //if (ImGui.Button("Select Shown", new(100, 0)))
-            //    filter.TypeFilters = filter.Types.Select((x, i) => filter.TypeFilters[i] || x.ToString().CaseInsensitiveContains(filter.Query)).ToArray();
-            //ImGui.SameLine();
-            //if (ImGui.Button("Only Shown", new(100, 0)))
-            //    filter.TypeFilters = filter.Types.Select(x => x.ToString().CaseInsensitiveContains(filter.Query)).ToArray();
-            //ImGui.SameLine();
-            //if (ImGui.Button("Clear Shown", new(100, 0)))
-            //    filter.TypeFilters = filter.Types.Select((x, i) => filter.TypeFilters[i] && !x.ToString().CaseInsensitiveContains(filter.Query)).ToArray();
 
             var region = ImGui.GetContentRegionAvail();
             region.Y -= 30;
@@ -276,12 +250,6 @@ public class NetworkHud(string name) : SizedHud(name)
                 UpdateFilteredMessages();
                 ImGui.CloseCurrentPopup();
             }
-
-            //if (ImGui.Button("Cancel", new(120, 0)))
-            //{
-            //    //editFilter = new();
-            //    ImGui.CloseCurrentPopup();
-            //}
             ImGui.EndPopup();
         }
     }
@@ -294,4 +262,16 @@ public class NetworkHud(string name) : SizedHud(name)
         //ImGui.Unindent(10);
     }
 
+}
+
+public record FilteredMessage
+{
+    public MessageEventArgs Message;
+    public bool Filtered;
+
+    public FilteredMessage(MessageEventArgs message, bool filtered)
+    {
+        Message = message;
+        Filtered = filtered;
+    }
 }
