@@ -11,13 +11,17 @@ public abstract class SizedHud(string name, bool showInBar = false, bool visible
 
     protected override void AddEvents()
     {
-        ubHud.OnPreRender += PreRender; 
+        ubHud.OnPreRender += PreRender;
+        ubHud.OnPostRender += PostRender;
         base.AddEvents();
     }
+
+    public virtual void PostRender(object sender, EventArgs e) { }
 
     protected override void RemoveEvents()
     {
         ubHud.OnPreRender -= PreRender;
+        ubHud.OnPostRender -= PostRender;
         base.RemoveEvents();
     }
 }

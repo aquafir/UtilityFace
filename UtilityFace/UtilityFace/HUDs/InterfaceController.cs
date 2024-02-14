@@ -1,53 +1,45 @@
-﻿using UtilityFace.HUDs;
+﻿using UtilityBelt.Service.Lib.Settings;
 
-namespace UtilityFace;
+namespace UtilityFace.HUDs;
 
 /// <summary>
 /// Controls what UIs are shown
 /// </summary>
-internal class InterfaceController : SizedHud
+internal class InterfaceController(string name) : SizedHud(name, true, true)
 {
-    /// <summary>
-    /// The UBService Hud
-    /// </summary>
-    readonly Hud hud;
-    readonly Game g = new();
 
-    List<HudBase> Huds = new ();
+    public Settings Settings;
 
-    readonly InventoryHud backpack;
-    readonly PropertyEditorHud propertyEditor;
+    //[Summary("Show landblock boundaries")]
+    public Global<bool> ShowLandblockBoundaries = new(false);
+
+    //[Summary("Landblock boundary distance to draw to, setting to 0 only draws current landblock boundaries")]
+    //[MinMax(0, 5)]
+    //public Global<int> LandblockBoundaryDrawDistance = new(0);
+    //var settingsPath = System.IO.Path.Combine(AssemblyDirectory, "settings.json");
+    //Settings = new Settings(this, settingsPath, p => p.SettingType == SettingType.Global, null, "LBVisualizer Settings");
+    //Settings.Load();
 
 
-    public InterfaceController(string name) : base(name, true, true)
-    {
-        // Create a new UBService Hud
-        //hud = UBService.Huds.CreateHud("Inventory");
-        //hud.WindowSettings = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoScrollbar;
 
-        //// set to show our icon in the UBService HudBar
-        //hud.ShowInBar = true;
-        //hud.Visible = true;
-
-        //backpack = new(hud);
-        //backpack = new("Inventory");
-
-        //propertyEditor = new();
-
-        //AddEvents();
-    }
+    List<HudBase> Huds = new();
 
     public override void Init()
     {
         //Set up UIs?
         Huds = new()
         {
-            new InventoryHud("Inventory"),
-            new NetworkHud("Network"),
-            new ChatHud("Chat"),
-            new PropertyEditorHud("PropertyEditor"),
+            //new InventoryHud("Inventory"),
+            //new NetworkHud("Network"),
+            //new ChatHud("Chat"),
+            //new PropertyEditorHud("PropertyEditor"),
             //new NavHud("Navs"),
+            //new HaxHud("Hax"),
+            new RadarHud("Radar"),
         };
+
+        ubHud.WindowSettings = ImGuiWindowFlags.AlwaysAutoResize;
+        MinSize = new(1, 1);
 
         base.Init();
     }
@@ -56,7 +48,7 @@ internal class InterfaceController : SizedHud
     {
         ImGui.Text("UIs");
 
-        foreach(var  hud in Huds)
+        foreach (var hud in Huds)
         {
             bool vis = hud.ubHud.Visible;
             if (ImGui.Checkbox(hud.Name, ref vis))
@@ -77,7 +69,7 @@ internal class InterfaceController : SizedHud
 
         try
         {
-            var wo = g.Character.Weenie;
+            var wo = game.Character.Weenie;
             var desc = wo.Describe((StringId)result);
 
             Log.Chat(desc);
@@ -127,7 +119,7 @@ internal class InterfaceController : SizedHud
             return;
 
         //var wo = g.Actions.ObjectAppraise(id, new() { MaxRetryCount = 1, TimeoutMilliseconds = 100}, x => x.id);
-        if (!g.World.TryGet(id, out var wo))
+        if (!game.World.TryGet(id, out var wo))
             return;
         //if (wo is null || !wo.Success)
         //    return;
@@ -142,7 +134,7 @@ internal class InterfaceController : SizedHud
     protected override void AddEvents()
     {
         //hud.OnRender += Hud_OnRender;
-        g.World.OnChatInput += World_OnChatInput;
+        game.World.OnChatInput += World_OnChatInput;
         //g.World.OnChatNameClicked += World_OnChatNameClicked;
         //g.World.OnChatText += World_OnChatText;
         base.AddEvents();
@@ -152,7 +144,7 @@ internal class InterfaceController : SizedHud
     {
         try
         {
-            g.World.OnChatInput -= World_OnChatInput;
+            game.World.OnChatInput -= World_OnChatInput;
 
             //hud.OnPreRender -= Hud_OnPreRender;
             //hud.OnRender -= Hud_OnRender;
@@ -167,11 +159,20 @@ internal class InterfaceController : SizedHud
         try
         {
             //Dispose all UIs?
-            foreach(var hud in Huds)
+            foreach (var hud in Huds)
             {
                 hud?.Dispose();
             }
             Huds.Clear();
+
+            if (Settings != null)
+            {
+                
+                if (Settings.NeedsSave)
+                {
+                    Settings.Save();
+                }
+            }
 
         }
         catch (Exception ex)

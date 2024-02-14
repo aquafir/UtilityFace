@@ -96,7 +96,7 @@ public class PropertyTable
         Target = target;
         Filter?.SetTarget(target);
 
-        Log.Chat($"Table: {target.IntValues.Count} -- Filter: {Filter.Props.Length}");
+        //Log.Chat($"Table: {target.IntValues.Count} -- Filter: {Filter.Props.Length}");
 
         UpdateTable();
     }

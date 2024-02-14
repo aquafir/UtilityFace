@@ -41,6 +41,10 @@ internal class PropertyEditorHud(string name) : SizedHud(name, false, false)
 
     private void OnSelected(object sender, UtilityBelt.Scripting.Events.ObjectSelectedEventArgs e)
     {
+        //Don't select while inactive
+        if (!ubHud.Visible)
+            return;
+
         var wo = game.World.Get(e.ObjectId);
         if (wo is null)
             return;
@@ -58,9 +62,7 @@ internal class PropertyEditorHud(string name) : SizedHud(name, false, false)
         //Current = new PropertyData(wo);
 
         foreach (var table in propTables)
-        {
             table.SetTarget(Original);
-        }
     }
 
     public override void Draw(object sender, EventArgs e)

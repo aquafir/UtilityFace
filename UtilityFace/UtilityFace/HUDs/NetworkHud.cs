@@ -258,8 +258,45 @@ public class NetworkHud(string name) : SizedHud(name)
     {
         //ImGui.Indent(10);
         foreach (var key in obj.Data?.GetPropertyKeys())
-            ImGui.Text(key);
+        {
+            ImGui.Text(key);            
+        }
         //ImGui.Unindent(10);
+
+        /*
+         * local renderProps = nil
+renderProps = function(obj, depth)
+  ImGui.Indent(10)
+  if type(obj) == "userdata" and depth < 8 then
+    local props = obj.getPropertyKeys()
+    if #props > 0 then
+      for i, propName in ipairs(props) do
+        if (propName == nil) then
+          --print("Try get NIL prop", propName, "on", tostring(obj))
+        else
+          --print("Try get prop", propName, "on", tostring(obj))
+          if type(obj[propName]) == "userdata" then
+            local childProps = obj[propName].getPropertyKeys()
+            if #childProps > 0 then
+              ImGui.Text(string.format("%s:", propName))
+              renderProps(obj[propName], depth+1)
+            else
+              ImGui.Text(string.format("%s  =  %s", propName, tostring(obj[propName])))
+            end
+          else
+            ImGui.Text(string.format("%s  =  %s", propName, tostring(obj[propName])))
+          end
+        end
+      end
+    else
+      ImGui.Text(tostring(obj))
+    end
+  else
+    ImGui.Text(tostring(obj))
+  end
+  ImGui.Unindent(10)
+end
+         */
     }
 
 }

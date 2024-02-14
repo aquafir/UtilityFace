@@ -14,6 +14,7 @@ public static class DescriptionHelper
     static readonly Vector2 MIN_WIDTH = new(500f, 0);
     static readonly Vector2 MAX_WIDTH = new(1000f, float.MaxValue);
 
+    public static readonly Vector2 IconSize = new(24, 24);
 
     static uint _lastTooltipId = 0;
     static string _cachedTooltip = "";
@@ -26,7 +27,7 @@ public static class DescriptionHelper
         ImGui.BeginTooltip();
         //Icon
         var texture = wo.GetOrCreateTexture();
-        ImGui.TextureButton($"{wo.Id}", texture, Settings.IconSize);
+        ImGui.TextureButton($"{wo.Id}", texture, IconSize);
         ImGui.SameLine();
 
         ImGui.TextWrapped(desc);
@@ -38,14 +39,13 @@ public static class DescriptionHelper
             ImGui.Text("-------------------Equipped-------------------");
             //Icon
             texture = equipped.GetOrCreateTexture();
-            ImGui.TextureButton($"{wo.Id}", texture, Settings.IconSize);
+            ImGui.TextureButton($"{wo.Id}", texture, IconSize);
             ImGui.SameLine();
 
             ImGui.TextWrapped(equipped.Describe());
         }
 
         ImGui.EndTooltip();
-
     }
 
 

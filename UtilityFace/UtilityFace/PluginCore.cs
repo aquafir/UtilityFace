@@ -1,4 +1,6 @@
-﻿namespace UtilityFace;
+﻿using UtilityFace.HUDs;
+
+namespace UtilityFace;
 /// <summary>
 /// This is the main plugin class. When your plugin is loaded, Startup() is called, and when it's unloaded Shutdown() is called.
 /// </summary>

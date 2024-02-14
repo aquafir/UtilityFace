@@ -15,8 +15,6 @@ using DamageType = UtilityFace.Enums.DamageType;
 
 namespace UtilityFace.HUDs;
 
-
-
 public class ChatOptions
 {
     public static Vector2 MIN_SIZE = new(500, 500);
@@ -97,8 +95,8 @@ public class ChatHud(string name) : SizedHud(name, false, true)
         Active,
         Inactive,
         PendingFocus,
-        StartOmnibar,
         SearchOmnibar,
+        FillTemplate,
     }
 
     ChatState _chatState = ChatState.Inactive;
@@ -158,11 +156,18 @@ public class ChatHud(string name) : SizedHud(name, false, true)
             //else 
             //    State = ImGui.GetIO().WantCaptureKeyboard ? ChatState.Active : ChatState.Inactive;
 
+            if(State == ChatState.SearchOmnibar && chatMessage == "/") {
+                chatMessage = "";
+            }
+
             unsafe
             {
                 if (ImGui.InputText("###ChatBox", ref chatMessage, 1000, CHAT_INPUT_FLAGS, this.CommandInputCallback))
                 {
-                    SendMessage();
+                   // if (State != ChatState.SearchOmnibar)
+                        SendMessage();
+                    //else
+                    //    State = ChatState.PendingFocus;
                 }
             }
 
@@ -263,7 +268,7 @@ public class ChatHud(string name) : SizedHud(name, false, true)
         //    State = ChatState.SearchOmnibar;
         //}
 
-        if (State != ChatState.StartOmnibar)
+        if (State != ChatState.SearchOmnibar)
             return;
 
         // Showcase NOT relying on a IsItemHovered() to emit a tooltip.
@@ -361,7 +366,7 @@ public class ChatHud(string name) : SizedHud(name, false, true)
 
         if (ImGui.IsKeyPressed(ImGuiKey.UpArrow))
         {
-            if (State == ChatState.StartOmnibar)
+            if (State == ChatState.SearchOmnibar)
             {
                 if (omnibarResults.Count == 0)
                     return 0;
@@ -384,7 +389,7 @@ public class ChatHud(string name) : SizedHud(name, false, true)
 
         if (ImGui.IsKeyPressed(ImGuiKey.DownArrow))
         {
-            if (State == ChatState.StartOmnibar)
+            if (State == ChatState.SearchOmnibar)
             {
                 if (omnibarResults.Count == 0)
                     return 0;
@@ -408,31 +413,37 @@ public class ChatHud(string name) : SizedHud(name, false, true)
         if (ptr.BufTextLen == 0 && ImGui.IsKeyPressed(ImGuiKey.Slash))
         {
             Log.Chat($"Start omnibar!");
-            State = ChatState.StartOmnibar;
-            
-            //Delete the slash?
-            chatMessage = "";
-            ptr.SetText(chatMessage);
+            State = ChatState.SearchOmnibar;
+            omniIndex = 0;
+
+            //Todo: center?
 
             return 0;
         }
 
-        if (State == ChatState.StartOmnibar)
+        if (State == ChatState.SearchOmnibar)
         {
+            if (ImGui.IsKeyPressed(ImGuiKey.Backspace) && (ptr.SelectionEnd - ptr.SelectionStart == ptr.BufTextLen || ptr.BufTextLen == 0))
+            {
+                Log.Chat($"Escape omnibar!");
+                State = ChatState.Active;
+                return 0;
+            }
+
             omnibarResults = CommandHelper.MatchCommands(chatMessage);
 
             //Zen mode to select only result?
             if (omnibarResults.Count == 1)
             {
-                ptr.SetText(omnibarResults[0], true);
+                SelectOmnibarResult(ptr);
+                //ptr.SetText(omnibarResults[0], true);
                 return 0;
             }
 
-            if(ImGui.IsKeyPressed(ImGuiKey.Enter))
+            if (ImGui.IsKeyPressed(ImGuiKey.Tab))
             {
-                chatMessage = omnibarResults[omniIndex];
-                Log.Chat($"Selected: {omniIndex} - {chatMessage}");
-                ptr.SetText(chatMessage, true);
+                SelectOmnibarResult(ptr);
+
                 return 0;
             }
 
@@ -442,16 +453,30 @@ public class ChatHud(string name) : SizedHud(name, false, true)
 
         return 0;
     }
+
+    private unsafe void SelectOmnibarResult(ImGuiInputTextCallbackDataPtr ptr)
+    {
+        State = ChatState.PendingFocus;
+        if (omnibarResults.Count == 0)
+            return;
+
+        chatMessage = omnibarResults[omniIndex];
+        Log.Chat($"Selected: {omniIndex} - {chatMessage}");
+        ptr.SetText(chatMessage, true);
+
+    }
+
     private void HandleInput()
     {
         if (ImGui.IsKeyPressed(ImGuiKey.Enter))
         {
             Log.Chat($"Enter - {State}");
 
-            if (State != ChatState.Active)
+            if (State != ChatState.Active && State != ChatState.SearchOmnibar)
                 State = ChatState.PendingFocus;
         }
     }
+
 
     private void Incoming_Combat_HandleAttackerNotificationEvent(object sender, Combat_HandleAttackerNotificationEvent_S2C_EventArgs e) => AddMessage(e.GetChatLog());
     private void Incoming_Combat_HandleDefenderNotificationEvent(object sender, Combat_HandleDefenderNotificationEvent_S2C_EventArgs e) => AddMessage(e.GetChatLog());

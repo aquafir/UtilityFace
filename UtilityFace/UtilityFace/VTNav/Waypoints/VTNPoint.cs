@@ -1,6 +1,7 @@
 ﻿using Decal.Adapter.Wrappers;
 using System.Drawing;
 using UtilityBelt.Service.Lib.ACClientModule;
+using UtilityFace.HUDs;
 
 namespace UtilityBelt.Lib.VTNav.Waypoints
 {
@@ -27,6 +28,7 @@ namespace UtilityBelt.Lib.VTNav.Waypoints
 
         public VTNPoint(StreamReader reader, VTNavRoute parentRoute, int index)
         {
+            
             sr = reader;
             route = parentRoute;
             this.index = index;
