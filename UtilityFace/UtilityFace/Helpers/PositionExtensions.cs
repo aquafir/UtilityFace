@@ -2,6 +2,7 @@
 using Position = UtilityBelt.Scripting.Interop.Position;
 using UtilityBelt.Lib;
 using System.Drawing;
+using UtilityBelt.Service.Lib.ACClientModule;
 
 
 namespace UtilityFace.Helpers;
@@ -16,6 +17,11 @@ public static class PositionExtensions
 
     public static Vector2 ToVector2(this Position start) => new(start.GlobalX(), start.GlobalY());
     public static Vector3 ToVector3(this Position start) => new(start.GlobalX(), start.GlobalY(), start.Frame.Origin.Z);
+    public static Coordinates FromVector2(this Vector2 v, int z = 0) => new(v.Y / C, v.X / C, z);
+    public static Coordinates FromVector3(this Vector3 v) => new(v.Y / C, v.X / C, v.Z);
+
+    public static string FormatCartesian(this Coordinates coords) => $"{coords.NS}{(coords.NS < 0 ? "S" : "N")}, {coords.EW}{(coords.EW < 0 ? "W" : "E")}";
+    public static float[] ToArray(this Coordinates coords) => new[] {coords.EW, coords.NS, coords.Z};
 
     public static Vector2 ScreenVectorTo(this Position start, Position end) => new Vector2((end.EW() - start.EW()) * C, (start.NS() - end.NS()) * C);
 

@@ -1,4 +1,6 @@
 ﻿using UtilityBelt.Service.Lib.Settings;
+using UtilityBelt.Service.Views.SettingsEditor;
+using UtilityFace.Settings;
 
 namespace UtilityFace.HUDs;
 
@@ -8,7 +10,7 @@ namespace UtilityFace.HUDs;
 internal class InterfaceController(string name) : SizedHud(name, true, true)
 {
 
-    public Settings Settings;
+//    public Settings Settings;
 
     //[Summary("Show landblock boundaries")]
     public Global<bool> ShowLandblockBoundaries = new(false);
@@ -20,7 +22,9 @@ internal class InterfaceController(string name) : SizedHud(name, true, true)
     //Settings = new Settings(this, settingsPath, p => p.SettingType == SettingType.Global, null, "LBVisualizer Settings");
     //Settings.Load();
 
-
+    SettingsEditor _settingsUI = new SettingsEditor("My Settings", new List<object>() { typeof(SettingsRoot)
+        });
+    // dispose _settingsUI later...
 
     List<HudBase> Huds = new();
 
@@ -47,6 +51,11 @@ internal class InterfaceController(string name) : SizedHud(name, true, true)
     public override void Draw(object sender, EventArgs e)
     {
         ImGui.Text("UIs");
+
+        if (ImGui.Button("Settings"))
+        {
+            _settingsUI.Hud.Visible = !_settingsUI.Hud.Visible;
+        }
 
         foreach (var hud in Huds)
         {
@@ -165,15 +174,16 @@ internal class InterfaceController(string name) : SizedHud(name, true, true)
             }
             Huds.Clear();
 
-            if (Settings != null)
-            {
-                
-                if (Settings.NeedsSave)
-                {
-                    Settings.Save();
-                }
-            }
+            //if (Settings != null)
+            //{
 
+            //    if (Settings.NeedsSave)
+            //    {
+            //        Settings.Save();
+            //    }
+            //}
+
+            _settingsUI?.Dispose();
         }
         catch (Exception ex)
         {

@@ -104,7 +104,6 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
             re = new(search, RegexOptions.Compiled | RegexOptions.IgnoreCase);
         }
         ImGui.SameLine();
-        //var watch = Stopwatch.StartNew();
 
         //Get the draw list
         var dl = ImGui.GetWindowDrawList();
@@ -115,8 +114,9 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
         var cosTheta = (float)Math.Cos(heading);
         var sinTheta = (float)Math.Sin(heading);
 
+        float markerSize = Math.Max(2, 2 + .5f * scale);
+
         //Get centered window position
-        Vector2 dimensions = ImGui.GetWindowSize();
         Vector2 radius = ImGui.GetWindowSize() / 2;
 
         //Get a radius for the compas label.  Assumes a square
@@ -128,8 +128,8 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
         var north = radarCenter + labelRadius.Rotate(heading + Math.PI * 2 / 2);
         var west = radarCenter + labelRadius.Rotate(heading + Math.PI * 1 / 2);
         var south = radarCenter + labelRadius.Rotate(heading);
-
         //dl.AddCircle(radarCenter, labelRadius.Y, 0xFFCCCCCC, 100, 7);
+
         var size = big ? 30 : 10;
         var f = ImGui.GetFont();
         dl.AddText(f, size, north, (uint)Color.Blue.ToArgb(), "N");
@@ -143,46 +143,76 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
         {
             Vector2 mousePos = ImGui.GetMousePos();
             Vector2 windowPos = ImGui.GetWindowPos();
-            Vector2 cursorPosRelativeToWindow = mousePos - windowPos - dimensions / 2;
+            //Should be center coords
+            Vector2 centerOffset = mousePos - windowPos - radius;
+
+            //Adjust for something?
+            var cursorOffset = new Vector2(0, 15) * scale;
+            cursorOffset = rotate ? cursorOffset.Rotate(-heading) : cursorOffset;
+            //centerOffset -= cursorOffset;
 
             //Adjust for scale/rotation
-            var adjustPos = cursorPosRelativeToWindow / scale;
-            var rotatedPos = adjustPos.Rotate(cosTheta, sinTheta);
-            var mouseCenter = radarCenter + rotatedPos;
+            var scaledPos = centerOffset / scale;
+            var rotatedPos = rotate ? scaledPos.Rotate(-heading) : scaledPos;
 
-            //var wos = tree.GetNearestNeighbours(new[] { adjustPos.X, adjustPos.Y }, 1);
-            var wos = tree.RadialSearch(new[] { adjustPos.X, adjustPos.Y }, 10 / scale, 5);
+            //Get coordinates from position relative to player
+            var coordsVec = player + new Vector2(rotatedPos.X, -rotatedPos.Y); //slip y axis
+            var coords = coordsVec.FromVector2();
+
+            //var wos = tree.GetNearestNeighbours(new[] { scaledPos.X, scaledPos.Y }, 1);
+            var wos = tree.RadialSearch(new[] { scaledPos.X, scaledPos.Y }, 10 / scale, 5);
+
+            //if (wos.Length > 0)
+            //{
+            if (ImGui.BeginTooltip())
+            {
+                //ImGui.Text($"{centerOffset}\n{scaledPos}\n{rotatedPos} @ {heading} rad\n{coordsVec}\n{coords}");
+                ImGui.Text($"{coords}");
+
+                foreach (var wo in wos.Select(x => x.Value))
+                {
+                    var texture = wo.GetOrCreateTexture();
+                    ImGui.TextureButton($"{wo.Id}", texture, new(24));
+                    ImGui.SameLine();
+                    ImGui.Text($"{wo.Name} - {wo.ServerPosition.ToVector2().FromVector2().FormatCartesian()}");
+                }
+
+                ImGui.EndTooltip();
+            }
 
             if (wos.Length > 0)
             {
-                if (ImGui.BeginTooltip())
-                {
-                    foreach (var wo in wos.Select(x => x.Value))
-                    {
-                        var texture = wo.GetOrCreateTexture();
-                        ImGui.TextureButton($"{wo.Id}", texture, new(24));
-                        ImGui.SameLine();
-                        ImGui.Text($"{wo.Name}");
-                    }
-
-                    ImGui.EndTooltip();
-                }
-
                 var first = wos.FirstOrDefault().Value;
 
                 if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
-                    first.Use(new() { MaxRetryCount = 0, TimeoutMilliseconds = 100 });
-                //game.Actions.InvokeChat("/smite");
+                    first.TryUse();
                 else if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
                     first.Select();
             }
 
+            //Having issues with popup
+            //else if (ImGui.BeginPopupContextItem($"###{first.Id}", ImGuiPopupFlags.MouseButtonRight | ImGuiPopupFlags.AnyPopup))
+            //{
+            //    Log.Chat($"Hit?");
+            //    if (ImGui.MenuItem("Use"))
+            //        first.TryUse();
+
+            //    if (ImGui.MenuItem("Tele To"))
+            //        game.Actions.InvokeChat($"/tele {first.ServerPosition.ToVector2().FromVector2().FormatCartesian()}");
+
+            //    if (ImGui.MenuItem("Select"))
+            //        first.Select();
+
+            //    ImGui.EndPopup();
+            //}
+            //}
+
+            if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
+                game.Actions.InvokeChat($"/tele {coords.FormatCartesian()}");
 
             scale += ImGui.GetIO().MouseWheel / 10;
             scale = Math.Max(.1f, scale);
-            //if (ImGui.IsMouseClicked(MouseButton.Middle, ))
         }
-
 
         //if (ImGui.Checkbox("Big", ref big))
         //    SetMode();
@@ -198,8 +228,14 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
             ImGui.DragFloat("Scale", ref scale, .05f, .1f, 6f);
         }
 
-        //Mark player
-        dl.AddCircleFilled(radarCenter, 5, (uint)Color.Blue.ToArgb());
+        //Mark player (triangle/circle/line)
+        var pHeading = rotate ? 0 : game.Character.Heading();
+        var t1 = radarCenter + new Vector2(0, -20).Rotate(pHeading);
+        var t2 = radarCenter + new Vector2(5, 0).Rotate(pHeading);
+        var t3 = radarCenter + new Vector2(-5, 0).Rotate(pHeading);
+        dl.AddTriangleFilled(t1, t2, t3, 0xFFFFFF00);
+        //dl.AddCircleFilled(radarCenter, 5, (uint)Color.Blue.ToArgb());
+        //var t = new Vector2(0, -50).Rotate(game.Character.Heading());
 
         //Mark range
         dl.AddCircle(radarCenter, range * scale, (uint)Color.Blue.ToArgb());
@@ -211,11 +247,10 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
             if (rotate)
                 vto = vto.Rotate(cosTheta, sinTheta);
             vto *= scale;
-            dl.AddCircle(radarCenter + vto, 4, 0xFF00FFFF);
+            dl.AddCircle(radarCenter + vto, markerSize+2, 0xFF00FFFF);
         }
 
-        //Log.Chat($"{heading} - {cosTheta} - {sinTheta}");
-
+        //Scan landscape/rebuild tree
         tree.Clear();
         foreach (var wo in game.World.GetLandscape())
         {
@@ -226,11 +261,11 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
             uint color = wo.ObjectClass switch
             {
                 ObjectClass.Portal => 0xFFFF00FF,
-                ObjectClass.Player => 0x666666,
-                ObjectClass.Vendor => 0x999999,
+                ObjectClass.Player => 0xFF666666,
+                ObjectClass.Vendor => 0xFF999999,
                 ObjectClass.Corpse => 0xFF0000,
-                ObjectClass.Lifestone => 0x00FF00,
-                ObjectClass.Npc => 0xFF0000FF,
+                ObjectClass.Lifestone => 0xFF00FF00,
+                ObjectClass.Npc => 0xFF00CCCC,
                 ObjectClass.Monster => 0xFFCCCC00,
                 _ => 0
             };
@@ -250,19 +285,19 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
             vto *= scale;
 
             //Draw
-            dl.AddCircle(radarCenter + vto, 2, color);
+            dl.AddCircleFilled(radarCenter + vto, markerSize, color);
+            dl.AddCircle(radarCenter + vto, markerSize+1, 0xFF111111);
 
             if (!String.IsNullOrWhiteSpace(search) && re.IsMatch(wo.Name))
-                dl.AddCircle(radarCenter + vto, 4, 0xFFCC00CC);
+                dl.AddCircle(radarCenter + vto, markerSize + 2, 0xFFCC00CC);
+
+            //Icon
             //var texture = wo.GetOrCreateTexture();
             //var s = new Vector2(30) * scale;
             //var start = radarCenter + vto - s/2;
             //var end = start + s;
             //dl.AddImage(texture.TexturePtr, start, end);
         }
-
-        //watch.Stop();
-        //Log.Chat($"{watch.ElapsedMilliseconds}ms");
 
         base.Draw(sender, e);
     }

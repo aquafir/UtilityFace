@@ -578,33 +578,6 @@ public class InventoryHud(string name) : SizedHud(name)
                 else if (TryGetNearest(out var player))
                     wo.Give(player.Id);
             }
-            //print('Nothing selected')
-            //        end
-            //    if ImGui.MenuItem("Give NPC") then
-            //        if game.World.Selected ~= nil and game.World.Selected.ObjectClass == ObjectClass.Npc then
-            //            wo.Give(game.World.Selected.Id)
-            //        else
-            //wo.Give(game.World.GetNearest(ObjectClass.Npc).Id)
-            //        end
-            //    end
-            //    if ImGui.MenuItem("Give Player") then
-            //        if game.World.Selected ~= nil and game.World.Selected.ObjectClass == ObjectClass.Player then
-            //            wo.Give(game.World.Selected.Id)
-            //        else
-            //wo.Give(game.World.GetNearest(ObjectClass.Player).Id)
-            //        end
-            //    end
-            //    -- if ImGui.MenuItem("Give Vendor") then
-            //    --     if game.World.Selected ~= nil and game.World.Selected.ObjectClass == ObjectClass.Vendor then
-            //    --         wo.Give(game.World.Selected.Id)
-            //    --     else
-            //--wo.Give(game.World.GetNearest(ObjectClass.Vendor).Id)
-            //--     end
-            //-- end
-            //    if ImGui.MenuItem("Salvage") then
-            //        --game.Actions.Salvage()
-            //        game.Actions.SalvageAdd(wo.Id)
-            //    end
             ImGui.EndPopup();
         }
     }
