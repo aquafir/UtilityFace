@@ -14,7 +14,7 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
     bool big = true;
     float scale = 1;
     float range = 75;   //Radar range
-    private float alpha => big ? .6f : 1f;
+    private float alpha => big ? .5f : .8f;
     private Vector2 minimapPosition;
 
     public override void PreRender(object sender, EventArgs e)
@@ -35,7 +35,7 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
     {
         MinSize = new(700);
         //MaxSize = new(700);
-        ubHud.WindowSettings = ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoTitleBar;
+        ubHud.WindowSettings = ImGuiWindowFlags.NoTitleBar;
 
         //SetMode();
 
@@ -54,6 +54,9 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
         {
             if (big)
             {
+                //Store pos
+                minimapPosition = ImGui.GetWindowPos();
+
                 //Set moveable stuff?
                 ubHud.WindowSettings = ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoTitleBar;
 
@@ -77,9 +80,13 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
                 MinSize = new(200);
                 MaxSize = new(700);
             }
-        }catch(Exception ex) { Log.Error(ex); }
+        }
+        catch (Exception ex) { Log.Error(ex); }
     }
 
+
+    string search = "";
+    Regex re = new("");
     public override void Draw(object sender, EventArgs e)
     {
         if (ImGui.IsKeyPressed(ImGuiKey.Equal))
@@ -88,45 +95,63 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
             big = !big;
             SetMode();
         }
+
+        if (ImGui.IsKeyPressed(ImGuiKey.F) && ImGui.IsKeyDown(ImGuiKey.LeftCtrl))
+            ImGui.SetKeyboardFocusHere();
+
+        if (ImGui.InputText("##Search", ref search, 50, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.AutoSelectAll))
+        {
+            re = new(search, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        }
+        ImGui.SameLine();
         //var watch = Stopwatch.StartNew();
+
+        //Get the draw list
+        var dl = ImGui.GetWindowDrawList();
 
         //Get global coords / heading
         var player = game.Character.Weenie.ServerPosition.ToVector2();
-        var heading = -game.Character.Heading();
+        var heading = rotate ? -game.Character.Heading() : 0;
         var cosTheta = (float)Math.Cos(heading);
         var sinTheta = (float)Math.Sin(heading);
 
         //Get centered window position
-        var radarCenter = ImGui.GetWindowPos();
-        radarCenter.X += ImGui.GetWindowWidth() / 2;
-        radarCenter.Y += ImGui.GetWindowHeight() / 2;
+        Vector2 dimensions = ImGui.GetWindowSize();
+        Vector2 radius = ImGui.GetWindowSize() / 2;
+
+        //Get a radius for the compas label.  Assumes a square
+        Vector2 labelRadius = new(0, radius.X - (big ? 20 : 10));
+        var rot = labelRadius.Rotate(heading * Math.PI / 180);
+
+        var radarCenter = ImGui.GetWindowPos() + radius;
+        var east = radarCenter + labelRadius.Rotate(heading + Math.PI * 3 / 2);
+        var north = radarCenter + labelRadius.Rotate(heading + Math.PI * 2 / 2);
+        var west = radarCenter + labelRadius.Rotate(heading + Math.PI * 1 / 2);
+        var south = radarCenter + labelRadius.Rotate(heading);
+
+        //dl.AddCircle(radarCenter, labelRadius.Y, 0xFFCCCCCC, 100, 7);
+        var size = big ? 30 : 10;
+        var f = ImGui.GetFont();
+        dl.AddText(f, size, north, (uint)Color.Blue.ToArgb(), "N");
+        dl.AddText(f, size, west, (uint)Color.Blue.ToArgb(), "W");
+        dl.AddText(f, size, south, (uint)Color.Blue.ToArgb(), "S");
+        dl.AddText(f, size, east, (uint)Color.Blue.ToArgb(), "E");
+        //dl.AddText(radarCenter, (uint)Color.Blue.ToArgb(), "C");
 
         //Hover
         if (ImGui.IsWindowHovered())
         {
             Vector2 mousePos = ImGui.GetMousePos();
             Vector2 windowPos = ImGui.GetWindowPos();
-            Vector2 dimensions = ImGui.GetWindowSize();
-
-            //Log.Chat($"{dimensions/2}");
             Vector2 cursorPosRelativeToWindow = mousePos - windowPos - dimensions / 2;
 
             //Adjust for scale/rotation
             var adjustPos = cursorPosRelativeToWindow / scale;
-
             var rotatedPos = adjustPos.Rotate(cosTheta, sinTheta);
-            //if (ImGui.BeginTooltip())
-            //{
-            //    ImGui.Text($"{adjustPos} - {rotatedPos}");
-            //    ImGui.EndTooltip();
-            //}
             var mouseCenter = radarCenter + rotatedPos;
 
-            //if (rotate)
-            //    adjustPos = adjustPos.Rotate(cosTheta, sinTheta);
-
+            //var wos = tree.GetNearestNeighbours(new[] { adjustPos.X, adjustPos.Y }, 1);
             var wos = tree.RadialSearch(new[] { adjustPos.X, adjustPos.Y }, 10 / scale, 5);
-            //var wos = tree.GetNearestNeighbours(new [] { adjustPos.X, adjustPos.Y }, 1);
 
             if (wos.Length > 0)
             {
@@ -144,31 +169,36 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
                 }
 
                 var first = wos.FirstOrDefault().Value;
-                if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
-                    first.Select();
 
+                if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+                    first.Use(new() { MaxRetryCount = 0, TimeoutMilliseconds = 100 });
+                //game.Actions.InvokeChat("/smite");
+                else if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                    first.Select();
             }
-            //else
-            //    Log
-            // Output the relative position
-            //Log.Chat($"Cursor Position Relative to Window: ({cursorPosRelativeToWindow.X}, {cursorPosRelativeToWindow.Y})");
-            //Log.Chat($"Adjusted Position: ({adjustPos.X}, {adjustPos.Y})");
+
+
+            scale += ImGui.GetIO().MouseWheel / 10;
+            scale = Math.Max(.1f, scale);
+            //if (ImGui.IsMouseClicked(MouseButton.Middle, ))
         }
 
 
-        if (ImGui.Checkbox("Big", ref big))
-            SetMode();
+        //if (ImGui.Checkbox("Big", ref big))
+        //    SetMode();
 
-        ImGui.SameLine();
-        ImGui.Checkbox("Rotate", ref rotate);
+        if (big)
+        {
+            ImGui.SameLine();
+            ImGui.Checkbox("Rotate", ref rotate);
 
-        ImGui.SetNextItemWidth(100);
-        ImGui.DragFloat("Range", ref range, 1f, .1f, 100f);
-        ImGui.SetNextItemWidth(100);
-        ImGui.DragFloat("Scale", ref scale, .05f, .1f, 6f);
+            ImGui.SetNextItemWidth(100);
+            ImGui.DragFloat("Range", ref range, 1f, .1f, 100f);
+            ImGui.SetNextItemWidth(100);
+            ImGui.DragFloat("Scale", ref scale, .05f, .1f, 6f);
+        }
 
         //Mark player
-        var dl = ImGui.GetWindowDrawList();
         dl.AddCircleFilled(radarCenter, 5, (uint)Color.Blue.ToArgb());
 
         //Mark range
@@ -189,6 +219,10 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
         tree.Clear();
         foreach (var wo in game.World.GetLandscape())
         {
+            if (!String.IsNullOrWhiteSpace(search) && !re.IsMatch(wo.Name))
+                continue;
+
+
             uint color = wo.ObjectClass switch
             {
                 ObjectClass.Portal => 0xFFFF00FF,
@@ -218,6 +252,13 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
             //Draw
             dl.AddCircle(radarCenter + vto, 2, color);
 
+            if (!String.IsNullOrWhiteSpace(search) && re.IsMatch(wo.Name))
+                dl.AddCircle(radarCenter + vto, 4, 0xFFCC00CC);
+            //var texture = wo.GetOrCreateTexture();
+            //var s = new Vector2(30) * scale;
+            //var start = radarCenter + vto - s/2;
+            //var end = start + s;
+            //dl.AddImage(texture.TexturePtr, start, end);
         }
 
         //watch.Stop();
