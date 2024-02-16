@@ -33,7 +33,7 @@ public class NavHud(string name) : SizedHud(name, false, true)
     {
         if (mark is null)
         {
-            loc = game.Character.Weenie.ServerPosition.ToVec();
+            loc = game.Character.Weenie.ServerPosition.ToVector3();
             loc.Y += .05f;
             //mark = ac.NewD3DObj();
             //mark.Visible = false;

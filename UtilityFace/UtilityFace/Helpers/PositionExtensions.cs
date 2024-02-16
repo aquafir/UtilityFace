@@ -3,30 +3,75 @@ using Position = UtilityBelt.Scripting.Interop.Position;
 using UtilityBelt.Lib;
 using System.Drawing;
 using UtilityBelt.Service.Lib.ACClientModule;
-
+using Frame = UtilityBelt.Scripting.Interop.Frame;
 
 namespace UtilityFace.Helpers;
 public static class PositionExtensions
 {
     public static float C = (float)Position.C;
 
-    public static float EW(this Position pos) => Position.LandblockToEW(pos.Landcell >> 16 << 16, pos.Frame.Origin.X);
-    public static float NS(this Position pos) => Position.LandblockToNS(pos.Landcell >> 16 << 16, pos.Frame.Origin.Y);
+    public unsafe static CPhysicsObj GetPhysicsObj(this WorldObject wo)
+    {
+        var cphys = *CPhysicsObj.GetObjectA(wo.Id);
+        return cphys;
+    }
+    public unsafe static Position GetPosition(this WorldObject wo)
+    {
+        var pos = wo.GetPhysicsObj().m_position;
+        Vector3 v = new(pos.frame.m_fOrigin.x, pos.frame.m_fOrigin.y, pos.frame.m_fOrigin.z);
+
+        //UtilityBelt.Scripting.Interop.Quaternion q = new(pos.frame.qw, pos.frame.qx, pos.frame.qy, pos.frame.qz);
+        //p.Frame.Orientation.W
+        
+        Position p = new();
+        p.Landcell = pos.objcell_id;
+        p.Frame.Origin = v;
+        return p;
+    }
+
+    public static Vector2 ToVector2(this Position pos) => new(pos.GlobalX(), pos.GlobalY());
+    public static Vector3 ToVector3(this Position pos) => new(pos.GlobalX(), pos.GlobalY(), pos.Frame.Origin.Z);
     public static float GlobalX(this Position pos) => pos.EW() * C;
     public static float GlobalY(this Position pos) => pos.NS() * C;
+    public static float EW(this Position pos) => Position.LandblockToEW(pos.Landcell >> 16 << 16, pos.Frame.Origin.X);
+    public static float NS(this Position pos) => Position.LandblockToNS(pos.Landcell >> 16 << 16, pos.Frame.Origin.Y);
+    public static float[] ToCartesian(this Position pos) => new[] { pos.NS(), pos.EW() };
+    public static string FormatCartesian(this Position pos) => $"{pos.NS()}{(pos.NS() < 0 ? "S" : "N")}, {pos.EW()}{(pos.EW() < 0 ? "W" : "E")}";
+    public static float[] ToGlobal(this Position pos) => new[] { pos.GlobalX(), pos.GlobalY() };
 
-    public static Vector2 ToVector2(this Position start) => new(start.GlobalX(), start.GlobalY());
-    public static Vector3 ToVector3(this Position start) => new(start.GlobalX(), start.GlobalY(), start.Frame.Origin.Z);
+    /// <summary>
+    /// Converts a position to an x,y,z array
+    /// </summary>
+    public static float[] ToArray(this Position position, bool d3dUnits = true)
+    {
+        float x = Position.LandblockToEW(position.Landcell >> 16 << 16, position.Frame.Origin.X);
+        float y = Position.LandblockToNS(position.Landcell >> 16 << 16, position.Frame.Origin.Y);
+        float z = position.Frame.Origin.Z;
+
+        return new float[] { x, y, d3dUnits ? z / 240 : z };
+    }
+    public static float[] ToArray2(this Position position, bool d3dUnits = true)
+    {
+        float x = Position.LandblockToEW(position.Landcell >> 16 << 16, position.Frame.Origin.X);
+        float y = Position.LandblockToNS(position.Landcell >> 16 << 16, position.Frame.Origin.Y);
+        float z = position.Frame.Origin.Z;
+
+        return new float[] { x, y};
+    }
+
+
     public static Coordinates FromVector2(this Vector2 v, int z = 0) => new(v.Y / C, v.X / C, z);
     public static Coordinates FromVector3(this Vector3 v) => new(v.Y / C, v.X / C, v.Z);
 
     public static string FormatCartesian(this Coordinates coords) => $"{coords.NS}{(coords.NS < 0 ? "S" : "N")}, {coords.EW}{(coords.EW < 0 ? "W" : "E")}";
-    public static float[] ToArray(this Coordinates coords) => new[] {coords.EW, coords.NS, coords.Z};
+    public static float[] ToArray(this Coordinates coords) => new[] { coords.NS, coords.EW,  coords.Z };
 
     public static Vector2 ScreenVectorTo(this Position start, Position end) => new Vector2((end.EW() - start.EW()) * C, (start.NS() - end.NS()) * C);
 
     public static Vector2 Vector2To(this Position start, Position end)
     {
+        //WorldObject wo;
+        
         float sx = start.EW();
         float sy = start.NS();
         float ex = end.EW();
@@ -99,26 +144,15 @@ public static class PositionExtensions
         return vector * (targetMagnitude / currentMagnitude); ;
     }
 
-    /// <summary>
-    /// Converts a position to an x,y,z array
-    /// </summary>
-    public static float[] ToArray(this Position position, bool d3dUnits = true)
-    {
-        float x = Position.LandblockToEW(position.Landcell >> 16 << 16, position.Frame.Origin.X);
-        float y = Position.LandblockToNS(position.Landcell >> 16 << 16, position.Frame.Origin.Y);
-        float z = position.Frame.Origin.Z;
+    
+    //public static Vector3 ToVec(this Position position, bool d3dUnits = true)
+    //{
+    //    float x = Position.LandblockToEW(position.Landcell >> 16 << 16, position.Frame.Origin.X);
+    //    float y = Position.LandblockToNS(position.Landcell >> 16 << 16, position.Frame.Origin.Y);
+    //    float z = position.Frame.Origin.Z;
 
-        return new float[] { x, y, d3dUnits ? z / 240 : z };
-    }
-
-    public static Vector3 ToVec(this Position position, bool d3dUnits = true)
-    {
-        float x = Position.LandblockToEW(position.Landcell >> 16 << 16, position.Frame.Origin.X);
-        float y = Position.LandblockToNS(position.Landcell >> 16 << 16, position.Frame.Origin.Y);
-        float z = position.Frame.Origin.Z;
-
-        return new(x, y, d3dUnits ? z / 240 : z);
-    }
+    //    return new(x, y, d3dUnits ? z / 240 : z);
+    //}
 
     /// <summary>
     /// Todo: redo this.
