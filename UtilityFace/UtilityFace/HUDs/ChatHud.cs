@@ -2,77 +2,22 @@
 using Microsoft.Extensions.Options;
 using System;
 using System.Drawing;
+using System.Drawing.Printing;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using UtilityBelt.Common.Messages;
 using UtilityBelt.Common.Messages.Events;
 using UtilityBelt.Scripting.Events;
 using UtilityBelt.Scripting.Interop;
+using UtilityFace.Chat;
 using UtilityFace.Enums;
 using static System.Net.Mime.MediaTypeNames;
 using DamageType = UtilityFace.Enums.DamageType;
 
 namespace UtilityFace.HUDs;
 
-public class ChatOptions
-{
-    public static Vector2 MIN_SIZE = new(500, 500);
-    public static Vector2 MAX_SIZE = new(500, 500);
-    public const string MODAL_NAME = "FilterModel";
-    public const int MAX_CHAT = 5;
-    public const int MAX_HISTORY = 5;
-
-    public bool Debug = true;
-    public bool ShowModal = false;
-    public bool StayInChat = true;
-
-    public string Query = "";
-
-    public Dictionary<ChatMessageEx, ChatDisplay> Displays = new()
-    {
-        [ChatMessageEx.Abuse] = new(Color.Tan.ToVec4()),
-        [ChatMessageEx.AdminTell] = new(Color.Tan.ToVec4()),
-        [ChatMessageEx.Advancement] = new(Color.LightGreen.ToVec4()),
-        [ChatMessageEx.Allegiance] = new(Color.LightBlue.ToVec4()),
-        [ChatMessageEx.Appraisal] = new(Color.Tan.ToVec4()),
-        [ChatMessageEx.Channels] = new(Color.Tan.ToVec4()),
-        [ChatMessageEx.Combat] = new(Color.Red.ToVec4()),
-        [ChatMessageEx.CombatAttackerNotification] = new(Color.Pink.ChangeColorBrightness(.05f).ToVec4()),
-        [ChatMessageEx.CombatDefenderNotification] = new(Color.Red.ChangeColorBrightness(-.1f).ToVec4()),
-        [ChatMessageEx.CombatEnemy] = new(Color.Tomato.ToVec4()),
-        [ChatMessageEx.CombatEvasionAttackNotification] = new(Color.Pink.ChangeColorBrightness(.1f).ToVec4()),
-        [ChatMessageEx.CombatEvasionDefenderNotification] = new(Color.Red.ChangeColorBrightness(-.1f).ToVec4()),
-        [ChatMessageEx.CombatSelf] = new(Color.Thistle.ToVec4()),
-        [ChatMessageEx.CombatVictimOther] = new(Color.Green.ChangeColorBrightness(.2f).ToVec4()),
-        [ChatMessageEx.CombatVictimSelf] = new(Color.Green.ChangeColorBrightness(.3f).ToVec4()),
-        [ChatMessageEx.Craft] = new(Color.Tan.ToVec4()),
-        [ChatMessageEx.Default] = new(Color.Gray.ToVec4()),
-        [ChatMessageEx.Emote] = new(Color.DarkGray.ToVec4()),
-        [ChatMessageEx.Fellowship] = new(Color.Yellow.ToVec4()),
-        [ChatMessageEx.Help] = new(Color.Tan.ToVec4()),
-        [ChatMessageEx.Magic] = new(Color.LightBlue.ToVec4()),
-        [ChatMessageEx.OutgoingChannel] = new(Color.Tan.ToVec4()),
-        [ChatMessageEx.OutgoingSocial] = new(Color.Tan.ToVec4()),
-        [ChatMessageEx.OutgoingTell] = new(Color.DarkGoldenrod.ToVec4()),
-        [ChatMessageEx.Recall] = new(Color.Violet.ToVec4()),
-        [ChatMessageEx.Salvaging] = new(Color.Tan.ToVec4()),
-        [ChatMessageEx.Social] = new(Color.Tan.ToVec4()),
-        [ChatMessageEx.Speech] = new(Color.White.ToVec4()),
-        [ChatMessageEx.Spellcasting] = new(Color.LightBlue.ToVec4()),
-        [ChatMessageEx.System] = new(Color.DarkRed.ToVec4()),
-        [ChatMessageEx.Tell] = new(Color.Yellow.ToVec4()),
-        [ChatMessageEx.WorldBroadcast] = new(Color.Turquoise.ToVec4()),
-    };
-
-    public bool IsFiltered(ChatLog message)
-    {
-        if (!Displays.TryGetValue(message.Type, out var display))
-            return true;
-
-        return !display.Visible;
-    }
-}
 
 
 public class ChatHud(string name) : SizedHud(name, false, true)
@@ -80,25 +25,19 @@ public class ChatHud(string name) : SizedHud(name, false, true)
     readonly ChatOptions options = new();
     readonly List<string> history = new();
     readonly List<FilteredChat> chatBuffer = new();
-    List<string> omnibarResults = new();
 
     const ImGuiInputTextFlags CHAT_INPUT_FLAGS = ImGuiInputTextFlags.AutoSelectAll | ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.CallbackEdit | ImGuiInputTextFlags.CallbackAlways;
     private const int CHAT_INPUT_HEIGHT = 30;
     private const string OMNIBAR_POPUP = "Omnibar";
-    int historyIndex = 0;
-    int omniIndex = 0;
+    private const string CHAT_POPUP = "ChatMode";
 
     string chatMessage = "";
+    ChatTemplate template = new("");
+    List<string> omnibarResults = new();
+    int omniIndex = 0;
+    int historyIndex = 0;
 
-    enum ChatState
-    {
-        Active,
-        Inactive,
-        PendingFocus,
-        SearchOmnibar,
-        FillTemplate,
-    }
-
+    ChatMode Mode = ChatMode.Chat;
     ChatState _chatState = ChatState.Inactive;
     ChatState State
     {
@@ -111,74 +50,73 @@ public class ChatHud(string name) : SizedHud(name, false, true)
         }
     }
 
+    Styling style = new()
+    {
+        Styles = new()
+        {
+            ImGuiStyleVar.WindowRounding.Style(5),
+            ImGuiStyleVar.WindowPadding.Style(new Vector2(5)),
+            ImGuiStyleVar.WindowBorderSize.Style(1),
+            ImGuiStyleVar.FramePadding.Style(new Vector2(0)),
+            ImGuiStyleVar.ItemSpacing.Style(new Vector2(0, 2)),
+        }
+    };
+
     public override void Init()
     {
         MinSize = new(400, 100);
         MaxSize = new(600, 400);
         CommandHelper.LoadCommands();
-        ubHud.WindowSettings = ImGuiWindowFlags.None;
+
+        //NoBringToFrontOnFocus is used to 
+        ubHud.WindowSettings = ImGuiWindowFlags.None | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoBringToFrontOnFocus;
 
         base.Init();
     }
 
+    public override void PreRender(object sender, EventArgs e)
+    {
+        //Get rid of frame styles
+        style.PushStyles();
+        //ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 5);
+        //ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(5));    //No window borders
+        //ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
+        //ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new Vector2(0));
+        //ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(0, 2));     //Chat elements
+        base.PreRender(sender, e);
+    }
+    public override void PostRender(object sender, EventArgs e)
+    {
+        style.PopStyles();
+        //ImGui.PopStyleVar(5);
+        base.PostRender(sender, e);
+    }
     public override void Draw(object sender, EventArgs e)
     {
         try
         {
-            var region = ImGui.GetContentRegionAvail();
+            //if (ImGui.IsWindowFocused())
+            //    State = ChatState.Inactive;
 
-            region.Y -= CHAT_INPUT_HEIGHT;
-            if (ImGui.BeginChild("ChatChild", region, true, ImGuiWindowFlags.HorizontalScrollbar))
-            {
-                foreach (var chatEntry in chatBuffer)
-                {
-                    if (chatEntry.Filtered)
-                    {
-                        Log.Chat($"Skip {chatEntry.Message}");
-                        continue;
-                    }
+            //var region = ImGui.GetContentRegionAvail();
+            //region.Y -= CHAT_INPUT_HEIGHT;
 
-                    DrawChatEntry(chatEntry.Message);
-                }
-                ImGui.EndChild();
-            }
+            DrawChatLog();
 
             //If input is handled avoid reseting the chat message?
             HandleInput();
 
-            ImGui.SetNextItemWidth(region.X - CHAT_INPUT_HEIGHT);
+            //ImGui.SetNextItemWidth(region.X - CHAT_INPUT_HEIGHT);
 
-            if (State == ChatState.PendingFocus)
-            {
-                ImGui.SetKeyboardFocusHere();
-                State = ChatState.Active;
-            }
             //else 
             //    State = ImGui.GetIO().WantCaptureKeyboard ? ChatState.Active : ChatState.Inactive;
 
-            if(State == ChatState.SearchOmnibar && chatMessage == "/") {
-                chatMessage = "";
-            }
 
-            unsafe
-            {
-                if (ImGui.InputText("###ChatBox", ref chatMessage, 1000, CHAT_INPUT_FLAGS, this.CommandInputCallback))
-                {
-                   // if (State != ChatState.SearchOmnibar)
-                        SendMessage();
-                    //else
-                    //    State = ChatState.PendingFocus;
-                }
-            }
-
+            DrawModeSelection();
+            DrawChatInput();
             DrawOmnibar();
 
-            ImGui.SameLine();
-            if (ImGui.ArrowButton("###OptionsButton", ImGuiDir.Right))
-            {
-                options.ShowModal = true;
-                ImGui.OpenPopup(ChatOptions.MODAL_NAME);
-            }
+            DrawOptions();
             DrawModal();
         }
         catch (Exception ex)
@@ -186,6 +124,91 @@ public class ChatHud(string name) : SizedHud(name, false, true)
             Log.Error(ex);
         }
     }
+
+    private void DrawChatLog()
+    {
+        var region = ImGui.GetContentRegionAvail();
+        region.Y -= CHAT_INPUT_HEIGHT;
+
+        if (ImGui.BeginChild("ChatChild", region, true, ImGuiWindowFlags.HorizontalScrollbar))
+        {
+            foreach (var chatEntry in chatBuffer)
+            {
+                if (chatEntry.Filtered)
+                {
+                    Log.Chat($"Skip {chatEntry.Message}");
+                    continue;
+                }
+
+                DrawChatEntry(chatEntry.Message);
+            }
+            ImGui.EndChild();
+        }
+    }
+    private void DrawOptions()
+    {
+        ImGui.SameLine();
+        if (ImGui.ArrowButton("###OptionsButton", ImGuiDir.Right))
+        {
+            options.ShowModal = true;
+            ImGui.OpenPopup(ChatOptions.MODAL_NAME);
+        }
+    }
+    private void DrawChatInput()
+    {
+        if (State == ChatState.PendingFocus)
+        {
+            ImGui.SetKeyboardFocusHere();
+            State = ChatState.Active;
+        }
+
+        if (Mode == ChatMode.Template)
+        {
+            unsafe
+            {                
+                template.DrawTemplate(CommandInputCallback);
+            }
+            return;
+        }
+
+        unsafe
+        {
+            if (ImGui.InputText("###ChatBox", ref chatMessage, 1000, CHAT_INPUT_FLAGS, CommandInputCallback))
+            {
+                // if (State != ChatState.SearchOmnibar)
+                SendMessage();
+                //else
+                //    State = ChatState.PendingFocus;
+            }
+        }
+    }
+
+    private void DrawModeSelection()
+    {
+        ImGui.PushStyleVar(ImGuiStyleVar.ButtonTextAlign, new Vector2(0));
+        var neededSize = ImGui.CalcTextSize($"{ModeShorthand(ChatMode.Allegiance)}: ");
+        //ImGui.SetNextItemWidth(neededWidth * 5);
+        //Log.Chat($"{neededWidth}");
+        if (ImGui.Button($"{ModeShorthand(Mode)}: ", neededSize))
+            ImGui.OpenPopup(CHAT_POPUP);
+
+        ImGui.SameLine();
+        if (ImGui.BeginPopup(CHAT_POPUP))
+        {
+            foreach (var mode in Enum.GetValues(typeof(ChatMode)))
+            //for (var i = 0; i < 5; i++)
+            {
+                if (ImGui.Selectable($"{mode}"))
+                {
+                    Mode = (ChatMode)mode;
+                    //Log.Chat("Click " + i);
+                }
+            }
+            ImGui.EndPopup();
+        }
+        ImGui.PopStyleVar();
+    }
+
     private void DrawChatEntry(ChatLog chat)
     {
         //Get styles/defaults
@@ -262,43 +285,55 @@ public class ChatHud(string name) : SizedHud(name, false, true)
     }
     private void DrawOmnibar()
     {
-        //if (State == ChatState.StartOmnibar)
-        //{
-        //    ImGui.OpenPopup(OMNIBAR_POPUP);
-        //    State = ChatState.SearchOmnibar;
-        //}
-
-        if (State != ChatState.SearchOmnibar)
+        if (Mode != ChatMode.Omni)
             return;
 
-        // Showcase NOT relying on a IsItemHovered() to emit a tooltip.
-        //var center = ImGui.GetMainViewport().GetCenter();
-        //ImGui.SetNextWindowPos(center, ImGuiCond.Appearing, new(0.5f, 0.5f));
-        if (ImGui.BeginTooltip())
+        //Get style stuff
+        var margin = ImGui.GetStyle().FramePadding * 2;
+        var fontHeight = ImGui.GetTextLineHeightWithSpacing();
+        var width = ImGui.GetWindowWidth();
+        var height = ImGui.GetWindowHeight();
+
+        //Get start position
+        Vector2 winPos = ImGui.GetWindowPos();
+        winPos += margin;
+
+        //Get chat display size from window size sans margins/input
+        Vector2 displaySize = new Vector2(width, height) - 2 * margin;
+        displaySize.Y -= CHAT_INPUT_HEIGHT;
+
+        //Find size of chat by removing omnibar results from display
+        Vector2 chatSize = displaySize;
+        chatSize.Y = 2 * margin.Y + 5 * fontHeight;
+
+        //Find where chat starts by coming down the difference
+        Vector2 chatStart = winPos;
+        chatStart.Y += displaySize.Y - chatSize.Y;
+
+        ImGui.SetNextWindowPos(chatStart);
+        ImGui.SetNextWindowSize(chatSize, ImGuiCond.Always);
+        ImGui.Begin("Anchored Window", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoNav | ImGuiWindowFlags.AlwaysAutoResize);
+        for (var i = 0; i < omnibarResults.Count; i++)
         {
-            //ImGui.ProgressBar((float)Math.Sin(ImGui.GetTime()) * 0.5f + 0.5f, new Vector2(ImGui.GetFontSize() * 25, 0.0f));
+            var match = omnibarResults[i];
 
-            for (var i = 0; i < omnibarResults.Count; i++)
-            {
-                var match = omnibarResults[i];
+            Vector4 col = omniIndex == i ? Color.Purple.ToVec4() : Color.Gray.ToVec4();
+            ImGui.PushStyleColor(ImGuiCol.Text, col);
 
-                Vector4 col = omniIndex == i ? Color.Purple.ToVec4() : Color.Gray.ToVec4();
-                ImGui.TextColored(col, $"{i}: {match}");
-            }
+            if (ImGui.Selectable($"{i}: {match}"))//, i == 2))
+            { }
 
-            ImGui.EndTooltip();
+            ImGui.PopStyleColor();
         }
-
+        ImGui.End();
 
         //if (ImGui.BeginPopup(OMNIBAR_POPUP))
         //{
         //    for(var i = 0; i < omnibarResults.Count; i++)
         //    {
         //        var match = omnibarResults[i];
-
         //        if (ImGui.Selectable($"{i}: {match}"))
         //            Log.Chat($"Selected {match}");
-
         //    }
         //    ImGui.EndPopup();
         //}
@@ -360,13 +395,19 @@ public class ChatHud(string name) : SizedHud(name, false, true)
     }
 
     //https://github.com/UnknownX7/Dalamud/blob/abd3242c78548a587bd9af680ae375750715cd8c/Dalamud/Interface/Internal/Windows/ConsoleWindow.cs#L355
+    /// <summary>
+    /// Handles input while the chat/template is focused
+    /// </summary>
+    /// <param name="callback"></param>
     private unsafe int CommandInputCallback(ImGuiInputTextCallbackData* data)
     {
         var ptr = new ImGuiInputTextCallbackDataPtr(data);
 
+        CheckMode(ptr);
+
         if (ImGui.IsKeyPressed(ImGuiKey.UpArrow))
         {
-            if (State == ChatState.SearchOmnibar)
+            if (Mode == ChatMode.Omni)
             {
                 if (omnibarResults.Count == 0)
                     return 0;
@@ -389,7 +430,7 @@ public class ChatHud(string name) : SizedHud(name, false, true)
 
         if (ImGui.IsKeyPressed(ImGuiKey.DownArrow))
         {
-            if (State == ChatState.SearchOmnibar)
+            if (Mode == ChatMode.Omni)
             {
                 if (omnibarResults.Count == 0)
                     return 0;
@@ -410,25 +451,33 @@ public class ChatHud(string name) : SizedHud(name, false, true)
             return 0;
         }
 
-        if (ptr.BufTextLen == 0 && ImGui.IsKeyPressed(ImGuiKey.Slash))
+        if (Mode == ChatMode.Template)
         {
-            Log.Chat($"Start omnibar!");
-            State = ChatState.SearchOmnibar;
-            omniIndex = 0;
+            if (ImGui.IsKeyPressed(ImGuiKey.Enter)) {
 
-            //Todo: center?
+            }
+            //if(ChatTemplate.Current.Type != ChatParamType.Constant)
+            //{
+            //    Log.Chat($"{ChatTemplate.Current.Value}");
+            //    //var width = ImGui.CalcTextSize(ChatTemplate.Current.Value).X;
+            //    //ChatTemplate.Current.Value = 
 
-            return 0;
+                //    //var width = ImGui.CalcTextSize("X").X * ptr.BufTextLen; Encoding.UTF8.GetBytes(chatMessage)
+                //    ChatTemplate.NextWidth = width + 5;
+                //}
+                //Log.Chat($"{width}");
+                //ImGui.SetNextItemWidth(width + 5);
         }
 
-        if (State == ChatState.SearchOmnibar)
+
+        if (Mode == ChatMode.Omni)
         {
-            if (ImGui.IsKeyPressed(ImGuiKey.Backspace) && (ptr.SelectionEnd - ptr.SelectionStart == ptr.BufTextLen || ptr.BufTextLen == 0))
-            {
-                Log.Chat($"Escape omnibar!");
-                State = ChatState.Active;
-                return 0;
-            }
+            //if (ImGui.IsKeyPressed(ImGuiKey.Backspace) && (ptr.SelectionEnd - ptr.SelectionStart == ptr.BufTextLen || ptr.BufTextLen == 0))
+            //{
+            //    Log.Chat($"Escape omnibar!");
+            //    State = ChatState.Active;
+            //    return 0;
+            //}
 
             omnibarResults = CommandHelper.MatchCommands(chatMessage);
 
@@ -446,44 +495,58 @@ public class ChatHud(string name) : SizedHud(name, false, true)
 
                 return 0;
             }
-
-            return 0;
         }
-
 
         return 0;
     }
+    /// <summary>
+    /// Check for text prefixes used to change chat mode such as /a or /f
+    /// </summary>
+    /// <param name="ptr"></param>
+    private void CheckMode(ImGuiInputTextCallbackDataPtr ptr)
+    {
+        //All shorthands 
+        if (ptr.BufTextLen != 2)
+            return;
 
-    private unsafe void SelectOmnibarResult(ImGuiInputTextCallbackDataPtr ptr)
+        ChatMode nextMode = ParseMode(chatMessage);
+
+        if (Mode != nextMode)
+        {
+            Log.Chat($"{Mode}->{nextMode}");
+            Mode = nextMode;
+            chatMessage = "";
+            ptr.SetText("");
+
+            if (Mode == ChatMode.Omni)
+            {
+                omniIndex = 0;
+                State = ChatState.PendingFocus;
+            }
+        }
+    }
+    private void SelectOmnibarResult(ImGuiInputTextCallbackDataPtr ptr)
     {
         State = ChatState.PendingFocus;
         if (omnibarResults.Count == 0)
             return;
 
+        Mode = ChatMode.Template;
+        template = new(omnibarResults[omniIndex]);
         chatMessage = omnibarResults[omniIndex];
         Log.Chat($"Selected: {omniIndex} - {chatMessage}");
         ptr.SetText(chatMessage, true);
-
     }
-
     private void HandleInput()
     {
         if (ImGui.IsKeyPressed(ImGuiKey.Enter))
         {
             Log.Chat($"Enter - {State}");
 
-            if (State != ChatState.Active && State != ChatState.SearchOmnibar)
+            if (State != ChatState.Active)
                 State = ChatState.PendingFocus;
         }
     }
-
-
-    private void Incoming_Combat_HandleAttackerNotificationEvent(object sender, Combat_HandleAttackerNotificationEvent_S2C_EventArgs e) => AddMessage(e.GetChatLog());
-    private void Incoming_Combat_HandleDefenderNotificationEvent(object sender, Combat_HandleDefenderNotificationEvent_S2C_EventArgs e) => AddMessage(e.GetChatLog());
-    private void Incoming_Combat_HandleEvasionAttackerNotificationEvent(object sender, Combat_HandleEvasionAttackerNotificationEvent_S2C_EventArgs e) => AddMessage(e.GetChatLog());
-    private void Incoming_Combat_HandleEvasionDefenderNotificationEvent(object sender, Combat_HandleEvasionDefenderNotificationEvent_S2C_EventArgs e) => AddMessage(e.GetChatLog());
-    private void Incoming_Combat_HandleVictimNotificationEventSelf(object sender, Combat_HandleVictimNotificationEventSelf_S2C_EventArgs e) => AddMessage(e.GetChatLog());
-    private void Incoming_Combat_HandleVictimNotificationEventOther(object sender, Combat_HandleVictimNotificationEventOther_S2C_EventArgs e) => AddMessage(e.GetChatLog());
 
 
     protected override void AddEvents()
@@ -512,20 +575,56 @@ public class ChatHud(string name) : SizedHud(name, false, true)
 
         base.RemoveEvents();
     }
-}
 
-public record struct ChatLog(uint SenderId, string SenderName, string Message, ChatChannel Room, ChatMessageEx Type, bool Eaten);
-public record struct FilteredChat(ChatLog Message, bool Filtered);
+    #region Combat Events -> ChatLog
+    private void Incoming_Combat_HandleAttackerNotificationEvent(object sender, Combat_HandleAttackerNotificationEvent_S2C_EventArgs e) => AddMessage(e.GetChatLog());
+    private void Incoming_Combat_HandleDefenderNotificationEvent(object sender, Combat_HandleDefenderNotificationEvent_S2C_EventArgs e) => AddMessage(e.GetChatLog());
+    private void Incoming_Combat_HandleEvasionAttackerNotificationEvent(object sender, Combat_HandleEvasionAttackerNotificationEvent_S2C_EventArgs e) => AddMessage(e.GetChatLog());
+    private void Incoming_Combat_HandleEvasionDefenderNotificationEvent(object sender, Combat_HandleEvasionDefenderNotificationEvent_S2C_EventArgs e) => AddMessage(e.GetChatLog());
+    private void Incoming_Combat_HandleVictimNotificationEventSelf(object sender, Combat_HandleVictimNotificationEventSelf_S2C_EventArgs e) => AddMessage(e.GetChatLog());
+    private void Incoming_Combat_HandleVictimNotificationEventOther(object sender, Combat_HandleVictimNotificationEventOther_S2C_EventArgs e) => AddMessage(e.GetChatLog());
+    #endregion
 
-public class ChatDisplay
-{
-    //public Color Color;
-    public Vector4 Color;
-    public bool Visible;
-
-    public ChatDisplay(Vector4 color, bool visible = true)
+    #region Helpers
+    private string ModeShorthand(ChatMode mode) => mode switch
     {
-        Color = color;
-        Visible = visible;
-    }
+        ChatMode.Chat => "Chat",
+        ChatMode.Selected => "Targ",
+        ChatMode.Fellow => "Fel",
+        ChatMode.General => "Gen",
+        ChatMode.LFG => "LFG",
+        ChatMode.Society => "Soc",
+        ChatMode.Monarch => "Mon",
+        ChatMode.Patron => "Pat",
+        ChatMode.Vassals => "Vas",
+        ChatMode.Allegiance => "Alleg",
+        ChatMode.Trade => "Trade",
+        ChatMode.Roleplay => "Role",
+        ChatMode.Olthoi => "Olth",
+        ChatMode.Omni => "Omni",
+        ChatMode.Template => "Fill",
+        _ => "????",
+    };
+    private ChatMode ParseMode(string command) => command switch
+    {
+        "/a" => ChatMode.Allegiance,
+        "/c" => ChatMode.Chat,
+        "/f" => ChatMode.Fellow,
+        "/g" => ChatMode.General,
+        "/l" => ChatMode.LFG,
+        "/m" => ChatMode.Monarch,
+        "/o" => ChatMode.Olthoi,
+        "/p" => ChatMode.Patron,
+        //"/w" => ChatMode.Roleplay,
+        "/s" => ChatMode.Selected,
+        //"/s" => ChatMode.Society,
+        "/b" => ChatMode.Trade,
+        "/v" => ChatMode.Vassals,
+        "//" => ChatMode.Omni,
+        //"//" => ChatMode.Template,
+        _ => Mode,
+    };
+    #endregion
 }
+
+

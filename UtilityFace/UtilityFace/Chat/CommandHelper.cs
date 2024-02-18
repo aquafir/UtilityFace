@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UtilityFace;
+namespace UtilityFace.Chat;
 
 /// <summary>
 /// Handles command templates found in a file
@@ -12,8 +12,6 @@ namespace UtilityFace;
 public static class CommandHelper
 {
     //public static string FilePath => Path.Combine(PluginCore.AssemblyDirectory ?? "", "Resources", "Commands.txt");
-
-    public const string TEMPLATE_STRING = "??";
     public static string[] Commands { get; set; }
     public static bool LoadCommands()
     {

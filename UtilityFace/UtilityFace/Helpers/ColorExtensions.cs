@@ -44,4 +44,6 @@ public static class ColorExtensions
 
         return Color.FromArgb(color.A, (int)red, (int)green, (int)blue);
     }
+
+    public static uint ToUint(this Color color) =>  (uint)color.ToArgb();
 }

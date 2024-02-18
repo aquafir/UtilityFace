@@ -44,6 +44,7 @@ public class NavHud(string name) : SizedHud(name, false, true)
             ////mark.ScaleZ = 5.25f;
             ////mark.ScaleY = 5f;
             //mark.Visible = true;
+
             mark = ac.MarkCoordsWithShape(loc.X, loc.Y, loc.Z, DecalD3DShape.Ring, 0xAA55ff55);
             mark.Visible = true;
         }

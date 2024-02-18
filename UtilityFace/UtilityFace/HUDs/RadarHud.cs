@@ -1,5 +1,6 @@
 ﻿using KdTree;
 using KdTree.Math;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using UtilityBelt.Lib.VTNav;
@@ -10,9 +11,9 @@ namespace UtilityFace.HUDs;
 internal class RadarHud(string name) : SizedHud(name, false, true)
 {
     KdTree<float, WorldObject> tree = new(2, new FloatMath(), AddDuplicateBehavior.Skip);
-    bool rotate = true;
+    bool rotate = false;
     bool big = true;
-    float scale = 1;
+    float scale = 5000;
     float range = 75;   //Radar range
     private float alpha => big ? .5f : .8f;
     private Vector2 minimapPosition;
@@ -95,7 +96,6 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
             big = !big;
             SetMode();
         }
-
         if (ImGui.IsKeyPressed(ImGuiKey.F) && ImGui.IsKeyDown(ImGuiKey.LeftCtrl))
             ImGui.SetKeyboardFocusHere();
 
@@ -110,6 +110,11 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
 
         //Get global coords / heading
         var player = game.Character.Weenie.ServerPosition.ToVector2();
+        //Log.Chat($"{game.Character.Weenie.PhysicsDesc is null}");
+        //var phys = game.Character.Weenie.GetPosition();
+        //Log.Chat($"{phys.FormatCartesian()}");
+        //var player = phys.ToVector2();
+
         var heading = rotate ? -game.Character.Heading() : 0;
         var cosTheta = (float)Math.Cos(heading);
         var sinTheta = (float)Math.Sin(heading);
@@ -146,10 +151,6 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
             //Should be center coords
             Vector2 centerOffset = mousePos - windowPos - radius;
 
-            //Adjust for something?
-            var cursorOffset = new Vector2(0, 15) * scale;
-            cursorOffset = rotate ? cursorOffset.Rotate(-heading) : cursorOffset;
-            //centerOffset -= cursorOffset;
 
             //Adjust for scale/rotation
             var scaledPos = centerOffset / scale;
@@ -160,29 +161,35 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
             var coords = coordsVec.FromVector2();
 
             //var wos = tree.GetNearestNeighbours(new[] { scaledPos.X, scaledPos.Y }, 1);
-            var wos = tree.RadialSearch(new[] { scaledPos.X, scaledPos.Y }, 10 / scale, 5);
+            //var wos = tree.RadialSearch(new[] { scaledPos.X, scaledPos.Y }, 10 / scale, 5);
+            var wos = tree.RadialSearch(new[] { coords.NS, coords.EW }, .1f / scale, 5);
 
             //if (wos.Length > 0)
             //{
             if (ImGui.BeginTooltip())
             {
+                ImGui.Text($"{Coordinates.Me.DistanceToFlat(coords.ScreenAdjust())}");
                 //ImGui.Text($"{centerOffset}\n{scaledPos}\n{rotatedPos} @ {heading} rad\n{coordsVec}\n{coords}");
-                ImGui.Text($"{coords}");
+                //ImGui.Text($"{coords}");
 
                 foreach (var wo in wos.Select(x => x.Value))
                 {
+                    if (wo.ServerPosition is null)
+                        continue;
                     var texture = wo.GetOrCreateTexture();
                     ImGui.TextureButton($"{wo.Id}", texture, new(24));
                     ImGui.SameLine();
                     ImGui.Text($"{wo.Name} - {wo.ServerPosition.ToVector2().FromVector2().FormatCartesian()}");
+                    ImGui.Text($"{wo.Name} - {wo.ServerPosition.ToGlobal()[0]}");
                 }
 
                 ImGui.EndTooltip();
             }
 
+            var first = wos.FirstOrDefault()?.Value; 
             if (wos.Length > 0)
             {
-                var first = wos.FirstOrDefault().Value;
+
 
                 if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
                     first.TryUse();
@@ -208,7 +215,22 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
             //}
 
             if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
-                game.Actions.InvokeChat($"/tele {coords.FormatCartesian()}");
+            {
+                //if (first is not null)
+                //{
+                //    //Log.Chat($"Teleporting using {first.Name} position:\n{first.ServerPosition.FormatCartesian()}");
+                //    //game.Actions.InvokeChat($"/tele {first.ServerPosition.FormatCartesian()}");
+                //    game.Actions.InvokeChat($"/teleloc {first.ServerPosition.FormatTeleloc()}");
+                //}
+                //else
+                //{
+                    //Log.Chat($"/teleloc {coords.FormatTeleloc()}");
+                    //Log.Chat($"/teleloc {game.Character.Weenie.ServerPosition.FormatTeleloc()}");
+                    //game.Actions.InvokeChat($"/tele {coords.FormatCartesian()}"); 
+                    game.Actions.InvokeChat($"/teleloc {coords.ScreenAdjust().FormatTeleloc()}");
+                //}
+            }
+
 
             scale += ImGui.GetIO().MouseWheel / 10;
             scale = Math.Max(.1f, scale);
@@ -234,7 +256,7 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
         var t2 = radarCenter + new Vector2(5, 0).Rotate(pHeading);
         var t3 = radarCenter + new Vector2(-5, 0).Rotate(pHeading);
         dl.AddTriangleFilled(t1, t2, t3, 0xFFFFFF00);
-        //dl.AddCircleFilled(radarCenter, 5, (uint)Color.Blue.ToArgb());
+        dl.AddCircleFilled(radarCenter, 2, (uint)Color.Blue.ToArgb());
         //var t = new Vector2(0, -50).Rotate(game.Character.Heading());
 
         //Mark range
@@ -280,7 +302,10 @@ internal class RadarHud(string name) : SizedHud(name, false, true)
                 vto = vto.Rotate(cosTheta, sinTheta);
 
             //Add adjusted position
-            tree.Add(new[] { vto.X, vto.Y }, wo);
+            //tree.Add(new[] { vto.X, vto.Y }, wo);
+            tree.Add(wo.ServerPosition.ToCartesian(), wo);
+            //tree.Add(wo.PhysicsDesc.Position.ToArray(), wo);
+            //tree.Add(wo.GetPosition().ToArray2(), wo);
 
             vto *= scale;
 

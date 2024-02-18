@@ -37,6 +37,8 @@ public static class PositionExtensions
     public static float NS(this Position pos) => Position.LandblockToNS(pos.Landcell >> 16 << 16, pos.Frame.Origin.Y);
     public static float[] ToCartesian(this Position pos) => new[] { pos.NS(), pos.EW() };
     public static string FormatCartesian(this Position pos) => $"{pos.NS()}{(pos.NS() < 0 ? "S" : "N")}, {pos.EW()}{(pos.EW() < 0 ? "W" : "E")}";
+    //"cell [x y z] (qw qx qy qz)
+    public static string FormatTeleloc(this Position pos) => $"{pos.Landcell:X} [{pos.Frame.Origin.X} {pos.Frame.Origin.Y} {pos.Frame.Origin.Z}]";
     public static float[] ToGlobal(this Position pos) => new[] { pos.GlobalX(), pos.GlobalY() };
 
     /// <summary>
@@ -59,12 +61,16 @@ public static class PositionExtensions
         return new float[] { x, y};
     }
 
-
     public static Coordinates FromVector2(this Vector2 v, int z = 0) => new(v.Y / C, v.X / C, z);
     public static Coordinates FromVector3(this Vector3 v) => new(v.Y / C, v.X / C, v.Z);
 
     public static string FormatCartesian(this Coordinates coords) => $"{coords.NS}{(coords.NS < 0 ? "S" : "N")}, {coords.EW}{(coords.EW < 0 ? "W" : "E")}";
+    public static string FormatTeleloc(this Coordinates pos) => $"{pos.LandCell:X} [{pos.LocalX} {pos.LocalY} {pos.LocalZ}]";
     public static float[] ToArray(this Coordinates coords) => new[] { coords.NS, coords.EW,  coords.Z };
+    /// <summary>
+    /// Adjust for some unknown factor for screen usage
+    /// </summary>
+    public static Coordinates ScreenAdjust(this Coordinates coords) => new Coordinates(coords.LandCell, coords.LocalX - 7.95f, coords.LocalY + .174f, coords.LocalZ);
 
     public static Vector2 ScreenVectorTo(this Position start, Position end) => new Vector2((end.EW() - start.EW()) * C, (start.NS() - end.NS()) * C);
 
