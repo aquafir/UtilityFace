@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UtilityFace.Enums;
-using DamageType = UtilityFace.Enums.DamageType;
+﻿using DamageType = UtilityFace.Enums.DamageType;
 
 namespace UtilityFace.Helpers;
 

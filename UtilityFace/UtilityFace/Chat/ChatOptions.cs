@@ -14,6 +14,7 @@ public class ChatOptions
     public bool Debug = true;
     public bool ShowModal = false;
     public bool StayInChat = true;
+    public bool SendCompleteTemplate = true;
 
     public string Query = "";
 

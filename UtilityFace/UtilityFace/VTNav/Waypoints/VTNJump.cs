@@ -1,6 +1,3 @@
-using Decal.Adapter.Wrappers;
-using System.Drawing;
-
 namespace UtilityBelt.Lib.VTNav.Waypoints
 {
     class VTNJump : VTNPoint {

@@ -1,7 +1,5 @@
-﻿using Decal.Adapter.Wrappers;
-using System.Drawing;
+﻿using System.Drawing;
 using UtilityBelt.Service.Lib.ACClientModule;
-using UtilityFace.HUDs;
 
 namespace UtilityBelt.Lib.VTNav.Waypoints
 {

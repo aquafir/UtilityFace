@@ -1,7 +1,4 @@
-﻿using Decal.Adapter.Wrappers;
-using System.Drawing;
-using UtilityBelt.Scripting.Enums;
-using ObjectClass = UtilityBelt.Scripting.Enums.ObjectClass;
+﻿using ObjectClass = UtilityBelt.Scripting.Enums.ObjectClass;
 
 namespace UtilityBelt.Lib.VTNav.Waypoints
 {

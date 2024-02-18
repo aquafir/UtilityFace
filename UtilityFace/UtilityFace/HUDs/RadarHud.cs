@@ -1,11 +1,7 @@
 ﻿using KdTree;
 using KdTree.Math;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using UtilityBelt.Lib.VTNav;
 using UtilityBelt.Service.Lib.ACClientModule;
-using UtilityFace.Helpers;
 
 namespace UtilityFace.HUDs;
 internal class RadarHud(string name) : SizedHud(name, false, true)

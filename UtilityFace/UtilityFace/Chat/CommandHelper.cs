@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace UtilityFace.Chat;
+﻿namespace UtilityFace.Chat;
 
 /// <summary>
 /// Handles command templates found in a file

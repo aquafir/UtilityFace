@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace UtilityBelt.Lib.VTNav.Waypoints
+﻿namespace UtilityBelt.Lib.VTNav.Waypoints
 {
     class VTNRecall : VTNPoint {
         public int RecallSpellId = 0;

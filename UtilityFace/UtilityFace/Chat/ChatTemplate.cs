@@ -1,7 +1,4 @@
-﻿using AcClient;
-using UtilityFace.Enums;
-
-namespace UtilityFace.Chat;
+﻿namespace UtilityFace.Chat;
 
 public class ChatTemplate
 {

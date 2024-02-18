@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using UtilityBelt.Scripting.Lib;
-
-namespace UtilityFace.Helpers;
+﻿namespace UtilityFace.Helpers;
 public static class ImGuiExtensions
 {
     public static void SetText(this ImGuiInputTextCallbackDataPtr ptr, string text, bool select = false)

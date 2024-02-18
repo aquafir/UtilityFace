@@ -1,8 +1,6 @@
-﻿using System.Text;
-using UtilityBelt.Common.Messages.Events;
+﻿using UtilityBelt.Common.Messages.Events;
 using UtilityFace.Chat;
 using UtilityFace.Enums;
-using UtilityFace.HUDs;
 using DamageType = UtilityFace.Enums.DamageType;
 
 namespace UtilityFace.Helpers;

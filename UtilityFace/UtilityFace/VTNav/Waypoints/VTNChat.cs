@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace UtilityBelt.Lib.VTNav.Waypoints
+﻿namespace UtilityBelt.Lib.VTNav.Waypoints
 {
     class VTNChat : VTNPoint {
         public string Message = "";

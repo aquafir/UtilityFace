@@ -4,7 +4,6 @@ using UtilityBelt.Service.Lib.ACClientModule;
 using System.Diagnostics;
 using UtilityBelt.Lib.VTNav;
 using UtilityBelt.Lib.VTNav.Waypoints;
-using System.Drawing.Drawing2D;
 using Vector3 = System.Numerics.Vector3;
 
 namespace UtilityFace.HUDs;

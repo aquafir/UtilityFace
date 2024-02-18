@@ -1,24 +1,9 @@
-﻿using ImGuiNET;
-using Microsoft.Extensions.Options;
-using System;
-using System.Drawing;
-using System.Drawing.Printing;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.RegularExpressions;
-using UtilityBelt.Common.Messages;
+﻿using System.Drawing;
 using UtilityBelt.Common.Messages.Events;
-using UtilityBelt.Scripting.Events;
-using UtilityBelt.Scripting.Interop;
 using UtilityFace.Chat;
 using UtilityFace.Enums;
-using static System.Net.Mime.MediaTypeNames;
-using DamageType = UtilityFace.Enums.DamageType;
 
 namespace UtilityFace.HUDs;
-
-
 
 public class ChatHud(string name) : SizedHud(name, false, true)
 {
@@ -28,7 +13,6 @@ public class ChatHud(string name) : SizedHud(name, false, true)
 
     const ImGuiInputTextFlags CHAT_INPUT_FLAGS = ImGuiInputTextFlags.AutoSelectAll | ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.CallbackEdit | ImGuiInputTextFlags.CallbackAlways;
     private const int CHAT_INPUT_HEIGHT = 30;
-    private const string OMNIBAR_POPUP = "Omnibar";
     private const string CHAT_POPUP = "ChatMode";
 
     string chatMessage = "";
@@ -37,7 +21,18 @@ public class ChatHud(string name) : SizedHud(name, false, true)
     int omniIndex = 0;
     int historyIndex = 0;
 
-    ChatMode Mode = ChatMode.Chat;
+    //State tracking that prints with Debug enabled
+    ChatMode _chatMode = ChatMode.Chat;
+    ChatMode Mode
+    {
+        get => _chatMode;
+        set
+        {
+            if (options.Debug && _chatMode != value)
+                Log.Chat($"{_chatMode}->{value}");
+            _chatMode = value;
+        }
+    }
     ChatState _chatState = ChatState.Inactive;
     ChatState State
     {
@@ -54,11 +49,11 @@ public class ChatHud(string name) : SizedHud(name, false, true)
     {
         Styles = new()
         {
-            ImGuiStyleVar.WindowRounding.Style(5),
-            ImGuiStyleVar.WindowPadding.Style(new Vector2(5)),
-            ImGuiStyleVar.WindowBorderSize.Style(1),
-            ImGuiStyleVar.FramePadding.Style(new Vector2(0)),
-            ImGuiStyleVar.ItemSpacing.Style(new Vector2(0, 2)),
+            //ImGuiStyleVar.WindowRounding.Style(5),
+            //ImGuiStyleVar.WindowPadding.Style(new Vector2(5)),
+            //ImGuiStyleVar.WindowBorderSize.Style(1),
+            //ImGuiStyleVar.FramePadding.Style(new Vector2(0)),
+            //ImGuiStyleVar.ItemSpacing.Style(new Vector2(0, 2)),
         }
     };
 
@@ -78,17 +73,11 @@ public class ChatHud(string name) : SizedHud(name, false, true)
     {
         //Get rid of frame styles
         style.PushStyles();
-        //ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 5);
-        //ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(5));    //No window borders
-        //ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
-        //ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new Vector2(0));
-        //ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(0, 2));     //Chat elements
         base.PreRender(sender, e);
     }
     public override void PostRender(object sender, EventArgs e)
     {
         style.PopStyles();
-        //ImGui.PopStyleVar(5);
         base.PostRender(sender, e);
     }
     public override void Draw(object sender, EventArgs e)
@@ -165,7 +154,7 @@ public class ChatHud(string name) : SizedHud(name, false, true)
         if (Mode == ChatMode.Template)
         {
             unsafe
-            {                
+            {
                 template.DrawTemplate(CommandInputCallback);
             }
             return;
@@ -216,7 +205,7 @@ public class ChatHud(string name) : SizedHud(name, false, true)
 
         //if (chat.Eaten)
         //    return;
-
+        
         if (options.Debug)
             ImGui.TextUnformatted($"{chat.Type} - {chat.SenderName} - {chat.Room} - {chat.SenderId} - {chat.Eaten}");
 
@@ -365,22 +354,77 @@ public class ChatHud(string name) : SizedHud(name, false, true)
     }
     private void SendMessage()
     {
-        game.Actions.InvokeChat(chatMessage);
-
-        //history.Add(chatMessage);
-        history.Insert(0, chatMessage);
-        if (history.Count > ChatOptions.MAX_HISTORY)
-        {
-            //history.RemoveAt(0);
-            history.RemoveAt(ChatOptions.MAX_HISTORY - 1);
-        }
-
-        //Reset history index for up/down
-        historyIndex = -1;
-
         //Base off player setting?
         //focusChat = game.Character.Options1.HasFlag(CharacterOptions1.u_0x00000800);
         State = options.StayInChat ? ChatState.PendingFocus : ChatState.Inactive;
+
+        if (String.IsNullOrEmpty(chatMessage))
+        {
+            Log.Chat($"Unable to send empty message");
+            return;
+        }
+
+        //Set history
+        historyIndex = -1;
+        history.Insert(0, chatMessage);
+        if (history.Count > ChatOptions.MAX_HISTORY)
+            history.RemoveAt(ChatOptions.MAX_HISTORY - 1);
+
+        switch (Mode)
+        {
+            case ChatMode.Allegiance:
+                game.Actions.InvokeChat($"/a {chatMessage}");
+                break;
+            case ChatMode.Chat:
+                game.Actions.InvokeChat($"{chatMessage}");
+                //                game.Actions.InvokeChat($"/say {chatMessage}");
+                break;
+            case ChatMode.Fellow:
+                game.Actions.InvokeChat($"/f {chatMessage}");
+                break;
+            case ChatMode.General:
+                game.Actions.InvokeChat($"/general {chatMessage}");
+                break;
+            case ChatMode.LFG:
+                game.Actions.InvokeChat($"/lfg {chatMessage}");
+                break;
+            case ChatMode.Monarch:
+                game.Actions.InvokeChat($"/m {chatMessage}");
+                break;
+            case ChatMode.Olthoi:
+                game.Actions.InvokeChat($"/olthoi {chatMessage}");
+                break;
+            case ChatMode.Patron:
+                game.Actions.InvokeChat($"/p {chatMessage}");
+                break;
+            case ChatMode.Roleplay:
+                game.Actions.InvokeChat($"/roleplay {chatMessage}");
+                break;
+            case ChatMode.Selected:
+                if (game.World.Selected is null)
+                    Log.Chat($"Nothing selected to send message to.");
+                else
+                    game.Actions.SendTellById(game.World.Selected.Id, $"{chatMessage}", new() { MaxRetryCount = 0, TimeoutMilliseconds = 1 });
+                break;
+            //case ChatMode.Society:
+            //    game.Actions.InvokeChat($"/soc {chatMessage}");
+            //    break;
+            case ChatMode.Trade:
+                game.Actions.InvokeChat($"/trade {chatMessage}");
+                break;
+            case ChatMode.Vassals:
+                game.Actions.InvokeChat($"/v {chatMessage}");
+                break;
+            //case ChatMode.Omni:
+            //Shouldn't be hit
+            //    break;
+            case ChatMode.Template:
+                break;
+            default:
+                break;
+        }
+
+        //Reset chat
         chatMessage = "";
     }
 
@@ -404,6 +448,42 @@ public class ChatHud(string name) : SizedHud(name, false, true)
         var ptr = new ImGuiInputTextCallbackDataPtr(data);
 
         CheckMode(ptr);
+
+        switch (Mode)
+        {
+            case ChatMode.Allegiance:
+                break;
+            case ChatMode.Chat:
+                break;
+            case ChatMode.Fellow:
+                break;
+            case ChatMode.General:
+                break;
+            case ChatMode.LFG:
+                break;
+            case ChatMode.Monarch:
+                break;
+            case ChatMode.Olthoi:
+                break;
+            case ChatMode.Patron:
+                break;
+            case ChatMode.Roleplay:
+                break;
+            case ChatMode.Selected:
+                break;
+            case ChatMode.Society:
+                break;
+            case ChatMode.Trade:
+                break;
+            case ChatMode.Vassals:
+                break;
+            case ChatMode.Omni:
+                break;
+            case ChatMode.Template:
+                break;
+            default:
+                break;
+        }
 
         if (ImGui.IsKeyPressed(ImGuiKey.UpArrow))
         {
@@ -453,7 +533,8 @@ public class ChatHud(string name) : SizedHud(name, false, true)
 
         if (Mode == ChatMode.Template)
         {
-            if (ImGui.IsKeyPressed(ImGuiKey.Enter)) {
+            if (ImGui.IsKeyPressed(ImGuiKey.Enter))
+            {
 
             }
             //if(ChatTemplate.Current.Type != ChatParamType.Constant)
@@ -462,11 +543,11 @@ public class ChatHud(string name) : SizedHud(name, false, true)
             //    //var width = ImGui.CalcTextSize(ChatTemplate.Current.Value).X;
             //    //ChatTemplate.Current.Value = 
 
-                //    //var width = ImGui.CalcTextSize("X").X * ptr.BufTextLen; Encoding.UTF8.GetBytes(chatMessage)
-                //    ChatTemplate.NextWidth = width + 5;
-                //}
-                //Log.Chat($"{width}");
-                //ImGui.SetNextItemWidth(width + 5);
+            //    //var width = ImGui.CalcTextSize("X").X * ptr.BufTextLen; Encoding.UTF8.GetBytes(chatMessage)
+            //    ChatTemplate.NextWidth = width + 5;
+            //}
+            //Log.Chat($"{width}");
+            //ImGui.SetNextItemWidth(width + 5);
         }
 
 
@@ -531,11 +612,26 @@ public class ChatHud(string name) : SizedHud(name, false, true)
         if (omnibarResults.Count == 0)
             return;
 
-        Mode = ChatMode.Template;
+        //Parse result as a template
         template = new(omnibarResults[omniIndex]);
-        chatMessage = omnibarResults[omniIndex];
-        Log.Chat($"Selected: {omniIndex} - {chatMessage}");
-        ptr.SetText(chatMessage, true);
+
+        //If there aren't any parameters complete it
+        if (template.Parameters.Count == 1)
+        {
+            chatMessage = template.ToString();
+            Mode = ChatMode.Chat;
+
+            if (options.SendCompleteTemplate)
+                SendMessage();
+
+            return;
+        }
+        else
+        {
+            chatMessage = "";
+            ptr.SetText(chatMessage, true);
+            Mode = ChatMode.Template;
+        }
     }
     private void HandleInput()
     {
@@ -543,7 +639,7 @@ public class ChatHud(string name) : SizedHud(name, false, true)
         {
             Log.Chat($"Enter - {State}");
 
-            if (State != ChatState.Active)
+            if (State == ChatState.Inactive)
                 State = ChatState.PendingFocus;
         }
     }
