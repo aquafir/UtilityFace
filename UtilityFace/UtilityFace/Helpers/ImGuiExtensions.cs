@@ -48,6 +48,40 @@ public static class ImGuiExtensions
     };
     public static Style Style(this ImGuiStyleVar var, object value) => var.IsFloat() ? 
         new StyleFloat(var, Convert.ToSingle(value)) : new StyleVector2(var, (Vector2)value);
+
+    //public static Styling GetStyling(this ImGuiStylePtr style)
+    //{
+    //    style.Alpha = 1.0f;
+    //    style.DisabledAlpha = 0.1000000014901161f;
+    //    style.WindowPadding = new Vector2(8.0f, 8.0f);
+    //    style.WindowRounding = 10.0f;
+    //    style.WindowBorderSize = 0.0f;
+    //    style.WindowMinSize = new Vector2(30.0f, 30.0f);
+    //    style.WindowTitleAlign = new Vector2(0.5f, 0.5f);
+    //    style.WindowMenuButtonPosition = ImGuiDir.Right;
+    //    style.ChildRounding = 5.0f;
+    //    style.ChildBorderSize = 1.0f;
+    //    style.PopupRounding = 10.0f;
+    //    style.PopupBorderSize = 0.0f;
+    //    style.FramePadding = new Vector2(5.0f, 3.5f);
+    //    style.FrameRounding = 5.0f;
+    //    style.FrameBorderSize = 0.0f;
+    //    style.ItemSpacing = new Vector2(5.0f, 4.0f);
+    //    style.ItemInnerSpacing = new Vector2(5.0f, 5.0f);
+    //    style.CellPadding = new Vector2(4.0f, 2.0f);
+    //    style.IndentSpacing = 5.0f;
+    //    style.ColumnsMinSpacing = 5.0f;
+    //    style.ScrollbarSize = 15.0f;
+    //    style.ScrollbarRounding = 9.0f;
+    //    style.GrabMinSize = 15.0f;
+    //    style.GrabRounding = 5.0f;
+    //    style.TabRounding = 5.0f;
+    //    style.TabBorderSize = 0.0f;
+    //    style.TabMinWidthForCloseButton = 0.0f;
+    //    style.ColorButtonPosition = ImGuiDir.Right;
+    //    style.ButtonTextAlign = new Vector2(0.5f, 0.5f);
+    //    style.SelectableTextAlign = new Vector2(0.0f, 0.0f);
+    //}
 }
 
 public abstract class Style

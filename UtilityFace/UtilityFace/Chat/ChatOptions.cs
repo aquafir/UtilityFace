@@ -6,12 +6,19 @@ namespace UtilityFace.Chat;
 public class ChatOptions
 {
     public static Vector2 MIN_SIZE = new(500, 500);
-    public static Vector2 MAX_SIZE = new(500, 500);
+    public static Vector2 MAX_SIZE = new(500, 800);
     public const string MODAL_NAME = "FilterModel";
-    public const int MAX_CHAT = 5;
-    public const int MAX_HISTORY = 5;
+    
+    /// <summary>
+    /// Number of ChatLog entries displayed
+    /// </summary>
+    public const int MAX_CHAT = 20;
+    /// <summary>
+    /// Buffer of ChatLog entries kept
+    /// </summary>
+    public const int MAX_HISTORY = 1000;
 
-    public bool Debug = true;
+    public bool Debug = false;
     public bool ShowModal = false;
     public bool StayInChat = true;
     public bool SendCompleteTemplate = true;
