@@ -42,7 +42,7 @@ public class ChatTemplate
         if (index != template.Length)
             Parameters.Add(new(ChatParamType.Constant, template.Substring(index)));
 
-        Log.Chat($"Parsed {Parameters.Count} parameters:\n{string.Join("\n  ", Parameters.Select(x => $"{x.Type}: {x.Value}"))}");
+        //Log.Chat($"Parsed {Parameters.Count} parameters:\n{string.Join("\n  ", Parameters.Select(x => $"{x.Type}: {x.Value}"))}");
     }
 
     public void DrawTemplate(ImGuiInputTextCallback callback)

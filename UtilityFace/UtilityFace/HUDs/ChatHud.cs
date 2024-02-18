@@ -29,8 +29,8 @@ public class ChatHud(string name) : SizedHud(name, false, true)
         get => _chatMode;
         set
         {
-            if (options.Debug && _chatMode != value)
-                Log.Chat($"{_chatMode}->{value}");
+            //if (options.Debug && _chatMode != value)
+            //    Log.Chat($"{_chatMode}->{value}");
             _chatMode = value;
         }
     }
@@ -94,14 +94,19 @@ public class ChatHud(string name) : SizedHud(name, false, true)
 
             DrawModeSelection();
             DrawChatInput();
+
             DrawOmnibar();
 
             DrawOptions();
             DrawModal();
 
-            //Check remove focus?
-            if (State == ChatState.Inactive)
-                ImGui.SetItemDefaultFocus();
+            //Check removed focus?
+            //if (State == ChatState.Active && !ImGui.IsAnyItemFocused() && ImGui.IsKeyDown(ImGuiKey.Enter))
+            //{
+            //    State = ChatState.Inactive;
+            //    Log.Chat("Deactivating");
+            //    //ImGui.SetKeyboardFocusHere(-1);
+            //}
         }
         catch (Exception ex)
         {
@@ -141,6 +146,7 @@ public class ChatHud(string name) : SizedHud(name, false, true)
     }
     private void DrawChatInput()
     {
+        //Grab focus
         if (State == ChatState.PendingFocus)
         {
             ImGui.SetKeyboardFocusHere();
@@ -168,6 +174,9 @@ public class ChatHud(string name) : SizedHud(name, false, true)
         }
     }
 
+    /// <summary>
+    /// Draw ChatMode menu
+    /// </summary>
     private void DrawModeSelection()
     {
         ImGui.PushStyleVar(ImGuiStyleVar.ButtonTextAlign, new Vector2(0));
@@ -180,13 +189,9 @@ public class ChatHud(string name) : SizedHud(name, false, true)
         if (ImGui.BeginPopup(CHAT_POPUP))
         {
             foreach (var mode in Enum.GetValues(typeof(ChatMode)))
-            //for (var i = 0; i < 5; i++)
             {
                 if (ImGui.Selectable($"{mode}"))
-                {
                     Mode = (ChatMode)mode;
-                    //Log.Chat("Click " + i);
-                }
             }
             ImGui.EndPopup();
         }
@@ -314,20 +319,7 @@ public class ChatHud(string name) : SizedHud(name, false, true)
             ImGui.PopStyleColor();
         }
         ImGui.End();
-
-        //if (ImGui.BeginPopup(OMNIBAR_POPUP))
-        //{
-        //    for(var i = 0; i < omnibarResults.Count; i++)
-        //    {
-        //        var match = omnibarResults[i];
-        //        if (ImGui.Selectable($"{i}: {match}"))
-        //            Log.Chat($"Selected {match}");
-        //    }
-        //    ImGui.EndPopup();
-        //}
     }
-
-
 
     private void AddMessage(ChatLog chat)
     {
@@ -341,12 +333,11 @@ public class ChatHud(string name) : SizedHud(name, false, true)
     private void SendMessage()
     {
         //Base off player setting?
-        //focusChat = game.Character.Options1.HasFlag(CharacterOptions1.u_0x00000800);
         State = options.StayInChat ? ChatState.PendingFocus : ChatState.Inactive;
 
-        if (String.IsNullOrEmpty(chatMessage))
+        //Check for empty inputs
+        if (Mode != ChatMode.Template && String.IsNullOrEmpty(chatMessage) || (Mode == ChatMode.Template && String.IsNullOrEmpty($"{template}")))
         {
-            Log.Chat($"Empty");
             State = ChatState.Inactive;
             return;
         }
@@ -406,7 +397,12 @@ public class ChatHud(string name) : SizedHud(name, false, true)
             //Shouldn't be hit
             //    break;
             case ChatMode.Template:
+                Log.Chat($"Filled template: {template}");
                 game.Actions.InvokeChat($"{template}");
+
+                //Reset template
+                Mode = ChatMode.Chat;
+                template = null;
                 break;
             default:
                 break;
@@ -441,13 +437,27 @@ public class ChatHud(string name) : SizedHud(name, false, true)
         switch (Mode)
         {
             case ChatMode.Template:
-                if (ImGui.IsKeyPressed(ImGuiKey.Enter))
+                if (ImGui.IsKeyPressed(ImGuiKey.Backspace) && template.Parameters.Where(x => x.Type != ChatParamType.Constant).All(x => x.Value.Length == 0))
                 {
-                    //Tab complete is on the last?
+                    //Leave template mode if all blank on backspace?
+                    State = ChatState.PendingFocus;
+                    Mode = ChatMode.Chat;
                 }
+                if (ImGui.IsKeyPressed(ImGuiKey.Tab) && template is not null)
+                {
+                    //Check for all tabs filled to complete?
+                    if (template.Parameters.All(x => x.Value.Length > 0))
+                    {
+                        //FinishTemplate(ptr);
+                        SendMessage();
+                    }
+                }
+                if (ImGui.IsKeyPressed(ImGuiKey.Enter))
+                    SendMessage();
+                //FinishTemplate(ptr);
                 break;
             case ChatMode.Omni:
-                if(ImGui.IsKeyPressed(ImGuiKey.Backspace) && ptr.BufTextLen < 1)
+                if (ImGui.IsKeyPressed(ImGuiKey.Backspace) && ptr.BufTextLen < 1)
                 {
                     //Leave omni mode
                     chatMessage = "";
@@ -470,7 +480,7 @@ public class ChatHud(string name) : SizedHud(name, false, true)
                     Log.Chat($"Omni: {omniIndex}");
                 }
                 else if (ImGui.IsKeyPressed(ImGuiKey.Tab))
-                    SelectOmnibarResult(ptr);
+                    SelectOmnibarResult();
                 else
                 {
                     omnibarResults = CommandHelper.MatchCommands(chatMessage);
@@ -479,11 +489,14 @@ public class ChatHud(string name) : SizedHud(name, false, true)
                     //Zen mode to select only result?
                     if (omnibarResults.Count == 1)
                     {
-                        SelectOmnibarResult(ptr);
+                        SelectOmnibarResult();
                         //ptr.SetText(omnibarResults[0], true);
                         return 0;
                     }
                 }
+
+                //If a template is selected set the text
+                ptr.SetText(chatMessage, true);
                 break;
             default:
                 if (ImGui.IsKeyPressed(ImGuiKey.UpArrow))
@@ -511,6 +524,7 @@ public class ChatHud(string name) : SizedHud(name, false, true)
 
         return 0;
     }
+
     /// <summary>
     /// Check for text prefixes used to change chat mode such as /a or /f
     /// </summary>
@@ -525,7 +539,7 @@ public class ChatHud(string name) : SizedHud(name, false, true)
 
         if (Mode != nextMode)
         {
-            Log.Chat($"{Mode}->{nextMode}");
+            //Log.Chat($"{Mode}->{nextMode}");
             Mode = nextMode;
             chatMessage = "";
             ptr.SetText("");
@@ -537,13 +551,13 @@ public class ChatHud(string name) : SizedHud(name, false, true)
             }
         }
     }
-    private void SelectOmnibarResult(ImGuiInputTextCallbackDataPtr ptr)
+    private void SelectOmnibarResult()
     {
-        State = ChatState.PendingFocus;
         if (omnibarResults.Count == 0)
             return;
 
         //Parse result as a template
+        State = ChatState.PendingFocus;
         template = new(omnibarResults[omniIndex]);
 
         //If there aren't any parameters complete it
@@ -560,17 +574,26 @@ public class ChatHud(string name) : SizedHud(name, false, true)
         else
         {
             chatMessage = "";
-            ptr.SetText(chatMessage, true);
             Mode = ChatMode.Template;
         }
     }
     private void HandleInput()
     {
+        if (ImGui.IsKeyPressed(ImGuiKey.F10))
+            State = ChatState.Inactive;
+        if (ImGui.IsKeyPressed(ImGuiKey.F11))
+            State = ChatState.PendingFocus;
+        if (ImGui.IsKeyPressed(ImGuiKey.F8))
+            State = ChatState.Active;
+
+        if (ImGui.IsKeyPressed(ImGuiKey.F9))
+            Log.Chat($"{Mode} - {State} - {template} - {chatMessage}");
+
         if (ImGui.IsKeyPressed(ImGuiKey.Enter))
         {
-            Log.Chat($"Enter - {State}");
-
             if (State == ChatState.Inactive)
+                State = ChatState.PendingFocus;
+            else if(!ImGui.IsWindowFocused( ImGuiFocusedFlags.AnyWindow))
                 State = ChatState.PendingFocus;
         }
     }
