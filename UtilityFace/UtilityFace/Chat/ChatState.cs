@@ -5,4 +5,5 @@ public enum ChatState
     Active,
     Inactive,
     PendingFocus,
+    LosingFocus,
 }

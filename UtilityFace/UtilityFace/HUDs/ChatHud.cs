@@ -101,12 +101,12 @@ public class ChatHud(string name) : SizedHud(name, false, true)
             DrawModal();
 
             //Check removed focus?
-            //if (State == ChatState.Active && !ImGui.IsAnyItemFocused() && ImGui.IsKeyDown(ImGuiKey.Enter))
-            //{
-            //    State = ChatState.Inactive;
-            //    Log.Chat("Deactivating");
-            //    //ImGui.SetKeyboardFocusHere(-1);
-            //}
+            if(State == ChatState.LosingFocus)
+            {
+                State = ChatState.Inactive;
+                Log.Chat("Deactivating");
+                ImGui.SetKeyboardFocusHere(-1);
+            }
         }
         catch (Exception ex)
         {
@@ -499,6 +499,10 @@ public class ChatHud(string name) : SizedHud(name, false, true)
                 ptr.SetText(chatMessage, true);
                 break;
             default:
+                if(ImGui.IsKeyPressed(ImGuiKey.Tab))
+                {
+                    State = ChatState.LosingFocus;
+                }
                 if (ImGui.IsKeyPressed(ImGuiKey.UpArrow))
                 {
                     historyIndex = Math.Min(historyIndex + 1, history.Count - 1);
