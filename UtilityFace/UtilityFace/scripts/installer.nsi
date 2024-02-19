@@ -2,7 +2,7 @@
 
 !define APPNAME "UtilityFace"
 !define SOFTWARECOMPANY "UtilityFace"
-!define APPGUID "5f9e30d9-90e4-405b-afb8-cd202da201c8"
+!define APPGUID "{5f9e30d9-90e4-405b-afb8-cd202da201c8}"
 !define CLASSNAME "UtilityFace.PluginCore"
 !define ASSEMBLY "UtilityFace.dll"
 InstallDir "C:\Games\DecalPlugins\${APPNAME}"
