@@ -132,7 +132,7 @@ public class PropertyTable
         }
     }
 
-    public void Render()
+    public void Render(PropertyTable table)
     {
         if (Target is null || tableData.Length == 0)
         {
@@ -193,7 +193,31 @@ public class PropertyTable
                 ImGui.Text($"{tableData[i].OriginalValue}");
 
                 ImGui.TableNextColumn();
-                ImGui.InputText($"###{Type}{i}", ref tableData[i].CurrentValue, 300);
+                if(ImGui.InputText($"###{Type}{i}", ref tableData[i].CurrentValue, 300, ImGuiInputTextFlags.EnterReturnsTrue))
+                {
+                    var g = new Game();
+                    //var s = g.World.Selected;
+                    if (!g.World.TryGet(Target.Id, out var wo)) {
+                        Log.Chat("Unable to find target");
+                        break;
+                    }
+                    wo.Select();
+
+                    var cmd = table.Type switch
+                    {
+                        //PropType.Unknown => $"/setproperty PropertyBool.{tableData[i].Property} {tableData[i].CurrentValue}",
+                        PropType.Bool => $"/setproperty PropertyBool.{tableData[i].Property} {tableData[i].CurrentValue}",
+                        PropType.DataId => $"/setproperty PropertyDataId.{tableData[i].Property} {tableData[i].CurrentValue}",
+                        PropType.Float => $"/setproperty PropertyFloat.{tableData[i].Property} {tableData[i].CurrentValue}",
+                        PropType.InstanceId => $"/setproperty PropertyInstanceId.{tableData[i].Property} {tableData[i].CurrentValue}",
+                        PropType.Int => $"/setproperty PropertyInt.{tableData[i].Property} {tableData[i].CurrentValue}",
+                        PropType.Int64 => $"/setproperty PropertyInt64.{tableData[i].Property} {tableData[i].CurrentValue}",
+                        PropType.String => $"/setproperty PropertyString.{tableData[i].Property} {tableData[i].CurrentValue}",
+                    };
+
+                    g.Actions.InvokeChat(cmd);
+                    Log.Chat($"Ran command: {cmd}");
+                }
 
                 //ImGui.Text($"{tableData[i].CurrentValue}");
                 //break;

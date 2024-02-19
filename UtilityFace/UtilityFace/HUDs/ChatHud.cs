@@ -5,7 +5,7 @@ using UtilityFace.Enums;
 
 namespace UtilityFace.HUDs;
 
-public class ChatHud(string name) : SizedHud(name, false, true)
+public class ChatHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)
 {
     #region Const
     const ImGuiInputTextFlags CHAT_INPUT_FLAGS = ImGuiInputTextFlags.AutoSelectAll | ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.CallbackEdit | ImGuiInputTextFlags.CallbackAlways;
@@ -254,10 +254,7 @@ public class ChatHud(string name) : SizedHud(name, false, true)
         if (ImGui.IsItemHovered())
         {
             if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
-            {
-                Log.Chat($"RC!!");
                 ImGui.OpenPopup($"{SENDER_POPUP}{messageNumber}");
-            }
             else if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
             {
                 chatMessage = $"/t {chat.SenderName}, ";

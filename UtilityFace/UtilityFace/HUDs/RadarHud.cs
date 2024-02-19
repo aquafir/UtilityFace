@@ -4,7 +4,7 @@ using System.Drawing;
 using UtilityBelt.Service.Lib.ACClientModule;
 
 namespace UtilityFace.HUDs;
-internal class RadarHud(string name) : SizedHud(name, false, true)
+internal class RadarHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)
 {
     KdTree<float, WorldObject> tree = new(2, new FloatMath(), AddDuplicateBehavior.Skip);
     bool rotate = false;

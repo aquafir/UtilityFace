@@ -33,7 +33,7 @@ public class MessageFilter
 }
 
 
-public class NetworkHud(string name) : SizedHud(name)
+public class NetworkHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)
 {
     private const string MODAL_NAME = "FilterModel";
     const int MESSAGE_BUFFER = 500;

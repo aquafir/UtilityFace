@@ -7,7 +7,7 @@ using UtilityBelt.Lib.VTNav.Waypoints;
 using Vector3 = System.Numerics.Vector3;
 
 namespace UtilityFace.HUDs;
-public class NavHud(string name) : SizedHud(name, false, true)
+public class NavHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)
 {
     ACDecalD3D ac = new();
     VTNavRoute route;

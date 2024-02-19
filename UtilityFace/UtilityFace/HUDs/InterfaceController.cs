@@ -34,12 +34,13 @@ internal class InterfaceController(string name) : SizedHud(name, true, true)
         Huds = new()
         {
             //new InventoryHud("Inventory"),
-            //new NetworkHud("Network"),
-            new ChatHud("Chat"),
-            //new PropertyEditorHud("PropertyEditor"),
+            new NetworkHud("Network", true, false),
+            //new ChatHud("Chat"),
+            new PropertyEditorHud("PropertyEditor", true, false),
             //new NavHud("Navs"),
             //new HaxHud("Hax"),
             //new RadarHud("Radar"),
+            //new StyleHud("Styles"),
         };
 
         ubHud.WindowSettings = ImGuiWindowFlags.AlwaysAutoResize;

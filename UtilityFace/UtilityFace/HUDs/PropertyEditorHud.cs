@@ -1,6 +1,6 @@
 ﻿
 namespace UtilityFace.HUDs;
-internal class PropertyEditorHud(string name) : SizedHud(name, false, false)
+internal class PropertyEditorHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)
 {
     /// <summary>
     /// The UBService Hud
@@ -25,6 +25,14 @@ internal class PropertyEditorHud(string name) : SizedHud(name, false, false)
     /// Current version of property data
     /// </summary>
     //PropertyData Current = new();
+
+    public override void Init()
+    {
+        MinSize = new(300, 400);
+        MaxSize = new(800, 1000);
+        ubHud.WindowSettings = ImGuiWindowFlags.None;
+        base.Init();
+    }
 
     protected override void AddEvents()
     {
@@ -107,7 +115,7 @@ internal class PropertyEditorHud(string name) : SizedHud(name, false, false)
             {
                 if (ImGui.BeginTabItem($"{table.Name}"))
                 {
-                    table.Render();
+                    table.Render(table);
 
                     ImGui.EndTabItem();
                 }

@@ -1,6 +1,6 @@
 ﻿namespace UtilityFace.HUDs;
 
-public class InventoryHud(string name) : SizedHud(name)
+public class InventoryHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)
 {
     #region State / Config
     ScriptHudManager sHud = new();
