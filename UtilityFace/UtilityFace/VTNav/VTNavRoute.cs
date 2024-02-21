@@ -7,6 +7,8 @@ namespace UtilityBelt.Lib.VTNav;
 public class VTNavRoute : IDisposable {
     private bool disposed = false;
 
+    public string NavName => Path.GetFileNameWithoutExtension(NavPath ?? "");
+
     public string NavPath;
     public string Header = "uTank2 NAV 1.2";
     public int RecordCount = 0;

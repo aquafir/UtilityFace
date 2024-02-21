@@ -9,8 +9,8 @@ public class TableRow
     //Enum name
     public string Property;
     //Original value
-    public string OriginalValue;
-    public string CurrentValue;
+    public string OriginalValue = "";
+    public string CurrentValue = "";
 
     public virtual void Render() { }
 }

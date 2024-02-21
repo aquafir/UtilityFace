@@ -5,57 +5,80 @@ using System.Diagnostics;
 using UtilityBelt.Lib.VTNav;
 using UtilityBelt.Lib.VTNav.Waypoints;
 using Vector3 = System.Numerics.Vector3;
+using NavSet = System.Collections.Generic.HashSet<UtilityBelt.Lib.VTNav.VTNavRoute>;
 
 namespace UtilityFace.HUDs;
 public class NavHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)
 {
-    ACDecalD3D ac = new();
-    VTNavRoute route;
-    //VTWaypoint prevPoint;
+    VTNavRoute currentRoute;
     VTNPoint prevPoint;
     List<DecalD3DObj> markers = new();
-    string[] NavNames;
+
+    string[] navNames = {};
     int selected = 0;
 
-    List<VTNavRoute> routes;
-    KdTree<float, VTNavRoute> tree;
+    string[] nearbyNavs = {};
+    private int selectedNear;
+
+    List<VTNavRoute> routes = new();
+    KdTree<float, VTNPoint> tree = new(3, new FloatMath(), AddDuplicateBehavior.Skip);
 
     public void LoadNavs()
     {
-        NavNames = VTNavRoute.GetNavFileNames().ToArray();
-        Log.Chat($"Found {NavNames.Length} navs");
+        navNames = VTNavRoute.GetNavFileNames().ToArray();
+        Log.Chat($"Found {navNames.Length} navs");
     }
 
-    DecalD3DObj mark = null;
-    Vector3 loc;
+    public NavSet GetNearbyRoutes(KdTree<float, VTNPoint> tree, Coordinates center, float radius = 50f)
+    {
+        NavSet set = new();
+
+        foreach (var point in tree.RadialSearch(center.ToArray(), radius))
+        {
+            var route = point.Value.route;
+
+            if (!set.Contains(route))
+                set.Add(route);
+        }
+
+        return set;
+    }
+
+    public List<VTNavRoute> GetNavRoutes(string[] NavNames)
+    {
+        List<VTNavRoute> routes = new();
+        foreach (var routeName in NavNames)
+        {
+            if (!VTNavRoute.TryParseRouteFromName(routeName, out var route))
+                continue;
+
+            //Load all points
+            routes.Add(route);
+        }
+
+        return routes;
+    }
+
+    public KdTree<float, VTNPoint> GetNavKdTree(List<VTNavRoute> routes)
+    {
+        KdTree<float, VTNPoint> tree = new(3, new FloatMath(), AddDuplicateBehavior.Skip);
+
+        foreach (var route in routes)
+        {
+            foreach (var point in route.Points)
+                tree.Add(new[] { point.NS, point.EW, point.Z * 240 }, point);
+        }
+
+        tree.Balance();
+        return tree;
+    }
+
     public override void Draw(object sender, EventArgs e)
     {
-        if (mark is null)
-        {
-            loc = game.Character.Weenie.ServerPosition.ToVector3();
-            loc.Y += .05f;
-            //mark = ac.NewD3DObj();
-            //mark.Visible = false;
-            //mark.Color = 0xAA55ff55;
-            //mark.SetShape(DecalD3DShape.Cube);
-            //mark.Anchor(loc.X, loc.Y, loc.Z +.05f);
-            ////mark.ScaleX = 5.25f;
-            ////mark.ScaleZ = 5.25f;
-            ////mark.ScaleY = 5f;
-            //mark.Visible = true;
-
-            mark = ac.MarkCoordsWithShape(loc.X, loc.Y, loc.Z, DecalD3DShape.Ring, 0xAA55ff55);
-            mark.Visible = true;
-        }
-        if(ImGui.DragFloat3("Marker", ref loc)) {
-            Log.Chat($"Marking: {loc}");
-            mark.Anchor(loc.X, loc.Y, loc.Z);
-        }
-
-        if (ImGui.Button("Refresh") || NavNames is null)
+        if (ImGui.Button("Refresh") || navNames is null)
             LoadNavs();
 
-        if (NavNames.Length == 0)
+        if (navNames.Length == 0)
         {
             ImGui.Text("No navs found.");
             return;
@@ -65,107 +88,147 @@ public class NavHud(string name, bool showInBar = false, bool visible = false) :
         if (ImGui.Button("Load All"))
         {
             var watch = Stopwatch.StartNew();
+            var memStart = GC.GetTotalMemory(false);
 
-            routes = new();
-            tree = new(3, new FloatMath(), AddDuplicateBehavior.Skip);
-            foreach (var routeName in NavNames)
-            {
-                if (!VTNavRoute.TryParseRouteFromName(routeName, out var route))
-                    continue;
+            routes = GetNavRoutes(navNames);
+            tree = GetNavKdTree(routes);
 
-                //Load all points
-                routes.Add(route);
-                foreach (var point in route.Points)
-                {
-                    //if (point.Type == eWaypointType.)
-                        tree.Add(new[] { point.NS, point.EW, point.Z }, route);
-                }
-            }
             watch.Stop();
-
-            Log.Chat($"Loaded {routes.Count} routes with {tree.Count} points in {watch.ElapsedMilliseconds}ms.");
+            Log.Chat($"Loaded {routes.Count} routes with {tree.Count} points in {watch.ElapsedMilliseconds}ms using {(GC.GetTotalMemory(false) - memStart) / (1024 * 1024)}MB of memory");
 
             var pos = game.Character.Weenie.ServerPosition;
             var nearest = tree.GetNearestNeighbours(pos.ToArray(), 1).FirstOrDefault();
             if (nearest is not null)
             {
-                Log.Chat($"{nearest.Value.NavPath}");
+                // Log.Chat($"{nearest.Value.NavPath}");
+                Log.Chat($"{nearest.Value}");
             }
         }
 
-        if (ImGui.ListBox("Nav", ref selected, NavNames, NavNames.Length))
+        if (ImGui.ListBox("Nearby", ref selectedNear, nearbyNavs, nearbyNavs.Length, 5))
         {
-            var name = NavNames[selected];
-            Log.Chat($"Selected {selected} - {name}");
-            if (VTNavRoute.TryParseRouteFromName(name, out route))
+            ClearMarkers();
+            var name = nearbyNavs[selectedNear];
+            //game.Actions.InvokeChat($"/vt nav load {name}");
+            //Log.Chat($"Selected {selectedNear} - {name}");
+            if (VTNavRoute.TryParseRouteFromName(name, out currentRoute))
+                RenderRoute();
+        }
+        if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+        {
+            if (currentRoute is not null)
+                //&& Path.GetFileNameWithoutExtension(currentRoute.NavPath) != nearbyNavs[selectedNear]
+                game.Actions.InvokeChat($"/vt nav load {currentRoute.NavName}");
+            else
+                Log.Chat($"{currentRoute?.NavName}");
+        }
+
+
+            if (ImGui.ListBox("Nav", ref selected, navNames, navNames.Length, 5))
+        {
+            ClearMarkers();
+            var name = navNames[selected];
+            //Log.Chat($"Selected {selected} - {name}");
+            if (VTNavRoute.TryParseRouteFromName(name, out currentRoute))
                 RenderRoute();
         }
     }
 
     private void RenderRoute()
     {
-        //foreach (var marker in markers)
-        //    marker?.Dispose();
+        //Clear old markers
+        foreach (var marker in markers)
+            marker?.Dispose();
 
-        if (route is null)
-            return;
-
-        route.Dispose();
-        route.Draw();
-
-        //var s = ac.MarkObjectWithShape(game.CharacterId, DecalD3DShape.Ring, 0xAA55ff55);
-        var coords = game.Character.Weenie.ServerPosition.ToArray();
-        var s  = ac.MarkCoordsWithShape(coords[0], coords[1], coords[2]*240+.05f, DecalD3DShape.Ring, 0xAA55ff55);
-        
-        foreach (var point in route.Points)
+        foreach (var waypoint in currentRoute.Points)
         {
-            Log.Chat($"Drawing {point.Type} at {point.NS}, {point.EW}, {point.Z}");
-            point.Draw();
+            //if (waypoint.Type == WaypointType.Point 
+            if (prevPoint is null)
+                prevPoint = waypoint;
+            else
+            {
+                //Make a mark if they aren't overlapping?
+                if (prevPoint.DistanceTo(waypoint) > .1)
+                {
+                    var marker = waypoint.Mark(prevPoint);
+                    markers.Add(marker);
+                }
+                prevPoint = waypoint;
+            }
         }
-        //foreach (var waypoint in route.Points)
+
+        #region Undone UB approach?
+        //if (route is null)
+        //    return;
+
+        //route.Dispose();
+        //route.Draw();
+
+        //if (route is null)
+        //    return;
+
+        //route.Dispose();
+        //route.Draw();
+
+        //foreach (var point in route.Points)
         //{
-        //    //if (waypoint.Type == WaypointType.Point)
-        //    //{
-        //        if (prevPoint is null)
-        //            prevPoint = waypoint;
-        //        else
-        //        {
-        //            var marker = waypoint.Mark(prevPoint);
-        //            markers.Add(marker);
-        //            prevPoint = waypoint;
-        //        }
-        //    //}
-        //}
+        //    Log.Chat($"Drawing {point.Type} at {point.NS}, {point.EW}, {point.Z}");
+        //    point.Draw();
+        //} 
+        #endregion
+    }
+
+    private void ClearMarkers()
+    {
+        try
+        {
+            currentRoute?.Dispose();
+
+            foreach (var marker in markers)
+                marker?.Dispose();
+
+            markers.Clear();
+        }
+        catch (Exception ex) { Log.Error(ex); }
+    }
+
+    protected override void AddEvents()
+    {
+        //game.Character.OnPortalSpaceExited
+        //game.World.OnChatInput
+        game.OnTick += OnTick;
+        base.AddEvents();
+    }
+    protected override void RemoveEvents()
+    {
+        game.OnTick -= OnTick;
+        base.RemoveEvents();
+    }
+
+    private void OnTick(object sender, EventArgs e)
+    {
+        var watch = Stopwatch.StartNew();
+        float radius = .1f;
+        nearbyNavs = GetNearbyRoutes(tree, Coordinates.Me, radius).Select(x => x.NavName).ToArray();
+
+        //var results = tree.RadialSearch(Coordinates.Me.ToArray(), .01f);
+        ////var results = tree.GetNearestNeighbours(Coordinates.Me.ToArray(), 1);
+        watch.Stop();
+
+        //if (results.Length == 0)
+        //    return;
+
+        //var closest = results.First();
+
+        //Log.Chat($"Found {nearbyNavs.Length} navs within {radius} in {watch.ElapsedMilliseconds}ms");
+        //Log.Chat($"{watch.ElapsedTicks} ticks to find closest to {closest.Value.index}/{closest.Value.route.RecordCount} of {Path.GetFileNameWithoutExtension(closest.Value.route.NavPath)}");
+        //game.Actions.InvokeChat($"/vt nav load {closest.Value.NavName}");
     }
 
     public override void Dispose()
     {
-        try
-        {
-            route.Dispose();
-
-            foreach (var marker in markers)
-            {
-                marker?.Dispose();
-            }
-            markers.Clear();
-        }
-        catch (Exception ex) { Log.Error(ex); }
+        ClearMarkers();
 
         base.Dispose();
     }
 }
-
-//local init = function ()
-//  if vtfs.IsApproved then
-//    VTNavigation.HasAccess = true
-//    VTNavigation.RefreshNavFiles()
-//  else
-//    vtfs.OnAccessChanged.Add(function (evt)
-//      VTNavigation.HasAccess = evt.AccessGranted
-//      if evt.AccessGranted then
-//        VTNavigation.RefreshNavFiles()
-//      end
-//    end)
-//  end
-//end

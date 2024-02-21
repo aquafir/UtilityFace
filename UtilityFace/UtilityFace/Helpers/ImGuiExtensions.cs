@@ -46,73 +46,240 @@ public static class ImGuiExtensions
         ImGuiStyleVar.WindowRounding => true,
         _ => false,
     };
-    public static Style Style(this ImGuiStyleVar var, object value) => var.IsFloat() ? 
+    public static Style Style(this ImGuiStyleVar var, object value) => var.IsFloat() ?
         new StyleFloat(var, Convert.ToSingle(value)) : new StyleVector2(var, (Vector2)value);
+    public static Style Style(this ImGuiCol var, Vector4 value) => var.Style(value.ToUInt());
+    public static Style Style(this ImGuiCol var, uint value) => new StyleColor(var, value);
 
-    //public static Styling GetStyling(this ImGuiStylePtr style)
-    //{
-    //    style.Alpha = 1.0f;
-    //    style.DisabledAlpha = 0.1000000014901161f;
-    //    style.WindowPadding = new Vector2(8.0f, 8.0f);
-    //    style.WindowRounding = 10.0f;
-    //    style.WindowBorderSize = 0.0f;
-    //    style.WindowMinSize = new Vector2(30.0f, 30.0f);
-    //    style.WindowTitleAlign = new Vector2(0.5f, 0.5f);
-    //    style.WindowMenuButtonPosition = ImGuiDir.Right;
-    //    style.ChildRounding = 5.0f;
-    //    style.ChildBorderSize = 1.0f;
-    //    style.PopupRounding = 10.0f;
-    //    style.PopupBorderSize = 0.0f;
-    //    style.FramePadding = new Vector2(5.0f, 3.5f);
-    //    style.FrameRounding = 5.0f;
-    //    style.FrameBorderSize = 0.0f;
-    //    style.ItemSpacing = new Vector2(5.0f, 4.0f);
-    //    style.ItemInnerSpacing = new Vector2(5.0f, 5.0f);
-    //    style.CellPadding = new Vector2(4.0f, 2.0f);
-    //    style.IndentSpacing = 5.0f;
-    //    style.ColumnsMinSpacing = 5.0f;
-    //    style.ScrollbarSize = 15.0f;
-    //    style.ScrollbarRounding = 9.0f;
-    //    style.GrabMinSize = 15.0f;
-    //    style.GrabRounding = 5.0f;
-    //    style.TabRounding = 5.0f;
-    //    style.TabBorderSize = 0.0f;
-    //    style.TabMinWidthForCloseButton = 0.0f;
-    //    style.ColorButtonPosition = ImGuiDir.Right;
-    //    style.ButtonTextAlign = new Vector2(0.5f, 0.5f);
-    //    style.SelectableTextAlign = new Vector2(0.0f, 0.0f);
-    //}
+    public static Styling GetStyling(this ImGuiStylePtr style)
+    {
+        Styling styling = new();
+
+        //Loop through styles?
+        unsafe
+        {
+            foreach (ImGuiCol colStyle in Enum.GetValues(typeof(ImGuiCol)))
+            {
+                var color = *ImGui.GetStyleColorVec4(colStyle);
+                styling.Styles.Add(colStyle.Style(color));
+            }
+        }
+
+        styling.Styles.AddRange(new List<Style>()
+        {
+            ImGuiStyleVar.Alpha.Style(style.Alpha),
+            ImGuiStyleVar.ButtonTextAlign.Style(style.ButtonTextAlign),
+            ImGuiStyleVar.CellPadding.Style(style.CellPadding),
+            ImGuiStyleVar.ChildBorderSize.Style(style.ChildBorderSize),
+            ImGuiStyleVar.ChildRounding.Style(style.ChildRounding),
+            ImGuiStyleVar.DisabledAlpha.Style(style.DisabledAlpha),
+            ImGuiStyleVar.FrameBorderSize.Style(style.FrameBorderSize),
+            ImGuiStyleVar.FramePadding.Style(style.FramePadding),
+            ImGuiStyleVar.FrameRounding.Style(style.FrameRounding),
+            ImGuiStyleVar.GrabMinSize.Style(style.GrabMinSize),
+            ImGuiStyleVar.GrabRounding.Style(style.GrabRounding),
+            ImGuiStyleVar.IndentSpacing.Style(style.IndentSpacing),
+            ImGuiStyleVar.ItemInnerSpacing.Style(style.ItemInnerSpacing),
+            ImGuiStyleVar.ItemSpacing.Style(style.ItemSpacing),
+            ImGuiStyleVar.PopupBorderSize.Style(style.PopupBorderSize),
+            ImGuiStyleVar.PopupRounding.Style(style.PopupRounding),
+            ImGuiStyleVar.ScrollbarRounding.Style(style.ScrollbarRounding),
+            ImGuiStyleVar.ScrollbarSize.Style(style.ScrollbarSize),
+            ImGuiStyleVar.SelectableTextAlign.Style(style.SelectableTextAlign),
+            ImGuiStyleVar.TabRounding.Style(style.TabRounding),
+            ImGuiStyleVar.WindowBorderSize.Style(style.WindowBorderSize),
+            ImGuiStyleVar.WindowMinSize.Style(style.WindowMinSize),
+            ImGuiStyleVar.WindowPadding.Style(style.WindowPadding),
+            ImGuiStyleVar.WindowRounding.Style(style.WindowRounding),
+            ImGuiStyleVar.WindowTitleAlign.Style(style.WindowTitleAlign),
+        });
+        //public byte AntiAliasedFill;
+        //public byte AntiAliasedLines;
+        //public byte AntiAliasedLinesUseTex;
+        //public float CircleTessellationMaxError;
+        //public float ColumnsMinSpacing;
+        //public float CurveTessellationTol;
+        //public float HoverDelayNormal;
+        //public float HoverDelayShort;
+        //public float HoverStationaryDelay;
+        //public float LogSliderDeadzone;
+        //public float MouseCursorScale;
+        //public float SeparatorTextBorderSize;
+        //public float TabBorderSize;
+        //public float TabMinWidthForCloseButton;
+        //public ImGuiDir ColorButtonPosition;
+        //public ImGuiDir WindowMenuButtonPosition;
+        //public ImGuiHoveredFlags HoverFlagsForTooltipMouse;
+        //public ImGuiHoveredFlags HoverFlagsForTooltipNav;
+        //public Vector2 DisplaySafeAreaPadding;
+        //public Vector2 DisplayWindowPadding;
+        //public Vector2 SeparatorTextAlign;
+        //public Vector2 SeparatorTextPadding;
+        //public Vector2 TouchExtraPadding;
+
+        return styling;
+    }
 }
+
+//Put on hold since there's a probably replacement
+////byte AntiAliasedFill,
+////byte AntiAliasedLines,
+////byte AntiAliasedLinesUseTex,
+//public enum ImStyleVec
+//{
+//    ButtonTextAlign,
+//    CellPadding,
+//    DisplaySafeAreaPadding,
+//    DisplayWindowPadding,
+//    FramePadding,
+//    ItemInnerSpacing,
+//    ItemSpacing,
+//    SelectableTextAlign,
+//    SeparatorTextAlign,
+//    SeparatorTextPadding,
+//    TouchExtraPadding,
+//    WindowMinSize,
+//    WindowPadding,
+//    WindowTitleAlign,
+//}
+//public enum ImStyleFloat
+//{
+//    Alpha,
+//    ChildBorderSize,
+//    ChildRounding,
+//    CircleTessellationMaxError,
+//    ColumnsMinSpacing,
+//    CurveTessellationTol,
+//    DisabledAlpha,
+//    FrameBorderSize,
+//    FrameRounding,
+//    GrabMinSize,
+//    GrabRounding,
+//    HoverDelayNormal,
+//    HoverDelayShort,
+//    HoverStationaryDelay,
+//    IndentSpacing,
+//    LogSliderDeadzone,
+//    MouseCursorScale,
+//    PopupBorderSize,
+//    PopupRounding,
+//    ScrollbarRounding,
+//    ScrollbarSize,
+//    SeparatorTextBorderSize,
+//    TabBorderSize,
+//    TabMinWidthForCloseButton,
+//    TabRounding,
+//    WindowBorderSize,
+//    WindowRounding,
+//}
+//public enum ImStyleAlign
+//{
+//    //ImGuiDir 
+//    ColorButtonPosition,
+//    WindowMenuButtonPosition,
+
+//}
+//public enum ImStyleHover
+//{
+//    //ImGuiHoveredFlags
+//    HoverFlagsForTooltipMouse,
+//    HoverFlagsForTooltipNav,
+//}
+
 
 public abstract class Style
 {
-    public ImGuiStyleVar Type;
     public abstract void PushStyle();
+    public abstract void PopStyle();
+    public abstract bool TryParse(string s, out Style style);
 }
-public class StyleFloat : Style
-{
-    public float Value;
 
-    public StyleFloat(ImGuiStyleVar type, float value)
-    {
-        Type = type;
-        Value = value;
-    }
+public abstract class StyleVar(ImGuiStyleVar type) : Style
+{
+    public ImGuiStyleVar Type;
+    public override void PopStyle() => ImGui.PopStyleVar();
+}
+public class StyleFloat(ImGuiStyleVar type, float value) : StyleVar(type)
+{
+    public float Value = value;
 
     public override void PushStyle() => ImGui.PushStyleVar(Type, Value);
-}
-public class StyleVector2 : Style
-{
-    public Vector2 Value;
 
-    public StyleVector2(ImGuiStyleVar type, Vector2 value)
+    //alpha = 1.0
+    public override string ToString() => $"{Type} = {Value}";
+
+    public override bool TryParse(string s, out Style style)
     {
-        Type = type;
-        Value = value;
+        throw new NotImplementedException();
     }
+}
+public class StyleVector2(ImGuiStyleVar type, Vector2 value) : StyleVar(type)
+{
+    public Vector2 Value = value;
 
     public override void PushStyle() => ImGui.PushStyleVar(Type, Value);
+
+    //windowPadding = [8.0, 8.0]
+    public override string ToString() => $"{Type} = [{Value.X}, {Value.Y}]";
+    public override bool TryParse(string s, out Style style)
+    {
+        throw new NotImplementedException();
+    }
 }
+
+public class StyleColor(ImGuiCol type, uint value) : Style
+{
+    public ImGuiCol Type = type;
+    public uint Value = value;
+
+    public override void PushStyle() => ImGui.PushStyleColor(Type, Value);
+    public override void PopStyle() => ImGui.PopStyleColor();
+
+    //Text = "rgba(255, 255, 255, 1.0)"
+    public override string ToString()
+    {
+        var bytes = BitConverter.GetBytes(Value);
+        return $"{Type} = rgba({bytes[0]}, {bytes[1]}, {bytes[2]}, {bytes[3]})";
+    }
+
+    public override bool TryParse(string s, out Style style)
+    {
+        throw new NotImplementedException();
+    }
+
+    //public override bool TryParse(string s, out Style style)
+    //{
+    //    style = null;
+    //    var split = s.Split('=');
+    //    if (split.Length < 2)
+    //        return false;
+    //}
+}
+
+//TODO: Deal with GetStyle() -> only stuff
+//style.ColorButtonPosition = ImGuiDir.Left;
+//style.WindowMenuButtonPosition = ImGuiDir.Right;
+//public class StyleDirection(ImGuiCol type, uint value) : Style
+//{
+//    public ImGuiCol Type = type;
+//    public uint Value = value;
+
+//    public override void PushStyle() => ImGui.PushStyleColor(Type, Value);
+//    public override void PopStyle() => ImGui.PopStyleColor();
+
+//    //Text = "rgba(255, 255, 255, 1.0)"
+//    public override string ToString()
+//    {
+//        var bytes = BitConverter.GetBytes(Value);
+//        return $"{Type} = rgba({bytes[0]}, {bytes[1]}, {bytes[2]}, {bytes[3]})";
+//    }
+
+//    public override bool TryParse(string s, out Style style)
+//    {
+//        throw new NotImplementedException();
+//    }
+//}
+
 public class Styling
 {
     public List<Style> Styles = new();
@@ -123,5 +290,9 @@ public class Styling
         foreach (var style in Styles)
             style.PushStyle();
     }
-    public void PopStyles() => ImGui.PopStyleVar(Styles.Count);
+    public void PopStyles()
+    {
+        foreach (var style in Styles)
+            style.PopStyle();
+    }
 }

@@ -1,4 +1,8 @@
 ﻿
+using AcClient;
+using System.Text;
+using UtilityBelt.Scripting.Actions;
+
 namespace UtilityFace.HUDs;
 internal class PropertyEditorHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)
 {
@@ -36,13 +40,13 @@ internal class PropertyEditorHud(string name, bool showInBar = false, bool visib
 
     protected override void AddEvents()
     {
-        game.World.OnObjectSelected += OnSelected; ;
+        //game.World.OnObjectSelected += OnSelected; ;
         base.AddEvents();
     }
 
     protected override void RemoveEvents()
     {
-        game.World.OnObjectSelected -= OnSelected;
+        //game.World.OnObjectSelected -= OnSelected;
 
         base.RemoveEvents();
     }
@@ -78,9 +82,7 @@ internal class PropertyEditorHud(string name, bool showInBar = false, bool visib
         try
         {
             DrawMenu();
-            //ImGui.BeginChild("Editor");
             DrawTabBar();
-            //ImGui.EndChild();
         }
         catch (Exception ex)
         {
@@ -101,7 +103,36 @@ internal class PropertyEditorHud(string name, bool showInBar = false, bool visib
         ImGui.SameLine();
         if (ImGui.Button("Save"))
         {
-            Log.Chat("Todo!");
+            Log.Chat("Save?");
+            //if(game.World.Selected == null)
+            if (propTables is null || propTables.Sum(x => x.tableData.Length) == 0)
+            {
+                Log.Chat("Nothing to save.");
+            }
+            else
+            {
+                var sb = new StringBuilder();
+
+                foreach (var table in propTables)
+                {
+                    sb.AppendLine($"==={table.Type}===");
+                    sb.AppendLine($"{"Key",-8}{"Prop",-35}{"Value"}");
+
+                    foreach (var prop in table.tableData)
+                        sb.AppendLine($"{prop.Key,-8}{prop.Property,-35}{prop.OriginalValue}");
+
+                    sb.AppendLine($"");
+                }
+                try
+                {
+                    var time = DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss");
+                    var name = $"{Original.Id} - {Original.Name} - {time}.txt";
+                    var path = Path.Combine(PluginCore.AssemblyDirectory, name);
+                    File.WriteAllText(path, sb.ToString());
+                    Log.Chat($"Saved to:\n{path}");
+                }
+                catch (Exception ex) { Log.Error(ex); }
+            }
         }
         ImGui.Separator();
 
@@ -109,18 +140,15 @@ internal class PropertyEditorHud(string name, bool showInBar = false, bool visib
 
     private void DrawTabBar()
     {
-        if (ImGui.BeginTabBar("PropertyTab"))
+        ImGui.BeginTabBar("PropertyTab");
+        foreach (var table in propTables)
         {
-            foreach (var table in propTables)
+            if (ImGui.BeginTabItem($"{table.Name}"))
             {
-                if (ImGui.BeginTabItem($"{table.Name}"))
-                {
-                    table.Render(table);
-
-                    ImGui.EndTabItem();
-                }
+                table.Render(table);
+                ImGui.EndTabItem();
+            }
         }
-            ImGui.EndTabBar();
-        }
+        ImGui.EndTabBar();
     }
 }

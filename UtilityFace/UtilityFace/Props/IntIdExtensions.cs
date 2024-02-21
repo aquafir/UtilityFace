@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using UtilityBelt.Scripting.Lib;
 using UtilityFace.Enums;
 using DamageType = UtilityFace.Enums.DamageType;
 
@@ -29,7 +30,27 @@ public static class IntIdExtensions
     /// <summary>
     /// Tries to find the Enum associated with a property key
     /// </summary>
-    public static bool TryGetEnum(this IntId key, out Type enumType) => _enums.TryGetValue(key, out enumType);
+    public static bool TryGetEnumType(this IntId key, out Type enumType) => _enums.TryGetValue(key, out enumType);
+    /// <summary>
+    /// Tries to get a cached string array of the names of the enum associated with a property key
+    /// </summary>
+    static readonly Dictionary<Type, string[]> _cachedEnumNames = new();
+    public static bool TryGetEnumNames(this IntId key, out string[] names)
+    {
+        if (!key.TryGetEnumType(out var type) || !type.IsEnum)
+        {
+            names = null;
+            return false;
+        }
+
+        if (!_cachedEnumNames.TryGetValue(type, out names))
+        {            
+            names = Enum.GetNames(type);
+            _cachedEnumNames.AddOrUpdate(type, names);
+        }
+        return true;
+    }
+
 
     /// <summary>
     /// Returns a descriptive label for a property, defaulting to the name of the property

@@ -9,8 +9,7 @@ public class PropertyFilter
     public PropertyData Target { get; set; } = new();
 
     public bool ShowName { get; set; } = false;
-
-    public bool ShowIncludeMissing { get; set; } = true;
+    public bool ShowIncludeMissing { get; set; } = false;
 
     public int Width = 80;
     public bool IncludeMissing = false;
@@ -62,8 +61,8 @@ public class PropertyFilter
             ImGui.SameLine();
         }
 
-        //ImGui.SetNextItemWidth(Width);
-        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+        ImGui.SetNextItemWidth(Width);
+        //ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
         if (ImGui.Combo($"###{Label}Combo", ref SelectedIndex, Props, Props.Length))
         {
             Changed = true;
@@ -72,7 +71,7 @@ public class PropertyFilter
         if (UseFilter)
         {
             ImGui.SetNextItemWidth(Width);
-            //ImGui.SameLine();
+            ImGui.SameLine();
 
             if (ImGui.InputText($"{Name}###{Label}Filter", ref FilterText, 256))
                 UpdateFilter();

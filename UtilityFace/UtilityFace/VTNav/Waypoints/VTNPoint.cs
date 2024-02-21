@@ -175,7 +175,7 @@ namespace UtilityBelt.Lib.VTNav.Waypoints
             obj.Visible = false;
             obj.Color = 0xAA55ff55;
             obj.SetShape(DecalD3DShape.Cube);
-            obj.Anchor(EW, NS, Z*240+.05f);//(prevPoint.EastWest + EastWest) / 2, (prevPoint.NorthSouth + NorthSouth) / 2, (prevPoint.Z + Z) * 120 + 0.05f);
+            obj.Anchor(NS, EW, Z*240+.05f);//(prevPoint.EastWest + EastWest) / 2, (prevPoint.NorthSouth + NorthSouth) / 2, (prevPoint.Z + Z) * 120 + 0.05f);
             obj.ScaleX = 1.25f;
             obj.ScaleZ = 1.25f;
             obj.ScaleY = 1.25f;
@@ -236,12 +236,12 @@ namespace UtilityBelt.Lib.VTNav.Waypoints
             obj.Visible = false;
             obj.Color = 0xAA55ff55;
             obj.SetShape(DecalD3DShape.Cube);
-            obj.Anchor((prevPoint.EW + EW) / 2, (prevPoint.NS + NS) / 2, (prevPoint.Z + Z) * 120 + 0.05f);
-            obj.OrientToCoords(EW, NS, Z * 240 + 0.05f, true);
+            obj.Anchor((prevPoint.NS + NS) / 2, (prevPoint.EW + EW) / 2, (prevPoint.Z + Z) * 120 + 0.05f);
+            obj.OrientToCoords(NS, EW, Z * 240 + 0.05f, true);
             obj.ScaleX = 0.25f;
             obj.ScaleZ = 0.25f;
             obj.ScaleY = (float)DistanceTo(prevPoint);
-            obj.Visible = true;
+            obj.Visible = true; 
             return obj;
         }
     }

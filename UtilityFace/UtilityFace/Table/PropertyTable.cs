@@ -1,4 +1,7 @@
-﻿namespace UtilityFace.Table;
+﻿using AcClient;
+using WattleScript.Interpreter;
+
+namespace UtilityFace.Table;
 
 public class PropertyTable
 {
@@ -26,7 +29,6 @@ public class PropertyTable
     //Data for the table
     //public List<TableRow> tableData = new ();
     public TableRow[] tableData = new TableRow[0];
-
     #endregion
 
     public PropertyTable(PropType type)
@@ -86,8 +88,9 @@ public class PropertyTable
                 //});
             }
             //Log.Chat($"{tableData.Length}");
-        }catch(Exception ex) { Log.Error(ex); }
-        
+        }
+        catch (Exception ex) { Log.Error(ex); }
+
     }
 
     public void SetTarget(PropertyData target)
@@ -122,31 +125,78 @@ public class PropertyTable
             //Set column/direction
             sortDirection = tableSortSpecs.Specs.SortDirection;
             sortColumn = tableSortSpecs.Specs.ColumnUserID;
-            //C.Chat($"Dirty: {sortDirection} - {tableSortSpecs.Specs.ColumnUserID}");
 
-            //Todo: do this more better
-            var specs = (&tableSortSpecs)->NativePtr;
-            specs->SpecsDirty = 0;
-
-            Array.Sort(tableData, CompareTableRows);
+            try
+            {
+                switch (sortColumn)
+                {
+                    case 0:
+                        tableData = sortDirection == ImGuiSortDirection.Descending ?
+                            tableData.OrderByDescending(x => x.Key).ToArray() :
+                            tableData.OrderBy(x => x.Key).ToArray();
+                        return;
+                    case 1:
+                        tableData = sortDirection == ImGuiSortDirection.Descending ?
+                            tableData.OrderByDescending(x => x.Property).ToArray() :
+                            tableData.OrderBy(x => x.Property).ToArray();
+                        return;
+                    case 2:
+                        //Base on string value
+                        if (Type == PropType.String || Type == PropType.Bool)
+                        {
+                            tableData = sortDirection == ImGuiSortDirection.Descending ?
+                                tableData.OrderByDescending(x => x.OriginalValue).ToArray() :
+                                tableData.OrderBy(x => x.OriginalValue).ToArray();
+                        }
+                        //Base on number value
+                        else
+                        {
+                            tableData = sortDirection == ImGuiSortDirection.Descending ?
+                                tableData.OrderByDescending(x => double.Parse(x.OriginalValue)).ToArray() :
+                                tableData.OrderBy(x => double.Parse(x.OriginalValue)).ToArray();
+                        }
+                        return;
+                    case 3:
+                        if (Type == PropType.String || Type == PropType.Bool)
+                        {
+                            tableData = sortDirection == ImGuiSortDirection.Descending ?
+                                tableData.OrderByDescending(x => x.CurrentValue).ToArray() :
+                                tableData.OrderBy(x => x.CurrentValue).ToArray();
+                        }
+                        else
+                        {
+                            tableData = sortDirection == ImGuiSortDirection.Descending ?
+                                tableData.OrderByDescending(x => double.Parse(x.CurrentValue)).ToArray() :
+                                tableData.OrderBy(x => double.Parse(x.CurrentValue)).ToArray();
+                        }
+                        return;
+                }
+            }
+            catch (Exception ex) { Log.Error(ex); }
         }
     }
 
+
+    /// <summary>
+    /// Render a table for a PropType
+    /// </summary>
     public void Render(PropertyTable table)
     {
-        if (Target is null || tableData.Length == 0)
+        if (Target is null)
         {
             ImGui.Text($"{Type} - {Filter.Props.Length} - {tableData.Length}");
             return;
         }
-        Filter.Render();
 
+        //Show the filter
+        Filter.Render();
 
         if (Filter.Changed)
             UpdateTable();
 
 
-        ImGui.Text($"Data: {tableData.Length}");
+        //Show item count?
+        //ImGui.Text($"Data: {tableData.Length}");
 
         if (ImGui.BeginTable($"{Type}", 4, TABLE_FLAGS))
         {
@@ -167,64 +217,82 @@ public class PropertyTable
             ImGui.TableHeadersRow();
 
             //Sort if needed
-            //Sort();
+            Sort();
 
             //ImGui.EndTable();
             //return;
 
             for (int i = 0; i < tableData.Length; i++)
             {
-                ImGui.TableNextRow();
-
-                ImGui.TableNextColumn();
-                ImGui.Text($"{tableData[i].Key}");
-
-                ImGui.TableNextColumn();
-                ImGui.Text($"{tableData[i].Property}");
-
-                //if (ImGui.BeginPopupContextItem())
-                //{
-                //    if (ImGui.MenuItem("Test123"))
-                //        Console.WriteLine("Clicked");
-                //    ImGui.EndPopup();
-                //}
-
-                ImGui.TableNextColumn();
-                ImGui.Text($"{tableData[i].OriginalValue}");
-
-                ImGui.TableNextColumn();
-                if(ImGui.InputText($"###{Type}{i}", ref tableData[i].CurrentValue, 300, ImGuiInputTextFlags.EnterReturnsTrue))
-                {
-                    var g = new Game();
-                    //var s = g.World.Selected;
-                    if (!g.World.TryGet(Target.Id, out var wo)) {
-                        Log.Chat("Unable to find target");
-                        break;
-                    }
-                    wo.Select();
-
-                    var cmd = table.Type switch
-                    {
-                        //PropType.Unknown => $"/setproperty PropertyBool.{tableData[i].Property} {tableData[i].CurrentValue}",
-                        PropType.Bool => $"/setproperty PropertyBool.{tableData[i].Property} {tableData[i].CurrentValue}",
-                        PropType.DataId => $"/setproperty PropertyDataId.{tableData[i].Property} {tableData[i].CurrentValue}",
-                        PropType.Float => $"/setproperty PropertyFloat.{tableData[i].Property} {tableData[i].CurrentValue}",
-                        PropType.InstanceId => $"/setproperty PropertyInstanceId.{tableData[i].Property} {tableData[i].CurrentValue}",
-                        PropType.Int => $"/setproperty PropertyInt.{tableData[i].Property} {tableData[i].CurrentValue}",
-                        PropType.Int64 => $"/setproperty PropertyInt64.{tableData[i].Property} {tableData[i].CurrentValue}",
-                        PropType.String => $"/setproperty PropertyString.{tableData[i].Property} {tableData[i].CurrentValue}",
-                    };
-
-                    g.Actions.InvokeChat(cmd);
-                    Log.Chat($"Ran command: {cmd}");
-                }
-
-                //ImGui.Text($"{tableData[i].CurrentValue}");
-                //break;
+                var row = tableData[i];
+                RenderRow(table, row, i);
             }
-
-            ImGui.EndTable();
         }
 
+        ImGui.EndTable();
+    }
+
+    public void RenderRow(PropertyTable table, TableRow row, int i)
+    {
+        ImGui.TableNextRow();
+
+        ImGui.TableNextColumn();
+        ImGui.Text($"{row.Key}");
+
+        ImGui.TableNextColumn();
+        ImGui.Text($"{row.Property}");
+
+        ImGui.TableNextColumn();
+        ImGui.Text($"{row.OriginalValue}");
+
+        ImGui.TableNextColumn();
+        RenderEdit(table, row, i);
+    }
+
+    public void RenderEdit(PropertyTable table, TableRow row, int i)
+    {
+        //Special handling of enum type
+        if (Type == PropType.Int && ((IntId)row.Key).TryGetEnumNames(out var names))
+        {
+            //var names = Enum.GetNames(enumType);
+            if (!int.TryParse(row.CurrentValue, out var value))
+            {
+                Log.Chat($"Can't parse?");
+            }
+
+            if (ImGui.Combo($"###{Type}{i}", ref value, names, names.Length))
+            {
+                row.CurrentValue = value.ToString();
+                Log.Chat($"Set to {names[value]} ({value})");
+            }
+        }
+
+        else if (ImGui.InputText($"###{Type}{i}", ref row.CurrentValue, 300, ImGuiInputTextFlags.EnterReturnsTrue))
+        {
+            var g = new Game();
+            //var s = g.World.Selected;
+            if (!g.World.TryGet(Target.Id, out var wo))
+            {
+                Log.Chat("Unable to find target");
+                return;
+            }
+            wo.Select();
+
+            var cmd = table.Type switch
+            {
+                //PropType.Unknown => $"/setproperty PropertyBool.{row.Property} {row.CurrentValue}",
+                PropType.Bool => $"/setproperty PropertyBool.{row.Property} {row.CurrentValue}",
+                PropType.DataId => $"/setproperty PropertyDataId.{row.Property} {row.CurrentValue}",
+                PropType.Float => $"/setproperty PropertyFloat.{row.Property} {row.CurrentValue}",
+                PropType.InstanceId => $"/setproperty PropertyInstanceId.{row.Property} {row.CurrentValue}",
+                PropType.Int => $"/setproperty PropertyInt.{row.Property} {row.CurrentValue}",
+                PropType.Int64 => $"/setproperty PropertyInt64.{row.Property} {row.CurrentValue}",
+                PropType.String => $"/setproperty PropertyString.{row.Property} {row.CurrentValue}",
+            };
+
+            g.Actions.InvokeChat(cmd);
+            Log.Chat($"Ran command: {cmd}");
+        }
     }
 }
+
