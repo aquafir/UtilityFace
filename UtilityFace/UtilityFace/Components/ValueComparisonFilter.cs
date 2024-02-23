@@ -1,6 +1,4 @@
-﻿using UtilityFace.Modals;
-
-namespace UtilityFace.Components;
+﻿namespace UtilityFace.Components;
 public class ValueComparisonFilter<T> : IOptionalFilter<T> 
 {
     double value;

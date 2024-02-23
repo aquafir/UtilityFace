@@ -1,6 +1,4 @@
-﻿using UtilityFace.Components;
-
-namespace UtilityFace.Modals;
+﻿namespace UtilityFace.Components;
 public abstract class IModal : IComp
 {
     protected Vector2 MinSize = new(300);

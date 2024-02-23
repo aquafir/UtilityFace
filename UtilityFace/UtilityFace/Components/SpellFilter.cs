@@ -1,15 +1,6 @@
 ﻿using ACE.DatLoader.Entity;
 using ACE.DatLoader.FileTypes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using UtilityBelt.Common.Messages.Types;
 using UtilityFace.HUDs;
-using UtilityFace.Modals;
-using Spell = UtilityBelt.Scripting.Interop.Spell;
 using SpellBook = UtilityBelt.Scripting.Interop.SpellBook;
 
 namespace UtilityFace.Components;

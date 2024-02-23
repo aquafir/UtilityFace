@@ -1,6 +1,4 @@
-﻿using UtilityFace.Components;
-
-namespace UtilityFace.Modals;
+﻿namespace UtilityFace.Components;
 
 /// <summary>
 /// Draws a text field that builds a Regex

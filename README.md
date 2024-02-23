@@ -50,9 +50,13 @@ An `IComp` (avoiding MS stuff) is a building blocks for HUDs.  All have:
 
 A `IPicker<T>` draws the elements needed to select something, such as value(s) from an Enum
 
-* A
-* `PagedPicker<T>`
-  * `DrawPageControl`
+* Has a `T Selection` for the last element interacted with
+* `ICollectionPicker<T>` adds 
+  * `T[] Choices` and loops through them in `DrawBody` 
+  * `DrawItem(T item, int index)` renders each item
+* `IPagedPicker<T>` adds
+  * `DrawPageControls` to the start of `DrawBody` 
+  * Number of items `PerPage` and the `CurrentPage` are used to display only part of the choices
 
 
 

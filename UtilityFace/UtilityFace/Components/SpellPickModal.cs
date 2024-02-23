@@ -1,9 +1,7 @@
 ﻿using ACE.DatLoader.Entity;
-using ACE.DatLoader.FileTypes;
-using UtilityFace.Components;
 using UtilityFace.HUDs;
 
-namespace UtilityFace.Modals;
+namespace UtilityFace.Components;
 public class SpellPickModal() : IModal()
 {
     static readonly SpellBook spellbook = HudBase.game.Character.SpellBook;

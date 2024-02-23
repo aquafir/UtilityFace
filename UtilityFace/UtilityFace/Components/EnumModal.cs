@@ -1,7 +1,4 @@
-﻿using System.Drawing;
-using System.Linq;
-
-namespace UtilityFace.Modals;
+﻿namespace UtilityFace.Components;
 internal class EnumModal<T> : IModal where T : struct, Enum
 {
     const ImGuiTableFlags TABLE_FLAGS = ImGuiTableFlags.BordersInner | ImGuiTableFlags.Resizable | ImGuiTableFlags.RowBg | ImGuiTableFlags.Reorderable | ImGuiTableFlags.Hideable | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable;

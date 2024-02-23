@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UtilityFace.Modals;
-
-namespace UtilityFace.Components;
+﻿namespace UtilityFace.Components;
 public abstract class IOptionalFilter<T>(Func<T, bool> filterPredicate = null) : IFilter<T>(filterPredicate)
 {
     public bool ShowInactive = false;

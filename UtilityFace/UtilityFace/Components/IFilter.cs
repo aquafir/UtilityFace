@@ -1,6 +1,4 @@
-﻿using UtilityFace.Components;
-
-namespace UtilityFace.Modals;
+﻿namespace UtilityFace.Components;
 public abstract class IFilter<T>(Func<T, bool> filterPredicate = null) : IComp
 {
     /// <summary>
@@ -27,4 +25,5 @@ public abstract class IFilter<T>(Func<T, bool> filterPredicate = null) : IComp
 
         return input.Where(item => !IsFiltered(item));
     }
+
 }

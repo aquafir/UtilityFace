@@ -1,12 +1,11 @@
 ﻿using UtilityFace.Components;
-using UtilityFace.Modals;
 
 namespace UtilityFace.HUDs;
 public class StyleHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)
 {
     TexturePickModal modal = new()
     {
-        IconSize = new(25),
+        IconSize = new(25),         
     };
     SpellPickModal sModal = new();
     EnumModal<IntId> enumPickModal = new();

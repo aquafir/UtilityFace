@@ -1,6 +1,4 @@
-﻿using UtilityFace.Components;
-
-namespace UtilityFace.Modals;
+﻿namespace UtilityFace.Components;
 
 //May need to change to enum struct
 public class EnumPicker<T> : IPicker<T> where T : struct, Enum
