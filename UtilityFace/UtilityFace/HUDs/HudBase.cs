@@ -3,7 +3,7 @@ public abstract class HudBase : IDisposable
 {
     public readonly string Name = nameof(HudBase);
 
-    protected readonly static Game game = new();
+    public readonly static Game game = new();
     public Hud ubHud;
 
     //Defaults?

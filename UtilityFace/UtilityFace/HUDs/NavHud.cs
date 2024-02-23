@@ -4,7 +4,6 @@ using UtilityBelt.Service.Lib.ACClientModule;
 using System.Diagnostics;
 using UtilityBelt.Lib.VTNav;
 using UtilityBelt.Lib.VTNav.Waypoints;
-using Vector3 = System.Numerics.Vector3;
 using NavSet = System.Collections.Generic.HashSet<UtilityBelt.Lib.VTNav.VTNavRoute>;
 
 namespace UtilityFace.HUDs;

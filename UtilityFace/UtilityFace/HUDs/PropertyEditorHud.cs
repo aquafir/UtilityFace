@@ -1,7 +1,4 @@
-﻿
-using AcClient;
-using System.Text;
-using UtilityBelt.Scripting.Actions;
+﻿using System.Text;
 
 namespace UtilityFace.HUDs;
 internal class PropertyEditorHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)

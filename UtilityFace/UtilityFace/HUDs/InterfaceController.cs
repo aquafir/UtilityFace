@@ -1,6 +1,4 @@
 ﻿using UtilityBelt.Service.Lib.Settings;
-using UtilityBelt.Service.Views.SettingsEditor;
-using UtilityFace.Settings;
 
 namespace UtilityFace.HUDs;
 

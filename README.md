@@ -30,13 +30,67 @@
 
 
 
-## Pickers / Modals
+## Components
 
-Help selecting things like icons or spells.
+An `IComp` (avoiding MS stuff) is a building blocks for HUDs.  All have:
+
+* `_id` automatically generated using a static field
+* Styling options handled internally 
+* `Check` which renders the component and returns true if it was interacted with
+  * `DrawBody`, called inside of `Check` which draws elements specific to the component
+  * `Changed` is set to false at the start and set to true on interaction
+* Different data needs handled by the state of the subclass, used when they've been interacted with in a style similar to ImGui
+* `Init`/`Dispose` 
 
 
 
-Modals have a static default version and may have other versions made for customization.
+
+
+### Picker
+
+A `Picker` draws the elements needed to select something, such as value(s) from an Enum
+
+
+
+
+
+### Filter
+
+A `IFilter<T>` draws some filtering criteria
+
+* It has a predicate for `T` used for
+  * `IEnumerable<T> GetFiltered(IEnumerable<T> input)`
+  * `bool IsFiltered(T item)`
+
+
+
+An `IOptionalFilter<T>` 
+
+* Adds in a `DrawToggle` which controls the `Active` state of the filter
+* That may be used to skip rendering the rest of the filter
+
+
+
+Types of filters:
+
+* `RegexFilter` filters based on text for a provided object and a `Func<T, string>` method
+* Todo?
+  * `ValueComparisonFilter` has a `CompareType` combo and a `double` input that is compares to a `Func<T, double?>` method
+  * `BoolFilter` for a list of boolean values
+
+### Modal
+
+A `Modal` is a centered popup for complex inputs
+
+* Keeps track of whether it is `_open` or the negation of that, `Finished`
+  * Not drawn if the modal is closed
+  * Returns true when the modal is closed
+  * `Changed` indicates whether the component was interacted with
+* Name kept unique using `_id`
+*  `MinSize/MaxSize` used to set constraints
+* `Open`/`Close` for related behavior
+* *Optionally renders as a popup*
+* *May use a manager/static default version for modals that will only exist one place at a time so a local copy isn't needed*
 
 
 

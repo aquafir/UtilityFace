@@ -1,7 +1,4 @@
-﻿using AcClient;
-using WattleScript.Interpreter;
-
-namespace UtilityFace.Table;
+﻿namespace UtilityFace.Table;
 
 public class PropertyTable
 {
