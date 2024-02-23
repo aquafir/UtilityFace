@@ -8,10 +8,10 @@ public class ValueComparisonFilter<T> : IOptionalFilter<T>
 
     public ValueComparisonFilter(Func<T, double?> targetPredicate) : base(null)
     {
-        this.targetPredicate = targetPredicate ?? throw new ArgumentNullException(nameof(targetPredicate));
+        this.targetPredicate = targetPredicate; //?? throw new ArgumentNullException(nameof(targetPredicate));
     }
 
-    EnumPicker<CompareType> comparison = new() { Label = "Comparison"};
+    FilteredEnumPicker<CompareType> comparison = new() { Label = "Comparison"};
     public override void DrawBody()
     {
         if(comparison.Check())

@@ -1,0 +1,38 @@
+﻿using UtilityFace.Components;
+
+namespace UtilityFace.Modals;
+
+//May need to change to enum struct
+public class FilteredEnumPicker<T> : EnumPicker<T> where T : struct, Enum
+{
+    string[] filteredChoices = { };
+
+    RegexFilter<string> RegexFilter;
+
+    public override void Init()
+    {
+        choices = Enum.GetNames(typeof(T));
+        filteredChoices = choices.ToArray();
+
+        RegexFilter = new(x => x);
+
+        base.Init();
+    }
+
+    public override void DrawBody()
+    {
+        if (RegexFilter.Check())
+        {
+            filteredChoices = RegexFilter.GetFiltered(choices).ToArray();
+            Changed = true;
+        }
+
+        ImGui.SetNextItemWidth(Width);
+        if (ImGui.Combo(Name, ref index, filteredChoices, filteredChoices.Length, ItemsShown))
+            Changed = true;
+
+        //Parse enum if there's an update, ignore invalid choices?
+        if (Changed && index > 0 && index < filteredChoices.Length)
+            Changed = Enum.TryParse(filteredChoices[index], out Choice);
+    }
+}

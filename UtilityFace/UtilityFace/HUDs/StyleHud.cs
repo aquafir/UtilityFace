@@ -36,13 +36,13 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
             sModal.Close();
         }
 
-        //if (ImGui.Button("Enum"))
-        //    enumPickModal.Open();
+        if (ImGui.Button("Enum"))
+            enumPickModal.Open();
 
-        //if(enumPickModal.Check() && enumPickModal.Changed)
-        //{
-        //    Log.Chat("Changed");
-        //}
+        if (enumPickModal.Check() && enumPickModal.Changed)
+        {
+            Log.Chat("Changed");
+        }
 
         bool change = false;
         if (enumPicker.Check())
@@ -70,11 +70,11 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
 
         ImGui.Text($"{truth}");
     }
-    //ComparisonFilter<WorldObject> foo;// = new(x => x.Id.Normalize());// { Label = "Comparison" };
+    //ValueComparisonFilter<WorldObject> foo;// = new(x => x.Id.Normalize());// { Label = "Comparison" };
     ValueComparisonFilter<double?> foo = new(x => x) { Label = "Comparison" };
     IntId prop;
     double? value;
     WorldObject w = game.Character.Weenie;
-    EnumPicker<IntId> enumPicker = new();
+    FilteredEnumPicker<IntId> enumPicker = new();
     bool? truth;
 }

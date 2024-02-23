@@ -48,9 +48,11 @@ An `IComp` (avoiding MS stuff) is a building blocks for HUDs.  All have:
 
 ### Picker
 
-A `Picker` draws the elements needed to select something, such as value(s) from an Enum
+A `IPicker<T>` draws the elements needed to select something, such as value(s) from an Enum
 
-
+* A
+* `PagedPicker<T>`
+  * `DrawPageControl`
 
 
 

@@ -3,39 +3,45 @@
 namespace UtilityFace.Modals;
 
 //May need to change to enum struct
-public class EnumPicker<T> : IPicker where T : struct, Enum
+public class EnumPicker<T> : IPicker<T> where T : struct, Enum
 {
-    int index = 0;
-    string[] choices = { };
-    string[] filteredChoices = { };
+    protected int index = 0;
+    protected string[] choices = { };
 
-    public string Name => $"{Label}###{_id}";
+    /// <summary>
+    /// Number of items shown by the combo box
+    /// </summary>
+    public int ItemsShown = 5;
 
+    /// <summary>
+    /// Current selection
+    /// </summary>
     public T Choice;
-    RegexFilter<string> RegexFilter;
+
+    /// <summary>
+    /// Tracks whether the selection is defined in the enum
+    /// </summary>
+    public bool Valid;
+
+    /// <summary>
+    /// Width of the combo box
+    /// </summary>
+    public float Width = 120;
 
     public override void Init()
     {
         choices = Enum.GetNames(typeof(T));
-        filteredChoices = choices.ToArray();
 
-        RegexFilter = new(x => x);
         base.Init();
     }
 
     public override void DrawBody()
     {
-        if (RegexFilter.Check())
-        {
-            filteredChoices = RegexFilter.GetFiltered(choices).ToArray();
-            Changed = true;
-        }
-
-        if (ImGui.Combo(Name, ref index, filteredChoices, filteredChoices.Length))
+        if (ImGui.Combo(Name, ref index, choices, choices.Length, ItemsShown))
             Changed = true;
 
         //Parse enum if there's an update, ignore invalid choices?
-        if(Changed && index > 0 && index < filteredChoices.Length)
-            Changed = Enum.TryParse(filteredChoices[index], out Choice);
+        if (Changed && index > 0 && index < choices.Length)
+            Valid = Enum.TryParse(choices[index], out Choice);
     }
 }

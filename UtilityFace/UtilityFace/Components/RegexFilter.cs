@@ -2,17 +2,6 @@
 
 namespace UtilityFace.Modals;
 
-//public class EnumFilter<T> : IFilter where T : Enum
-//{
-
-//}
-
-//public class RegexFilter<T>
-//{
-//    public abstract bool IsFiltered(T input);
-//}
-
-
 /// <summary>
 /// Draws a text field that builds a Regex
 /// </summary>
@@ -27,28 +16,27 @@ public class RegexFilter<T> : IOptionalFilter<T>
     public string Query = "";
     public uint MaxLength = 100;
 
-    public EnumPicker<StringCompareType> Comparison = new()
-    {
+    private readonly Func<T, string> targetPredicate;
+
+    //Todo: rethink, crashes if a filter is used from recursion but a filter isn't needed here
+    public EnumPicker<StringCompareType> Comparison = new() {
         Choice = StringCompareType.Match,
     };
 
-    private readonly Func<T, string> targetPredicate;
-
     public RegexFilter(Func<T, string> targetPredicate) : base(null)
     {
-        this.targetPredicate = targetPredicate ?? throw new ArgumentNullException(nameof(targetPredicate));
+        this.targetPredicate = targetPredicate;// ?? throw new ArgumentNullException(nameof(targetPredicate));
+        Comparison = new();
     }
 
     public override bool IsFiltered(T item)
     {
         if (Regex is null) return false;
 
-
-        return Regex.IsMatch(targetPredicate(item));
         return Comparison.Choice switch
         {
-            StringCompareType.Match => Regex.IsMatch(targetPredicate(item)),
-            StringCompareType.NoMatch => !Regex.IsMatch(targetPredicate(item)),
+            StringCompareType.Match => !Regex.IsMatch(targetPredicate(item)),
+            StringCompareType.NoMatch => Regex.IsMatch(targetPredicate(item)),
             _ => false,
         };
     }
