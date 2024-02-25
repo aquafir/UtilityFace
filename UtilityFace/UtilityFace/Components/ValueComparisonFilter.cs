@@ -1,8 +1,8 @@
 ﻿namespace UtilityFace.Components;
 public class ValueComparisonFilter<T> : IOptionalFilter<T> 
 {
-    double value;
-    private readonly Func<T, double?> targetPredicate;
+    protected double value;
+    protected readonly Func<T, double?> targetPredicate;
 
     public ValueComparisonFilter(Func<T, double?> targetPredicate) : base(null)
     {

@@ -6,6 +6,8 @@ public abstract class IModal : IComp
 
     public string Name => $"###{_id}";
 
+    public bool IsPopup { get; set; } = false;
+
     public bool Finished => !_open;
     protected bool _open;
 
@@ -33,21 +35,25 @@ public abstract class IModal : IComp
         var center = ImGui.GetMainViewport().GetCenter();
         ImGui.SetNextWindowPos(center, ImGuiCond.Appearing, new(0.5f, 0.5f));
 
-        // Begin the non-modal popup
-        //if (ImGui.BeginPopup(Name))
-        //{
-        //    //// Close the popup when the button is clicked
-        //    //showPopup = false;
-        //    //ImGui.CloseCurrentPopup();
-        //    try
-        //    {
-        //        DrawModalBody();
-        //    }
-        //    catch (Exception ex) { Log.Error(ex); }
+        if(IsPopup)
+        {
+            // Begin the non-modal popup
+            //if (ImGui.BeginPopup(Name))
+            //{
+            //    //// Close the popup when the button is clicked
+            //    //showPopup = false;
+            //    //ImGui.CloseCurrentPopup();
+            //    try
+            //    {
+            //        DrawModalBody();
+            //    }
+            //    catch (Exception ex) { Log.Error(ex); }
 
-        //    ImGui.EndPopup();
-        //}
-        //return Finished;
+            //    ImGui.EndPopup();
+            //}
+            //return Finished;
+        }
+
 
 
         //Dimensions?

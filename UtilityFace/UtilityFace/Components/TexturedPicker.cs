@@ -7,13 +7,17 @@ public class TexturedPicker<T> : IPagedPicker<T>
     /// </summary>
     public Vector2 IconSize = new(24);
 
+    /// <summary>
+    /// Set at the start of the draw loop to be used when drawing items
+    /// </summary>
+    protected int columns;
+    protected Func<T, ManagedTexture> textureMap;
+
     public TexturedPicker(Func<T, ManagedTexture> textureMap, T[] choices)
     {
         this.textureMap = textureMap;
         this.Choices = choices;
     }
-
-    Func<T, ManagedTexture> textureMap;
 
     public override void DrawBody()
     {
@@ -21,15 +25,14 @@ public class TexturedPicker<T> : IPagedPicker<T>
         var width = ImGui.GetWindowWidth();
         var margin = ImGui.GetStyle().FramePadding.X;
         var colWidth = 1 + IconSize.X + margin * 2;
-        cols = (int)(width / colWidth);
+        columns = (int)(width / colWidth);
                 
         base.DrawBody();
     }
 
-    int cols;
     public override void DrawItem(T item, int index)
     {
-        if (index++ % cols != 0)
+        if (index++ % columns != 0)
             ImGui.SameLine();
 
         var icon = textureMap(item);

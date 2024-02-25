@@ -1,11 +1,9 @@
 ﻿namespace UtilityFace.Components;
-
-//May need to change to enum struct
 public class FilteredEnumPicker<T> : EnumPicker<T> where T : struct, Enum
 {
-    string[] filteredChoices = { };
+    protected string[] filteredChoices = { };
 
-    RegexFilter<string> RegexFilter;
+    protected RegexFilter<string> RegexFilter;
 
     public override void Init()
     {

@@ -1,13 +1,9 @@
 ﻿namespace UtilityFace.Components;
-internal class EnumModal<T> : IModal where T : struct, Enum
+public class EnumModal<T> : IModal where T : struct, Enum
 {
-    const ImGuiTableFlags TABLE_FLAGS = ImGuiTableFlags.BordersInner | ImGuiTableFlags.Resizable | ImGuiTableFlags.RowBg | ImGuiTableFlags.Reorderable | ImGuiTableFlags.Hideable | ImGuiTableFlags.ScrollY | ImGuiTableFlags.Sortable;
-
     public Vector2 IconSize = new(24);
 
-    //int index = 0;
-    //string[] choices = { };
-    EnumPicker<T> picker = new();
+    protected EnumPicker<T> picker = new();
 
     public override void DrawBody()
     {
@@ -20,13 +16,5 @@ internal class EnumModal<T> : IModal where T : struct, Enum
                 picker.Changed = false;
             }
         }
-        //if (ImGui.Combo(nameof(T), ref index, choices, choices.Length))
-        //{
-        //    Changed = true;
-        //    _open = false;
-        //}
-
-        //if (ImGui.Button("Close"))
-        //    _open = false;
     }
 }

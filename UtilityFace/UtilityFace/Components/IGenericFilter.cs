@@ -1,5 +1,6 @@
 ﻿namespace UtilityFace.Components;
-public abstract class IFilter<T>(Func<T, bool> filterPredicate = null) : IComp
+
+public abstract class IGenericFilter<T>(Func<T, bool> filterPredicate = null) : IComp
 {
     /// <summary>
     /// Render the Filter, returning the finished state, the opposite of Open, to match the ImGui pattern?
@@ -18,7 +19,7 @@ public abstract class IFilter<T>(Func<T, bool> filterPredicate = null) : IComp
 
     public virtual bool IsFiltered(T item) => filterPredicate(item);
 
-    public virtual IEnumerable<T> GetFiltered(IEnumerable<T> input) 
+    public virtual IEnumerable<T> GetFiltered(IEnumerable<T> input)
     {
         if (input is null)
             return null;
