@@ -1,16 +1,45 @@
 ﻿using ACE.DatLoader.Entity;
 using UtilityFace.Components;
 
-//namespace UtilityFace.Components;
-public class FilterSet(List<IComp> filters)
+namespace UtilityFace.Components;
+/// <summary>
+/// FilterSets are groups of filters sharing a type they are filtering
+/// </summary>
+public class FilterSet<T>(List<IFilter<T>> filters) : IFilter<T>
 {
-    public List<IComp> Filters = filters;
+    public List<IFilter<T>> Filters = filters;
 
-    public bool Check()
+    /// <summary>
+    /// Checks if any Filter has been interacted with
+    /// </summary>
+    public override bool Check()
     {
-        //bool Changed = false;
-        //foreach (var filter in Filters)
+        foreach (var filter in Filters)
+        {
+            if (filter.Check())
+            {
+                Changed = true;
+                Log.Chat($"{filter.Label} changed");
+            }
+        }
 
-        return Filters.Any(x => x.Check());
+        return Changed;
     }
+
+    /// <summary>
+    /// Returns all items that have not been filtered
+    /// </summary>
+    public override IEnumerable<T> GetFiltered(IEnumerable<T> input) => input.Where(x => !IsFiltered(x));
+
+    /// <summary>
+    /// An item is filtered is any filter would filter it
+    /// </summary>
+    public override bool IsFiltered(T item) => Filters.Any(x => x.IsFiltered(item));
+
+
+    public override void DrawBody() { }
+    //{
+    //    foreach (var filter in Filters)
+    //        filter.DrawBody();
+    //}
 }

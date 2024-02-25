@@ -33,11 +33,11 @@ internal class InterfaceController(string name) : SizedHud(name, true, true)
         {
             //new InventoryHud("Inventory", true, false),
             //new NetworkHud("Network", true, false),
-            //new ChatHud("Chat", true, false),
+            //new ChatHud("Chat", true, true),
             //new PropertyEditorHud("PropertyEditor", true, false),
             //new NavHud("Navs", true, false),
             //new HaxHud("Hax"),
-            new RadarHud("Radar", true, true),
+            //new RadarHud("Radar", true, true),
             new StyleHud("Styles", true, true),
         };
 

@@ -39,7 +39,7 @@ public class EnumPicker<T> : IPicker<T> where T : struct, Enum
             Changed = true;
 
         //Parse enum if there's an update, ignore invalid choices?
-        if (Changed && index > 0 && index < choices.Length)
+        if (Changed && index >= 0 && index < choices.Length)
             Valid = Enum.TryParse(choices[index], out Choice);
     }
 }

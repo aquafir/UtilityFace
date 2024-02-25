@@ -145,7 +145,11 @@ Section "" CoreSection
     
     File "${BUILDPATH}\${ASSEMBLY}"
     File "${BUILDPATH}\${APPNAME}.pdb"
+    File "${BUILDPATH}\KdTreeLib.dll"
     File "${BUILDPATH}\UtilityBelt.Service.Installer.exe"
+
+    SetOutPath "$INSTDIR\Resources"
+    File "${BUILDPATH}\Resources\Commands.txt"
 
 SectionEnd
 
@@ -203,6 +207,7 @@ Section Uninstall
     ;Clean up
     Delete "$INSTDIR\${ASSEMBLY}"
     Delete "$INSTDIR\${APPNAME}.pdb"
+    Delete "${BUILDPATH}\KdTreeLib.dll"
     Delete "$INSTDIR\UtilityBelt.Service.Installer.exe"
     
     ;RMDir "$INSTDIR\"
