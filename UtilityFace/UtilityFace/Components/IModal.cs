@@ -6,7 +6,10 @@ public abstract class IModal : IComp
 
     public string Name => $"###{_id}";
 
-    public bool IsPopup { get; set; } = false;
+    /// <summary>
+    /// If true, renders as a popup that can be closed by clicking out of it
+    /// </summary>
+    public bool IsPopup { get; set; } = true;
 
     public bool Finished => !_open;
     protected bool _open;
@@ -27,6 +30,13 @@ public abstract class IModal : IComp
         //Not yet interacted with
         Changed = false;
 
+        //Check for clicking out of a popup
+        if (IsPopup && !ImGui.IsPopupOpen(Name))
+        {
+            Close();
+            return false;
+        }
+
         //Don't show if closed
         if (Finished)
             return false;
@@ -35,49 +45,26 @@ public abstract class IModal : IComp
         var center = ImGui.GetMainViewport().GetCenter();
         ImGui.SetNextWindowPos(center, ImGuiCond.Appearing, new(0.5f, 0.5f));
 
-        if(IsPopup)
-        {
-            // Begin the non-modal popup
-            //if (ImGui.BeginPopup(Name))
-            //{
-            //    //// Close the popup when the button is clicked
-            //    //showPopup = false;
-            //    //ImGui.CloseCurrentPopup();
-            //    try
-            //    {
-            //        DrawModalBody();
-            //    }
-            //    catch (Exception ex) { Log.Error(ex); }
-
-            //    ImGui.EndPopup();
-            //}
-            //return Finished;
-        }
-
-
-
         //Dimensions?
         ImGui.SetNextWindowSizeConstraints(MinSize, MaxSize);
-        if (ImGui.BeginPopupModal(Name, ref _open, WindowFlags))
-        //if (ImGui.BeginPopupContextWindow(Name,  ImGuiPopupFlags.))
+        var state = IsPopup ? ImGui.BeginPopup(Name, ImGuiWindowFlags.Popup) : ImGui.BeginPopupModal(Name, ref _open, WindowFlags);
+
+        try
         {
-            try
-            {
-                Vector2 size = ImGui.GetContentRegionAvail();
-                //size.Y *= 0.9f;
-                size.Y -= ImGui.GetFrameHeightWithSpacing() + 5;
+            Vector2 size = ImGui.GetContentRegionAvail();
+            size.Y -= ImGui.GetFrameHeightWithSpacing() + 5;
 
-                // Draw your area using the calculated size
-                ImGui.BeginChild($"{Name}B", size, true);
-                DrawBody();
-                ImGui.EndChild();
+            // Draw your area using the calculated size
+            ImGui.BeginChild($"{Name}B", size, true);
+            DrawBody();
+            ImGui.EndChild();
 
-                DrawFooter();
-            }
-            catch (Exception ex) { Log.Error(ex); }
-
-            ImGui.EndPopup();
+            DrawFooter();
         }
+        catch (Exception ex) { Log.Error(ex); }
+
+        if(state)
+            ImGui.EndPopup();
 
         return Finished;
     }
