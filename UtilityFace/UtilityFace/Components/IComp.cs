@@ -1,4 +1,5 @@
 ﻿namespace UtilityFace.Components;
+
 public abstract class IComp: IDisposable
 {
     protected static uint _nextId = 0;
@@ -10,8 +11,6 @@ public abstract class IComp: IDisposable
     /// Tracks whether any changes were made by the modal
     /// </summary>
     public bool Changed;
-
-    //public string Name => $"Pick###{_id}";
 
     public IComp()
     {

@@ -36,4 +36,24 @@ public static class RandomExtensions
     public static T GetRandom<T>(this IEnumerable<T> list) => list.GetRandomElements<T>(1).FirstOrDefault();
     public static List<T> GetRandomElements<T>(this IEnumerable<T> list, int elementsCount) =>
         list.OrderBy(arg => Guid.NewGuid()).Take(elementsCount).ToList();
+
+
+
+    
+}
+
+public static class BitExtensions
+{
+    public static TEnum Set<TEnum>(this TEnum value, TEnum flag) where TEnum : Enum
+    {
+        return (TEnum)Enum.ToObject(typeof(TEnum), Convert.ToInt64(value) | Convert.ToInt64(flag));
+    }
+    public static TEnum Clear<TEnum>(this TEnum value, TEnum flag) where TEnum : Enum
+    {
+        return (TEnum)Enum.ToObject(typeof(TEnum), Convert.ToInt64(value) & ~Convert.ToInt64(flag));
+    }
+    public static TEnum Toggle<TEnum>(this TEnum value, TEnum flag) where TEnum : Enum
+    {
+        return (TEnum)Enum.ToObject(typeof(TEnum), Convert.ToInt64(value) ^ Convert.ToInt64(flag));
+    }
 }

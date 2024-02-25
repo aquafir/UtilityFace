@@ -37,7 +37,7 @@ internal class InterfaceController(string name) : SizedHud(name, true, true)
             //new PropertyEditorHud("PropertyEditor", true, false),
             //new NavHud("Navs", true, false),
             //new HaxHud("Hax"),
-            //new RadarHud("Radar", true, false),
+            new RadarHud("Radar", true, true),
             new StyleHud("Styles", true, true),
         };
 

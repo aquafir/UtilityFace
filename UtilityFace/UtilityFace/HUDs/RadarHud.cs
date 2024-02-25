@@ -19,6 +19,12 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
         //Add opacity
         ImGui.PushStyleVar(ImGuiStyleVar.Alpha, alpha);
 
+        if (ImGui.IsKeyDown(ImGuiKey.ModCtrl))
+            ubHud.WindowSettings = ubHud.WindowSettings.Set(ImGuiWindowFlags.NoMouseInputs);
+        else
+            ubHud.WindowSettings = ubHud.WindowSettings.Clear(ImGuiWindowFlags.NoMouseInputs);
+
+
         base.PreRender(sender, e);
     }
 

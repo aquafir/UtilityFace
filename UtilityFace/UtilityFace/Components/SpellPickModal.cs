@@ -11,7 +11,7 @@ public class SpellPickModal() : IModal()
     int Pages => Spells.Length > 0 ? (Spells.Length / perPage) + 1 : 0;
 
     SpellFilter filter = new() {  Active = true, Label = "Filter?" };
-    KeyValuePair<uint, SpellBase>[] Spells = { };
+    SpellInfo[] Spells = { };
 
     public Vector2 IconSize = new(24);
 
@@ -55,8 +55,8 @@ public class SpellPickModal() : IModal()
             //    ImGui.TextureButton($"Spell{i}", TextureManager.GetOrCreateTexture(Enums.Texture.Vitae), IconSize);
             //    continue;
             //}
-            var spell = Spells[i].Value;
-            var id = Spells[i].Key;
+            var spell = Spells[i].Spell;
+            var id = Spells[i].Id;
 
             var tex = TextureManager.GetOrCreateTexture(spell.Icon);
             if (ImGui.TextureButton($"Spell{i}", tex, IconSize))

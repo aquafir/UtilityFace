@@ -1,15 +1,16 @@
 ﻿using ACE.DatLoader.Entity;
 using ACE.DatLoader.FileTypes;
+using System.ComponentModel.Design;
 using UtilityFace.HUDs;
 using SpellBook = UtilityBelt.Scripting.Interop.SpellBook;
 
 namespace UtilityFace.Components;
-public class SpellFilter : IOptionalFilter<KeyValuePair<uint, SpellBase>>
+public class SpellFilter : IOptionalFilter<SpellInfo>
 {
     static readonly SpellTable table = UBService.PortalDat.SpellTable;
     static readonly SpellBook spellbook = HudBase.game.Character.SpellBook;
 
-    RegexFilter<SpellBase> nameFilter = new(x => x.Name) {  Active = true, Label = "Name" };
+    RegexFilter<SpellBase> nameFilter = new(x => x.Name) { Active = true, Label = "Name" };
 
     public bool UseKnown = false;
 
@@ -83,16 +84,21 @@ public class SpellFilter : IOptionalFilter<KeyValuePair<uint, SpellBase>>
     /// <summary>
     /// Returns a filtered list of spells using UBs list
     /// </summary>
-    public KeyValuePair<uint, SpellBase>[] GetFilteredSpells() => GetFiltered(table.Spells).ToArray();
+    public SpellInfo[] GetFilteredSpells() => GetFiltered(table.Spells.Select(x => new SpellInfo(x.Key, x.Value))).ToArray();
         //public IEnumerable<KeyValuePair<uint, SpellBase>> GetFilteredSpells() => GetFiltered(table.Spells);
 
-    public override bool IsFiltered(KeyValuePair<uint, SpellBase> spellInfo)
+    public override bool IsFiltered(SpellInfo spellInfo)
     {
+        FilterSet foo = new(new()
+        {
+            nameFilter
+        });
+
         if (!Active)
             return false;
 
-        var spell = spellInfo.Value;
-        var id = spellInfo.Key;
+        var spell = spellInfo.Spell;
+        var id = spellInfo.Id;
 
         //Add desc?
         if (nameFilter.Active && nameFilter.IsFiltered(spell))
@@ -132,4 +138,4 @@ public class SpellFilter : IOptionalFilter<KeyValuePair<uint, SpellBase>>
     }
 }
 
-//public record struct SpellInfo(uint id, SpellBase spell);
+public record struct SpellInfo(uint Id, SpellBase Spell);

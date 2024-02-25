@@ -1,22 +1,16 @@
 ﻿using ACE.DatLoader.Entity;
+using UtilityFace.Components;
 
-namespace UtilityFace.Components;
-public class FilterSet
+//namespace UtilityFace.Components;
+public class FilterSet(List<IComp> filters)
 {
-    List<IFilter> Filters;  
-
+    public List<IComp> Filters = filters;
 
     public bool Check()
     {
-        bool Changed = false;
-        foreach (var filter in Filters)
+        //bool Changed = false;
+        //foreach (var filter in Filters)
 
-            Filters.Any(x => x.Check());
-
-    }
-
-    public override void DrawBody()
-    {
-        throw new NotImplementedException();
+        return Filters.Any(x => x.Check());
     }
 }
