@@ -144,100 +144,107 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
         //dl.AddText(radarCenter, (uint)Color.Blue.ToArgb(), "C");
 
         //Hover
-        try { 
-        if (ImGui.IsWindowHovered())
+        try
         {
-            Vector2 mousePos = ImGui.GetMousePos();
-            Vector2 windowPos = ImGui.GetWindowPos();
-            //Should be center coords
-            Vector2 centerOffset = mousePos - windowPos - radius;
-
-
-            //Adjust for scale/rotation
-            var scaledPos = centerOffset / scale;
-            var rotatedPos = rotate ? scaledPos.Rotate(-heading) : scaledPos;
-
-            //Get coordinates from position relative to player
-            var coordsVec = player + new Vector2(rotatedPos.X, -rotatedPos.Y); //slip y axis
-            var coords = coordsVec.FromVector2();
-
-            //var wos = tree.GetNearestNeighbours(new[] { scaledPos.X, scaledPos.Y }, 1);
-            //var wos = tree.RadialSearch(new[] { scaledPos.X, scaledPos.Y }, 10 / scale, 5);
-            var wos = tree.RadialSearch(new[] { coords.NS, coords.EW }, .1f / scale, 5);
-
-            //if (wos.Length > 0)
-            //{
-            if (ImGui.BeginTooltip())
+            if (ImGui.IsWindowHovered())
             {
-                ImGui.Text($"{Coordinates.Me.DistanceToFlat(coords.ScreenAdjust())}");
-                //ImGui.Text($"{centerOffset}\n{scaledPos}\n{rotatedPos} @ {heading} rad\n{coordsVec}\n{coords}");
-                //ImGui.Text($"{coords}");
+                Vector2 mousePos = ImGui.GetMousePos();
+                Vector2 windowPos = ImGui.GetWindowPos();
+                //Should be center coords
+                Vector2 centerOffset = mousePos - windowPos - radius;
 
-                foreach (var wo in wos.Select(x => x.Value))
+
+                //Adjust for scale/rotation
+                var scaledPos = centerOffset / scale;
+                var rotatedPos = rotate ? scaledPos.Rotate(-heading) : scaledPos;
+
+                //Get coordinates from position relative to player
+                var coordsVec = player + new Vector2(rotatedPos.X, -rotatedPos.Y); //slip y axis
+                var coords = coordsVec.FromVector2();
+
+                //var wos = tree.GetNearestNeighbours(new[] { scaledPos.X, scaledPos.Y }, 1);
+                //var wos = tree.RadialSearch(new[] { scaledPos.X, scaledPos.Y }, 10 / scale, 5);
+                var wos = tree.RadialSearch(new[] { coords.NS, coords.EW }, .1f / scale, 5);
+
+                //if (wos.Length > 0)
+                //{
+                if (ImGui.BeginTooltip())
                 {
-                    if (wo.ServerPosition is null)
-                        continue;
-                    var texture = wo.GetOrCreateTexture();
+                    ImGui.Text($"{Coordinates.Me.DistanceToFlat(coords.ScreenAdjust())}");
+                    //ImGui.Text($"{centerOffset}\n{scaledPos}\n{rotatedPos} @ {heading} rad\n{coordsVec}\n{coords}");
+                    //ImGui.Text($"{coords}");
+
+                    foreach (var wo in wos.Select(x => x.Value))
+                    {
+                        if (wo.ServerPosition is null)
+                            continue;
+                        var texture = wo.GetOrCreateTexture();
                         //TODO FIX HACK
                         if (texture is null) continue;
-                    ImGui.TextureButton($"{wo.Id}", texture, new(24));
-                    ImGui.SameLine();
-                    ImGui.Text($"{wo.Name} - {wo.ServerPosition.ToVector2().FromVector2().FormatCartesian()}");
-                    ImGui.Text($"{wo.Name} - {wo.ServerPosition.ToGlobal()[0]}");
+                        ImGui.TextureButton($"{wo.Id}", texture, new(24));
+                        ImGui.SameLine();
+                        ImGui.Text($"{wo.Name} - {wo.ServerPosition.ToVector2().FromVector2().FormatCartesian()}");
+                        ImGui.Text($"{wo.Name} - {wo.ServerPosition.ToGlobal()[0]}");
+                    }
+
+                    ImGui.EndTooltip();
                 }
 
-                ImGui.EndTooltip();
-            }
-
-            var first = wos.FirstOrDefault()?.Value;
-            if (wos.Length > 0)
-            {
+                var first = wos.FirstOrDefault()?.Value;
+                if (wos.Length > 0)
+                {
 
 
-                if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
-                    first.TryUse();
-                else if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
-                    first.Select();
-            }
+                    if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+                        first.TryUse();
+                    else if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                        first.Select();
+                    else if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
+                    unsafe {
+                        var clientUI = ((AcClient.ClientUISystem*)AcClient.ClientUISystem.s_pUISystem);
+                        clientUI->ExamineObject(first.Id);
+                    }
 
-            //Having issues with popup
-            //else if (ImGui.BeginPopupContextItem($"###{first.Id}", ImGuiPopupFlags.MouseButtonRight | ImGuiPopupFlags.AnyPopup))
-            //{
-            //    Log.Chat($"Hit?");
-            //    if (ImGui.MenuItem("Use"))
-            //        first.TryUse();
+                }
 
-            //    if (ImGui.MenuItem("Tele To"))
-            //        game.Actions.InvokeChat($"/tele {first.ServerPosition.ToVector2().FromVector2().FormatCartesian()}");
-
-            //    if (ImGui.MenuItem("Select"))
-            //        first.Select();
-
-            //    ImGui.EndPopup();
-            //}
-            //}
-
-            if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
-            {
-                //if (first is not null)
+                //Having issues with popup
+                //else if (ImGui.BeginPopupContextItem($"###{first.Id}", ImGuiPopupFlags.MouseButtonRight | ImGuiPopupFlags.AnyPopup))
                 //{
-                //    //Log.Chat($"Teleporting using {first.Name} position:\n{first.ServerPosition.FormatCartesian()}");
-                //    //game.Actions.InvokeChat($"/tele {first.ServerPosition.FormatCartesian()}");
-                //    game.Actions.InvokeChat($"/teleloc {first.ServerPosition.FormatTeleloc()}");
+                //    Log.Chat($"Hit?");
+                //    if (ImGui.MenuItem("Use"))
+                //        first.TryUse();
+
+                //    if (ImGui.MenuItem("Tele To"))
+                //        game.Actions.InvokeChat($"/tele {first.ServerPosition.ToVector2().FromVector2().FormatCartesian()}");
+
+                //    if (ImGui.MenuItem("Select"))
+                //        first.Select();
+
+                //    ImGui.EndPopup();
                 //}
-                //else
+                //}
+
+                //if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
                 //{
-                //Log.Chat($"/teleloc {coords.FormatTeleloc()}");
-                //Log.Chat($"/teleloc {game.Character.Weenie.ServerPosition.FormatTeleloc()}");
-                //game.Actions.InvokeChat($"/tele {coords.FormatCartesian()}"); 
-                game.Actions.InvokeChat($"/teleloc {coords.ScreenAdjust().FormatTeleloc()}");
+                    //if (first is not null)
+                    //{
+                    //    //Log.Chat($"Teleporting using {first.Name} position:\n{first.ServerPosition.FormatCartesian()}");
+                    //    //game.Actions.InvokeChat($"/tele {first.ServerPosition.FormatCartesian()}");
+                    //    game.Actions.InvokeChat($"/teleloc {first.ServerPosition.FormatTeleloc()}");
+                    //}
+                    //else
+                    //{
+                    //Log.Chat($"/teleloc {coords.FormatTeleloc()}");
+                    //Log.Chat($"/teleloc {game.Character.Weenie.ServerPosition.FormatTeleloc()}");
+                    //game.Actions.InvokeChat($"/tele {coords.FormatCartesian()}"); 
+                    //game.Actions.InvokeChat($"/teleloc {coords.ScreenAdjust().FormatTeleloc()}");
+                    //}
                 //}
+
+
+                scale += ImGui.GetIO().MouseWheel / 10;
+                scale = Math.Max(.1f, scale);
             }
-
-
-            scale += ImGui.GetIO().MouseWheel / 10;
-            scale = Math.Max(.1f, scale);
-        }
         }
         catch (Exception ex) { Log.Error(ex); }
 
@@ -283,7 +290,6 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
         foreach (var wo in game.World.GetLandscape())
         {
             if (!String.IsNullOrWhiteSpace(search) && !re.IsMatch(wo.Name))
-                //if(wo.WeenieClassId < 100000)
                 continue;
 
 

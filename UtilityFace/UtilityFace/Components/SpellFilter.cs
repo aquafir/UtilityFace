@@ -1,6 +1,5 @@
 ﻿using ACE.DatLoader.Entity;
 using ACE.DatLoader.FileTypes;
-using System.ComponentModel.Design;
 using UtilityFace.HUDs;
 using SpellBook = UtilityBelt.Scripting.Interop.SpellBook;
 

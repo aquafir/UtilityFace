@@ -106,7 +106,8 @@ A `Modal` is a centered popup for complex inputs
 * Name kept unique using `_id`
 *  `MinSize/MaxSize` used to set constraints
 * `Open`/`Close` for related behavior
-* *Optionally renders as a popup*
+* Optionally renders as a popup with `IsPopup`
+* `PickerModal<T>` displays a Picker and closes if an item is selected.
 * *May use a manager/static default version for modals that will only exist one place at a time so a local copy isn't needed*
 
 

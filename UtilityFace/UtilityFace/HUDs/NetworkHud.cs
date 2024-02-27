@@ -1,9 +1,6 @@
 ﻿using UtilityBelt.Common.Messages.Events;
-using UtilityBelt.Scripting.ScriptEnvs.Lua;
 using MessageDirection = UtilityBelt.Common.Enums.MessageDirection;
 using CommandLine;
-using System.Reflection;
-using System.Text;
 
 namespace UtilityFace.HUDs;
 

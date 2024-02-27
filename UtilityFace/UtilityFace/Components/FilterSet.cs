@@ -1,7 +1,4 @@
-﻿using ACE.DatLoader.Entity;
-using UtilityFace.Components;
-
-namespace UtilityFace.Components;
+﻿namespace UtilityFace.Components;
 /// <summary>
 /// FilterSets are groups of filters sharing a type they are filtering
 /// </summary>

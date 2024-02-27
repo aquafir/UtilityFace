@@ -1,9 +1,4 @@
-﻿using ACE.DatLoader.Entity;
-using ACE.DatLoader.FileTypes;
-using UtilityFace.HUDs;
-using WattleScript.Interpreter;
-
-namespace UtilityFace.Components;
+﻿namespace UtilityFace.Components;
 
 public class SpellPickModal : IModal
 {
