@@ -13,7 +13,8 @@ public class TexturedPicker<T> : IPagedPicker<T>
     protected int columns;
     protected Func<T, ManagedTexture> textureMap;
 
-    public TexturedPicker(Func<T, ManagedTexture> textureMap, T[] choices)
+    //public TexturedPicker(Func<T, ManagedTexture> textureMap, T[] choices)
+    public TexturedPicker(Func<T, ManagedTexture> textureMap, IEnumerable<T> choices)
     {
         this.textureMap = textureMap;
         this.Choices = choices;
@@ -32,7 +33,7 @@ public class TexturedPicker<T> : IPagedPicker<T>
 
     public override void DrawItem(T item, int index)
     {
-        if (index++ % columns != 0)
+        if (index % columns != 0)
             ImGui.SameLine();
 
         var icon = textureMap(item);

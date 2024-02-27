@@ -27,6 +27,7 @@ public class SpellFilter : IOptionalFilter<SpellInfo>
             new SpellSchoolFilter() { Label = "School" },
             new RegexFilter<SpellInfo>(x => x.Spell.Name) {Active = true, Label = "Name" },
         });
+        filters.Label = "FilterSet";
 
         base.Init();
     }
@@ -77,19 +78,6 @@ public class SpellFilter : IOptionalFilter<SpellInfo>
         }
 
         return filters.IsFiltered(spellInfo);
-
-        //Anything requiring SpellBook data below here
-        //if (!spellbook.TryGet(id, out var spellData))
-        //    return false;
-
-        //if (UseLevels)
-        //{
-        //    var level = spellData.Level - 1;
-        //    if (level >= 0 && level < Levels.Length && !Levels[level])
-        //        return true;
-        //}
-
-        return false;
     }
 }
 

@@ -2,6 +2,8 @@
 using UtilityBelt.Scripting.ScriptEnvs.Lua;
 using MessageDirection = UtilityBelt.Common.Enums.MessageDirection;
 using CommandLine;
+using System.Reflection;
+using System.Text;
 
 namespace UtilityFace.HUDs;
 
@@ -31,7 +33,6 @@ public class MessageFilter
         };
     }
 }
-
 
 public class NetworkHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)
 {
@@ -98,9 +99,6 @@ public class NetworkHud(string name, bool showInBar = false, bool visible = fals
     public override void Draw(object sender, EventArgs e)
     {
         var colPadding = 8;
-        //var contentPaddingWidth = ImGui.GetContentRegionAvail().X / 2 - 8;
-        //var contentPanelHeight = ImGui.GetContentRegionAvail().Y;
-        //var contentPanelSize = new Vector2(contentPaddingWidth, contentPanelHeight);
         var contentPanelSize = new Vector2(600, 600);
 
         if (ImGui.Button(active ? "Stop" : "Start"))
@@ -142,10 +140,7 @@ public class NetworkHud(string name, bool showInBar = false, bool visible = fals
             ImGui.EndGroup();
             //-- check if this row was clicked and set a new selectedMessage if so
             if (ImGui.IsItemClicked())
-            {
-                Log.Chat("Clicked!");
                 selectedMessage = message;
-            }
         }
 
         //--auto scroll if not scrolled to the bottom already
@@ -160,7 +155,8 @@ public class NetworkHud(string name, bool showInBar = false, bool visible = fals
         if (selectedMessage == null)
             ImGui.TextWrapped("No message selected. Click on a message on the left to view its details here.");
         else
-            RenderProps(selectedMessage, 0);
+            //RenderProps(selectedMessage.Data, 0);
+            ImGui.TextWrapped(ObjectDumper.Dump(selectedMessage.Data, 2));
         ImGui.EndChild();
     }
 
@@ -250,52 +246,6 @@ public class NetworkHud(string name, bool showInBar = false, bool visible = fals
             ImGui.EndPopup();
         }
     }
-
-    private void RenderProps(MessageEventArgs obj, int depth)
-    {
-        //ImGui.Indent(10);
-        foreach (var key in obj.Data?.GetPropertyKeys())
-        {
-            ImGui.Text(key);            
-        }
-        //ImGui.Unindent(10);
-
-        /*
-         * local renderProps = nil
-renderProps = function(obj, depth)
-  ImGui.Indent(10)
-  if type(obj) == "userdata" and depth < 8 then
-    local props = obj.getPropertyKeys()
-    if #props > 0 then
-      for i, propName in ipairs(props) do
-        if (propName == nil) then
-          --print("Try get NIL prop", propName, "on", tostring(obj))
-        else
-          --print("Try get prop", propName, "on", tostring(obj))
-          if type(obj[propName]) == "userdata" then
-            local childProps = obj[propName].getPropertyKeys()
-            if #childProps > 0 then
-              ImGui.Text(string.format("%s:", propName))
-              renderProps(obj[propName], depth+1)
-            else
-              ImGui.Text(string.format("%s  =  %s", propName, tostring(obj[propName])))
-            end
-          else
-            ImGui.Text(string.format("%s  =  %s", propName, tostring(obj[propName])))
-          end
-        end
-      end
-    else
-      ImGui.Text(tostring(obj))
-    end
-  else
-    ImGui.Text(tostring(obj))
-  end
-  ImGui.Unindent(10)
-end
-         */
-    }
-
 }
 
 public record FilteredMessage

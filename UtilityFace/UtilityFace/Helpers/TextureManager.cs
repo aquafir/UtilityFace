@@ -1,4 +1,6 @@
-﻿using UtilityBelt.Service.Lib;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using UtilityBelt.Service.Lib;
 using UtilityFace.Enums;
 
 namespace UtilityFace.Helpers;
@@ -7,6 +9,45 @@ public static class TextureManager
 {
     static readonly Dictionary<uint, ManagedTexture> _woTextures = new();
     static readonly ScriptHudManager sHud = new();
+
+    //Lazy load Textures by dimensions
+    public static Dictionary<Vector2, List<uint>> TextureGroups => _textureGroups.Value;
+
+    #region Texture Groups
+    const uint TEXTURE_START = 0x06000133;
+    const uint TEXTURE_END = 0x06007576;
+    static private Lazy<Dictionary<Vector2, List<uint>>> _textureGroups = new Lazy<Dictionary<Vector2, List<uint>>>(() => GetTextureGroups());
+
+    static Dictionary<Vector2, List<uint>> GetTextureGroups()
+    {
+        Dictionary<Vector2, List<uint>> groups = new();
+
+        int count = 0;
+        var watch = Stopwatch.StartNew();
+        for (uint i = TEXTURE_START; i <= TEXTURE_END; i++)
+        {
+            var texture = UBService.PortalDat.ReadFromDat<ACE.DatLoader.FileTypes.Texture>(i);
+
+            if (texture.Height == 0 || texture.Width == 0)
+                continue;
+
+            count++;
+            Vector2 d = new(texture.Width, texture.Height);
+            if (!groups.TryGetValue(d, out var group))
+            {
+                //Add new group for dimensions
+                group = new();
+                groups.AddOrUpdate(d, group);
+            }
+            group.Add(i);
+        }
+        watch.Stop();
+        Console.WriteLine($"Found {groups.Count} groups with {count} textures in {watch.ElapsedMilliseconds}ms");
+
+        return groups;
+    } 
+    #endregion
+
 
     //Named list of textures for convenience
     static readonly Dictionary<Texture, uint> iconMap = new()
@@ -62,7 +103,7 @@ public static class TextureManager
     /// <summary>
     /// Get the texture for the Icon of a WorldObject
     /// </summary>
-    public static ManagedTexture GetOrCreateTexture(this WorldObject wo) => GetOrCreateTexture(wo.GetIconId());
+    public static ManagedTexture GetOrCreateTexture(this WorldObject wo) => GetOrCreateTexture(wo?.GetIconId() ?? 0);
         //wo.Id == game.CharacterId ?
         //GetOrCreateTexture(Texture.PlayerIcon.IconId()) :
         //GetOrCreateTexture(wo.Value(DataId.Icon, 0x0600110C));
@@ -74,7 +115,10 @@ public static class TextureManager
     {
         if (!_woTextures.TryGetValue(iconId, out var texture))
         {
-            texture = sHud.GetIconTexture(iconId);
+            try
+            {
+                texture = sHud.GetIconTexture(iconId);
+            }catch(Exception ex) { Log.Error(ex); }
             _woTextures.AddOrUpdate(iconId, texture);
         }
         return texture;

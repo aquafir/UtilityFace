@@ -6,7 +6,10 @@ public abstract class IPagedPicker<T> : ICollectionPicker<T>  //where T
     public int CurrentPage;
     public int PerPage = 20;
 
-    public int Pages => Choices is null ? 0 : (int)(Choices.Length / PerPage);
+    //Todo: think about this?  Automatically cast if it isn't an array?
+    public T[] ChoiceArray => Choices is T[] ca ? ca : Choices.ToArray(); //Choices as T[];
+
+    public int Pages => Choices is null ? 0 : (int)(ChoiceArray.Length / PerPage);
     int offset => CurrentPage * PerPage;
 
     public virtual void DrawPageControls()
@@ -14,10 +17,10 @@ public abstract class IPagedPicker<T> : ICollectionPicker<T>  //where T
         ImGui.SliderInt($"##{_id}PC", ref CurrentPage, 0, Pages, $"{CurrentPage}/{Pages}");
         ImGui.SameLine();
         if (ImGui.ArrowButton($"{_id}U", ImGuiDir.Left))
-            CurrentPage = Math.Max(0, CurrentPage - 1);
+            CyclePage(-1);
         ImGui.SameLine();
         if (ImGui.ArrowButton($"{_id}D", ImGuiDir.Right))
-            CurrentPage = Math.Min(Pages, CurrentPage + 1);
+            CyclePage(1);
     }
 
     public override void DrawBody()
@@ -29,12 +32,53 @@ public abstract class IPagedPicker<T> : ICollectionPicker<T>  //where T
         for (var i = 0; i < PerPage; i++)
         {
             var current = i + offset;
-            if (current >= Choices.Length)
+            if (current >= ChoiceArray.Length)
                 break;
 
-            var choice = Choices[current];
+            var choice = ChoiceArray[current];
 
             DrawItem(choice, i);
         }
+    }
+
+    /// <summary>
+    /// Try to get the elements for a given page
+    /// </summary>
+    public IEnumerable<T> GetPage(int page) => Choices.Skip(offset).Take(PerPage);
+
+    public void CycleSelection(int offset, bool defaultWithoutSelection = true)
+    {
+        //Check for valid page
+        var page = GetPage(CurrentPage).ToList();
+        if (page is null || page.Count == 0)
+            return;
+
+        //Find selection / optionally use a default
+        var index = -1;
+        if (Selection is null && defaultWithoutSelection)
+            index = offset < 0 ? page.Count : page.Count - 1;
+        else
+            index = page.IndexOf(Selection);
+
+        Log.Chat($"Index: {Selection} {index} / {page.Count}");
+        //Check for a valid index
+        if (index == -1)
+            return;
+
+        //Grab the next offset
+        var p = page.Count;
+        var next = ((index + offset) % p + p) % p;
+
+        Selection = page[next];
+    }
+
+    /// <summary>
+    /// Cycle through the pages by the offset
+    /// </summary>
+    public void CyclePage(int offset)
+    {
+        Selection = default(T);
+        var p = Pages + 1;
+        CurrentPage = ((CurrentPage + offset) % p + p) % p;
     }
 }

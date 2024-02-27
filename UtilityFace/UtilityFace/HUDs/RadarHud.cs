@@ -24,7 +24,6 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
         else
             ubHud.WindowSettings = ubHud.WindowSettings.Clear(ImGuiWindowFlags.NoMouseInputs);
 
-
         base.PreRender(sender, e);
     }
 
@@ -40,7 +39,6 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
         //MaxSize = new(700);
         ubHud.WindowSettings = ImGuiWindowFlags.NoTitleBar;
 
-        //SetMode();
 
         base.Init();
     }
@@ -146,6 +144,7 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
         //dl.AddText(radarCenter, (uint)Color.Blue.ToArgb(), "C");
 
         //Hover
+        try { 
         if (ImGui.IsWindowHovered())
         {
             Vector2 mousePos = ImGui.GetMousePos();
@@ -179,6 +178,8 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
                     if (wo.ServerPosition is null)
                         continue;
                     var texture = wo.GetOrCreateTexture();
+                        //TODO FIX HACK
+                        if (texture is null) continue;
                     ImGui.TextureButton($"{wo.Id}", texture, new(24));
                     ImGui.SameLine();
                     ImGui.Text($"{wo.Name} - {wo.ServerPosition.ToVector2().FromVector2().FormatCartesian()}");
@@ -188,7 +189,7 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
                 ImGui.EndTooltip();
             }
 
-            var first = wos.FirstOrDefault()?.Value; 
+            var first = wos.FirstOrDefault()?.Value;
             if (wos.Length > 0)
             {
 
@@ -226,10 +227,10 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
                 //}
                 //else
                 //{
-                    //Log.Chat($"/teleloc {coords.FormatTeleloc()}");
-                    //Log.Chat($"/teleloc {game.Character.Weenie.ServerPosition.FormatTeleloc()}");
-                    //game.Actions.InvokeChat($"/tele {coords.FormatCartesian()}"); 
-                    game.Actions.InvokeChat($"/teleloc {coords.ScreenAdjust().FormatTeleloc()}");
+                //Log.Chat($"/teleloc {coords.FormatTeleloc()}");
+                //Log.Chat($"/teleloc {game.Character.Weenie.ServerPosition.FormatTeleloc()}");
+                //game.Actions.InvokeChat($"/tele {coords.FormatCartesian()}"); 
+                game.Actions.InvokeChat($"/teleloc {coords.ScreenAdjust().FormatTeleloc()}");
                 //}
             }
 
@@ -237,6 +238,8 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
             scale += ImGui.GetIO().MouseWheel / 10;
             scale = Math.Max(.1f, scale);
         }
+        }
+        catch (Exception ex) { Log.Error(ex); }
 
         //if (ImGui.Checkbox("Big", ref big))
         //    SetMode();
@@ -271,14 +274,16 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
             if (rotate)
                 vto = vto.Rotate(cosTheta, sinTheta);
             vto *= scale;
-            dl.AddCircle(radarCenter + vto, markerSize+2, 0xFF00FFFF);
+            dl.AddCircle(radarCenter + vto, markerSize + 2, 0xFF00FFFF);
         }
 
         //Scan landscape/rebuild tree
         tree.Clear();
+
         foreach (var wo in game.World.GetLandscape())
         {
             if (!String.IsNullOrWhiteSpace(search) && !re.IsMatch(wo.Name))
+                //if(wo.WeenieClassId < 100000)
                 continue;
 
 
@@ -291,10 +296,14 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
                 ObjectClass.Lifestone => 0xFF00FF00,
                 ObjectClass.Npc => 0xFF00CCCC,
                 ObjectClass.Monster => 0xFFCCCC00,
-                _ => 0
+                _ => 0xFFFFFFFF,
             };
             if (color == 0)
                 continue;
+
+
+
+
 
             //Get relative position with player as origin and y axis flipped
             var vto = game.Character.Weenie.ServerPosition.ScreenVectorTo(wo.ServerPosition);
@@ -313,7 +322,7 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
 
             //Draw
             dl.AddCircleFilled(radarCenter + vto, markerSize, color);
-            dl.AddCircle(radarCenter + vto, markerSize+1, 0xFF111111);
+            dl.AddCircle(radarCenter + vto, markerSize + 1, 0xFF111111);
 
             if (!String.IsNullOrWhiteSpace(search) && re.IsMatch(wo.Name))
                 dl.AddCircle(radarCenter + vto, markerSize + 2, 0xFFCC00CC);
@@ -324,8 +333,8 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
             //var start = radarCenter + vto - s/2;
             //var end = start + s;
             //dl.AddImage(texture.TexturePtr, start, end);
-        }
 
+        }
         base.Draw(sender, e);
     }
 }

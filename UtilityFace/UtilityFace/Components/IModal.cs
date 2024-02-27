@@ -2,9 +2,9 @@
 public abstract class IModal : IComp
 {
     protected Vector2 MinSize = new(300);
-    protected Vector2 MaxSize = new(600);
+    protected Vector2 MaxSize = new(800);
 
-    public string Name => $"###{_id}";
+    public string Name => $"{Label}###{_id}";
 
     /// <summary>
     /// If true, renders as a popup that can be closed by clicking out of it
@@ -14,8 +14,11 @@ public abstract class IModal : IComp
     public bool Finished => !_open;
     protected bool _open;
 
-    protected ImGuiWindowFlags WindowFlags = ImGuiWindowFlags.NoTitleBar;
+    protected ImGuiWindowFlags WindowFlags = ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse;
 
+    /// <summary>
+    /// Draw at the bottom of the modal
+    /// </summary>
     public virtual void DrawFooter()
     {
         if (ImGui.Button("Close"))
@@ -47,7 +50,7 @@ public abstract class IModal : IComp
 
         //Dimensions?
         ImGui.SetNextWindowSizeConstraints(MinSize, MaxSize);
-        var state = IsPopup ? ImGui.BeginPopup(Name, ImGuiWindowFlags.Popup) : ImGui.BeginPopupModal(Name, ref _open, WindowFlags);
+        var state = IsPopup ? ImGui.BeginPopup(Name, WindowFlags) : ImGui.BeginPopupModal(Name, ref _open, WindowFlags);
 
         try
         {

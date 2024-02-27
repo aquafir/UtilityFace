@@ -42,18 +42,26 @@ public static class RandomExtensions
     
 }
 
-public static class BitExtensions
+public static class CollectionExtensions
 {
-    public static TEnum Set<TEnum>(this TEnum value, TEnum flag) where TEnum : Enum
+    public static void ShiftElement<T>(this T[] array, int oldIndex, int newIndex)
     {
-        return (TEnum)Enum.ToObject(typeof(TEnum), Convert.ToInt64(value) | Convert.ToInt64(flag));
-    }
-    public static TEnum Clear<TEnum>(this TEnum value, TEnum flag) where TEnum : Enum
-    {
-        return (TEnum)Enum.ToObject(typeof(TEnum), Convert.ToInt64(value) & ~Convert.ToInt64(flag));
-    }
-    public static TEnum Toggle<TEnum>(this TEnum value, TEnum flag) where TEnum : Enum
-    {
-        return (TEnum)Enum.ToObject(typeof(TEnum), Convert.ToInt64(value) ^ Convert.ToInt64(flag));
+        // TODO: Argument validation
+        if (oldIndex == newIndex)
+        {
+            return; // No-op
+        }
+        T tmp = array[oldIndex];
+        if (newIndex < oldIndex)
+        {
+            // Need to move part of the array "up" to make room
+            Array.Copy(array, newIndex, array, newIndex + 1, oldIndex - newIndex);
+        }
+        else
+        {
+            // Need to move part of the array "down" to fill the gap
+            Array.Copy(array, oldIndex + 1, array, oldIndex, newIndex - oldIndex);
+        }
+        array[newIndex] = tmp;
     }
 }

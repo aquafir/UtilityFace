@@ -1,3 +1,13 @@
+Adding dll:
+
+* if you search for `${APPNAME}.pdb` in the installer you should see the two spots, one to copy on install and one to delete on uninstall
+
+* if you need subdirs it looks like this: https://gitlab.com/trevis/lbvisualizer/-/blob/master/LBVisualizer/scripts/installer.nsi?ref_type=heads#L150
+
+  
+
+
+
 ## HUDs
 
 `InterfaceController` starts and controls a number of replacement UIs.
@@ -57,6 +67,7 @@ A `IPicker<T>` draws the elements needed to select something, such as value(s) f
 * `IPagedPicker<T>` adds
   * `DrawPageControls` to the start of `DrawBody` 
   * Number of items `PerPage` and the `CurrentPage` are used to display only part of the choices
+* `TexturedPicker` 
 
 
 
@@ -167,3 +178,48 @@ A `Modal` is a centered popup for complex inputs
     * "Uses Darts as ammunition"
   * Format not found
     * "Darts"
+
+
+
+
+
+
+
+
+
+## Misc
+
+### Drag/Drop
+
+The `SetDragDropPayload` function allows you to attach data  to the drag and drop operation, and it requires specifying the payload  type, data pointer, and data size.
+
+
+
+Operations on pointers are:
+
+* Unary [`&` (address-of)](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/pointer-related-operators#address-of-operator-) operator: to get the address of a variable
+* Unary [`*` (pointer indirection)](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/pointer-related-operators#pointer-indirection-operator-) operator: to obtain the variable pointed by a pointer
+* The [`->` (member access)](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/pointer-related-operators#pointer-member-access-operator--) and [`[\]` (element access)](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/pointer-related-operators#pointer-element-access-operator-) operators
+* Arithmetic operators [`+`, `-`, `++`, and `--`](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/pointer-related-operators#pointer-arithmetic-operators)
+* Comparison operators [`==`, `!=`, `<`, `>`, `<=`, and `>=`](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/pointer-related-operators#pointer-comparison-operators)
+
+
+
+Pointer declarations look like:
+
+```
+type* identifier;
+void* identifier; //allowed but not recommended
+```
+
+
+
+
+
+Reference:
+
+* https://gitlab.com/utilitybelt/utilitybelt.service/-/blob/master/Views/Inspector/Inspector.cs?ref_type=heads#L357
+* https://gitlab.com/utilitybelt/utilitybelt.service/-/blob/master/Views/Inspector/MethodInspector.cs?ref_type=heads#L176
+* [Blittable types](https://learn.microsoft.com/en-us/dotnet/framework/interop/blittable-and-non-blittable-types)
+* [ImGui manager](https://github.com/JaThePlayer/Rysy/blob/3e2c675e43c0a1bfcf88bbae71963e3c2a4f167a/Rysy/Gui/ImGuiManager.cs#L482)
+* [Dalamud lib helpers](https://github.com/NightmareXIV/ECommons/blob/aa5305f34b24a7c6955c864675244b8ff5fddfcb/ECommons/ImGuiMethods/ImGuiDragDrop.cs)

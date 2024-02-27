@@ -12,19 +12,10 @@ public class FilterSet<T>(List<IFilter<T>> filters) : IFilter<T>
     /// <summary>
     /// Checks if any Filter has been interacted with
     /// </summary>
-    public override bool Check()
-    {
-        foreach (var filter in Filters)
-        {
-            if (filter.Check())
-            {
-                Changed = true;
-                Log.Chat($"{filter.Label} changed");
-            }
-        }
-
-        return Changed;
-    }
+    //public override bool Check()
+    //{
+    //    retu
+    //}
 
     /// <summary>
     /// Returns all items that have not been filtered
@@ -37,9 +28,12 @@ public class FilterSet<T>(List<IFilter<T>> filters) : IFilter<T>
     public override bool IsFiltered(T item) => Filters.Any(x => x.IsFiltered(item));
 
 
-    public override void DrawBody() { }
-    //{
-    //    foreach (var filter in Filters)
-    //        filter.DrawBody();
-    //}
+    public override void DrawBody() 
+    {
+        foreach (var filter in Filters)
+        {
+            if (filter.Check())
+                Changed = true;
+        }
+    }
 }

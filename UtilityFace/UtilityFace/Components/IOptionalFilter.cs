@@ -1,6 +1,9 @@
 ﻿namespace UtilityFace.Components;
 public abstract class IOptionalFilter<T>(Func<T, bool> filterPredicate = null) : IFilter<T>(filterPredicate)
 {
+    /// <summary>
+    /// Controls whether the body of the optional filter is drawn when inactive 
+    /// </summary>
     public bool ShowInactive = false;
 
     /// <summary>
@@ -10,7 +13,8 @@ public abstract class IOptionalFilter<T>(Func<T, bool> filterPredicate = null) :
 
     public virtual void DrawToggle()
     {
-        ImGui.Checkbox($"{Label}##{_id}", ref Active);
+        if (ImGui.Checkbox($"{Label}##{_id}", ref Active))
+            Changed = true;
 
         if (Active || ShowInactive)
             ImGui.SameLine();

@@ -6,8 +6,8 @@ public abstract class ICollectionPicker<T> : IPicker<T>
     /// <summary>
     /// Items being displayed and selected from
     /// </summary>
-    //public IEnumerable<T> Choices;
-    public T[] Choices;
+    public IEnumerable<T> Choices;
+    //public T[] Choices;
 
     //How to handle layout?
     //Vector2 Size / float Width / etc.
@@ -21,5 +21,6 @@ public abstract class ICollectionPicker<T> : IPicker<T>
             DrawItem(choice, index++);
     }
 
-    public abstract void DrawItem(T item, int index);
+    //public abstract void DrawItem(T item, int index);
+    public virtual void DrawItem(T item, int index) { }
 }
