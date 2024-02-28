@@ -8,15 +8,8 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
     EnumModal<IntId> enumPickModal = new();
     //TextureGroupFilter texG = new() { Active = true };
     TextureGroupPicker texG = new();
-    PickerModal<TextureGroup> texModal;
-    //ValueComparisonFilter<WorldObject> foo;// = new(x => x.Id.Normalize());// { Label = "Comparison" };
-    ValueComparisonFilter<double?> foo = new(x => x) { Label = "Comparison" };
-    IntId prop;
-    double? value;
-    WorldObject w = game.Character.Weenie;
-    FilteredEnumPicker<IntId> enumPicker = new();
-    bool? truth;
-
+    //PickerModal<ManagedTexture> texModal;
+    PickerModal<uint> texModal;
 
     public override void Init()
     {
@@ -24,17 +17,28 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
         base.Init();
     }
 
+
+    Dictionary<Vector2, PickerModal<uint>> modals = new();
+    static PickerModal<uint> Modal;
     public override void Draw(object sender, EventArgs e)
     {
         if (texG.Check())
-            Log.Chat("Changed");
+        {
+            var group = texG.Selection;
 
-        if (ImGui.Button("foo"))
-            texModal.Open();
+            if (!TextureManager.TryGetModal(group.Size, out Modal))
+                return;
 
-        if (texModal.Check() && texModal.Picker is TextureGroupPicker picker)
-            Log.Chat($"Picked {texModal.Selection}"); ;
-            //Log.Chat($"Picked {texModal.Picker.Selection}"); ;
+            //Set up the modal
+            Modal.MinSize = new(525);
+            Modal.Open();
+
+        }
+        if (Modal is null)
+            return;
+        
+        if(Modal.Check())
+            Log.Chat($"Picked {Modal.Selection}"); ;
 
         #region Ignore
         //if (ImGui.Button("Foo"))

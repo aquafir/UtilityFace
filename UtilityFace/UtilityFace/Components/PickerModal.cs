@@ -11,9 +11,9 @@ public class PickerModal<T>  : IModal //where T : IPicker<T>
 
     public T Selection => (Picker is IPicker<T> typed) ? typed.Selection : default(T); // (Picker as IPicker<T>).Selection;//Picker is IPicker<T> 
     
-    public PickerModal(IComp picker)
+    public PickerModal(IComp picker) : base()
     {
-        Picker = picker;
+        Picker = picker; 
     }
 
     public override void DrawBody()

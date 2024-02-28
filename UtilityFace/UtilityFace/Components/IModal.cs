@@ -1,8 +1,8 @@
 ﻿namespace UtilityFace.Components;
 public abstract class IModal : IComp
 {
-    protected Vector2 MinSize = new(300);
-    protected Vector2 MaxSize = new(800);
+    public Vector2 MinSize = new(300);
+    public Vector2 MaxSize = new(800);
 
     public string Name => $"{Label}###{_id}";
 
@@ -64,7 +64,10 @@ public abstract class IModal : IComp
 
             DrawFooter();
         }
-        catch (Exception ex) { Log.Error(ex); }
+        catch (Exception ex) { 
+            Log.Error(ex); 
+            Close(); //Close modals on a fail?
+        }
 
         if(state)
             ImGui.EndPopup();

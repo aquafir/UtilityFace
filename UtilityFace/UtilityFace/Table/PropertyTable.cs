@@ -1,4 +1,13 @@
-﻿namespace UtilityFace.Table;
+﻿using System.Collections.Generic;
+using System.Drawing;
+using System.Reflection;
+using UtilityBelt.Scripting.Actions;
+using UtilityBelt.Scripting.Lib;
+using UtilityBelt.Scripting.ScriptEnvs.Lua;
+using UtilityFace.Components;
+using static System.Net.Mime.MediaTypeNames;
+
+namespace UtilityFace.Table;
 
 public class PropertyTable
 {
@@ -20,6 +29,8 @@ public class PropertyTable
     public PropType Type { get; set; }
 
     public bool UseFilter { get; set; } = true;
+
+    static Vector2 ButtonSize = new(25);
 
     //List<PropertyFilter> filters = new();
 
@@ -51,6 +62,10 @@ public class PropertyTable
         {
             if (Filter is null)
                 return;
+
+            //Clear modal
+            textureModal = null;
+            modalRow = -1;
 
             //Get keys from filter
             //tableData.Clear();
@@ -249,22 +264,16 @@ public class PropertyTable
     public void RenderEdit(PropertyTable table, TableRow row, int i)
     {
         //Special handling of enum type
+        bool changed = false;
         if (Type == PropType.Int && ((IntId)row.Key).TryGetEnumNames(out var names))
-        {
-            //var names = Enum.GetNames(enumType);
-            if (!int.TryParse(row.CurrentValue, out var value))
-            {
-                Log.Chat($"Can't parse?");
-            }
-
-            if (ImGui.Combo($"###{Type}{i}", ref value, names, names.Length))
-            {
-                row.CurrentValue = value.ToString();
-                Log.Chat($"Set to {names[value]} ({value})");
-            }
-        }
-
+            changed = RenderPickEnum(row, i, names);
+        else if (Type == PropType.DataId && row.Property.Contains("Icon"))
+            //else if (Type == PropType.DataId && ((DataId)row.Key) == DataId.Icon)
+            changed = RenderPickIcon(row, i);
         else if (ImGui.InputText($"###{Type}{i}", ref row.CurrentValue, 300, ImGuiInputTextFlags.EnterReturnsTrue))
+            changed = true;
+
+        if (changed)
         {
             var g = new Game();
             //var s = g.World.Selected;
@@ -272,6 +281,12 @@ public class PropertyTable
             {
                 Log.Chat("Unable to find target");
                 return;
+            }
+            //Todo: rethink?  Id item
+            unsafe
+            {
+                var clientUI = ((AcClient.ClientUISystem*)AcClient.ClientUISystem.s_pUISystem);
+                clientUI->ExamineObject(wo.Id);
             }
             wo.Select();
 
@@ -290,6 +305,97 @@ public class PropertyTable
             g.Actions.InvokeChat(cmd);
             Log.Chat($"Ran command: {cmd}");
         }
+
+    }
+
+    /// <summary>
+    /// Render a combobox for an enum
+    /// </summary>
+    private bool RenderPickEnum(TableRow row, int i, string[] names)
+    {
+        if (!int.TryParse(row.CurrentValue, out var value))
+        {
+            Log.Chat($"Can't parse?");
+        }
+
+        if (ImGui.Combo($"###{Type}{i}", ref value, names, names.Length))
+        {
+            row.CurrentValue = value.ToString();
+            Log.Chat($"Set to {names[value]} ({value})");
+            return true;
+        }
+
+        return false;
+    }
+
+
+    int modalRow = -1;
+    PickerModal<uint> textureModal;
+    private bool RenderPickIcon(TableRow row, int i)
+    {
+        if (!uint.TryParse(row.CurrentValue, out var id))
+            return false;
+
+        //Use current ID as button
+        var tex = TextureManager.GetOrCreateTexture(id);
+        Vector2 size = tex.Bitmap.ToVector2();
+        if (ImGui.TextureButton($"{i}{row.Key}", tex, ButtonSize)) // size.ScaleToMax(new Vector2(80))))
+        {
+            //Find or create
+            if (!TextureManager.TryGetModal(size, out textureModal, true))
+            {
+                modalRow = -1;
+                return false;
+            }
+            modalRow = i;
+
+            //Set up the modal?
+            textureModal.MinSize = new(525);
+
+            //Page to current
+            if (textureModal.Picker is TexturedPicker<uint> picker
+                && uint.TryParse(row.CurrentValue, out var current)
+                && TextureManager.TextureGroups.TryGetValue(size, out var ids))
+            {
+                //Get the group
+                var index = Math.Max(ids.IndexOf(current), ids.IndexOf(current + TextureManager.TEXTURE_OFFSET));
+                var page = index < 0 ? 0 : index / picker.PerPage;
+                Log.Chat($"ID {current}->Index {index}/{ids.Count} for page {page}/{picker.Pages}");
+                picker.CurrentPage = page;
+            }
+        }
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.BeginTooltip();
+            ImGui.Text($"{id} - {tex.Bitmap.ToVector2()}");
+            ImGui.EndTooltip();
+        }
+
+        //Only check modal for the opening row
+        if (modalRow != i || textureModal is null)
+            return false;
+
+        if (textureModal.Check())
+        {
+            var iconId = textureModal.Selection;
+            Log.Chat($"{i} - {row.Property} - ID {iconId}");
+
+            if (iconId == default(uint))
+                return false;
+
+            //Not sure this matters?
+            //if (iconId >= TextureManager.TEXTURE_OFFSET)
+            //    iconId -= TextureManager.TEXTURE_OFFSET;
+
+            row.CurrentValue = $"{iconId}";
+
+            //Reusing the modal so null it to indicate not in use
+            //textureModal = null;
+            modalRow = -1;
+            return true;
+        }
+
+        return false;
     }
 }
 

@@ -11,8 +11,6 @@ public class TableRow
     //Original value
     public string OriginalValue = "";
     public string CurrentValue = "";
-
-    public virtual void Render() { }
 }
 
 //public class BoolRow : TableRow
