@@ -1,6 +1,6 @@
 ﻿using ACE.DatLoader.FileTypes;
 using System.Drawing;
-using UtilityFace.Components;
+using UtilityFace.Components.Pickers;
 
 namespace UtilityFace.HUDs;
 public class ActionHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)

@@ -1,4 +1,4 @@
-﻿namespace UtilityFace.Components;
+﻿namespace UtilityFace.Components.Filters;
 
 public abstract class IGenericFilter<T>(Func<T, bool> filterPredicate = null) : IComp
 {

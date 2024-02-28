@@ -1,7 +1,9 @@
-﻿namespace UtilityFace.Components;
+﻿using UtilityFace.Components.Filters;
+
+namespace UtilityFace.Components.Pickers;
 public class TextureGroupPicker : ICollectionPicker<TextureGroup>
 {
-    TextureGroupFilter filter = new() {  Active = false, Label = "Filter Groups?" };
+    TextureGroupFilter filter = new() { Active = false, Label = "Filter Groups?" };
 
     string[] choiceCombo;
 

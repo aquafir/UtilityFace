@@ -1,4 +1,4 @@
-﻿namespace UtilityFace.Components;
+﻿namespace UtilityFace.Components.Pickers;
 
 //May need to change to enum struct
 public class EnumPicker<T> : IPicker<T> where T : struct, Enum

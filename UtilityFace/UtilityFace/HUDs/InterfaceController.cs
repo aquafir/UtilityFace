@@ -37,7 +37,7 @@ internal class InterfaceController(string name) : SizedHud(name, true, true)
             new PropertyEditorHud("PropertyEditor", true, true),
             //new NavHud("Navs", true, false),
             //new HaxHud("Hax", true, true),
-            //new RadarHud("Radar", true, true),
+            new RadarHud("Radar", true, true),
             //new StyleHud("Styles", true, true),
             //new ActionHud("ActionBar", true, true),
             //new DragHud("Drag", true, true),  //Shows drag/top functionality

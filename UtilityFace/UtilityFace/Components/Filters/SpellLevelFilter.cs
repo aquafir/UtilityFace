@@ -1,7 +1,7 @@
 ﻿using UtilityFace.HUDs;
 using SpellBook = UtilityBelt.Scripting.Interop.SpellBook;
 
-namespace UtilityFace.Components;
+namespace UtilityFace.Components.Filters;
 
 public class SpellLevelFilter : IOptionalFilter<SpellInfo>
 {
@@ -27,7 +27,7 @@ public class SpellLevelFilter : IOptionalFilter<SpellInfo>
 
         //if(item.Id == 1)
         //    Log.Chat($"{item.Spell.Name} - {level} - {Levels[level]}");
-        
+
         //Check for invalid level
         if (level < 0 || level >= Levels.Length)
             return false;

@@ -1,7 +1,8 @@
 ﻿using ACE.DatLoader.FileTypes;
+using UtilityFace.Components.Filters;
 using UtilityFace.HUDs;
 
-namespace UtilityFace.Components;
+namespace UtilityFace.Components.Pickers;
 
 public class SpellPicker : TexturedPicker<SpellInfo>
 {
@@ -16,7 +17,7 @@ public class SpellPicker : TexturedPicker<SpellInfo>
     public override void DrawBody()
     {
         if (filter.Check())
-            this.Choices = filter.Active ? filter.GetFiltered(choices).ToArray() : choices;
+            Choices = filter.Active ? filter.GetFiltered(choices).ToArray() : choices;
 
         base.DrawBody();
     }
@@ -26,7 +27,7 @@ public class SpellPicker : TexturedPicker<SpellInfo>
         base.DrawItem(item, index);
 
         //Add in a tooltip
-        if(ImGui.IsItemHovered())
+        if (ImGui.IsItemHovered())
         {
             ImGui.BeginTooltip();
             var id = item.Id;

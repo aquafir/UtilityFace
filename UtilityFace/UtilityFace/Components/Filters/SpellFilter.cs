@@ -3,7 +3,7 @@ using ACE.DatLoader.FileTypes;
 using UtilityFace.HUDs;
 using SpellBook = UtilityBelt.Scripting.Interop.SpellBook;
 
-namespace UtilityFace.Components;
+namespace UtilityFace.Components.Filters;
 
 
 public class SpellFilter : IOptionalFilter<SpellInfo>

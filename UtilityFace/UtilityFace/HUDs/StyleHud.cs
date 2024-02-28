@@ -1,4 +1,5 @@
-﻿using UtilityFace.Components;
+﻿using UtilityFace.Components.Modals;
+using UtilityFace.Components.Pickers;
 
 namespace UtilityFace.HUDs;
 public class StyleHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)

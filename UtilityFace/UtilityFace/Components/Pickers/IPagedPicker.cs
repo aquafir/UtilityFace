@@ -1,4 +1,4 @@
-﻿namespace UtilityFace.Components;
+﻿namespace UtilityFace.Components.Pickers;
 
 public abstract class IPagedPicker<T> : ICollectionPicker<T>  //where T
 {
@@ -9,7 +9,7 @@ public abstract class IPagedPicker<T> : ICollectionPicker<T>  //where T
     //Todo: think about this?  Automatically cast if it isn't an array?
     public T[] ChoiceArray => Choices is T[] ca ? ca : Choices.ToArray(); //Choices as T[];
 
-    public int Pages => Choices is null ? 0 : (int)(ChoiceArray.Length / PerPage);
+    public int Pages => Choices is null ? 0 : ChoiceArray.Length / PerPage;
     int offset => CurrentPage * PerPage;
 
     public virtual void DrawPageControls()
@@ -77,7 +77,7 @@ public abstract class IPagedPicker<T> : ICollectionPicker<T>  //where T
     /// </summary>
     public void CyclePage(int offset)
     {
-        Selection = default(T);
+        Selection = default;
         var p = Pages + 1;
         CurrentPage = ((CurrentPage + offset) % p + p) % p;
     }

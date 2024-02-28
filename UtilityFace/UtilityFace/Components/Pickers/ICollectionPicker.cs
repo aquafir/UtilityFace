@@ -1,4 +1,4 @@
-﻿namespace UtilityFace.Components;
+﻿namespace UtilityFace.Components.Pickers;
 
 public abstract class ICollectionPicker<T> : IPicker<T>
 {

@@ -2,7 +2,8 @@
 using System.Drawing;
 using System.Reflection;
 using UtilityBelt.Service.Lib;
-using UtilityFace.Components;
+using UtilityFace.Components.Modals;
+using UtilityFace.Components.Pickers;
 using UtilityFace.Enums;
 using UtilityFace.HUDs;
 

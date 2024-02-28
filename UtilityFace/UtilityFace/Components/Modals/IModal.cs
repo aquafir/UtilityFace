@@ -1,4 +1,4 @@
-﻿namespace UtilityFace.Components;
+﻿namespace UtilityFace.Components.Modals;
 public abstract class IModal : IComp
 {
     public Vector2 MinSize = new(300);
@@ -64,12 +64,13 @@ public abstract class IModal : IComp
 
             DrawFooter();
         }
-        catch (Exception ex) { 
-            Log.Error(ex); 
+        catch (Exception ex)
+        {
+            Log.Error(ex);
             Close(); //Close modals on a fail?
         }
 
-        if(state)
+        if (state)
             ImGui.EndPopup();
 
         return Finished;

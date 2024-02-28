@@ -1,4 +1,6 @@
-﻿namespace UtilityFace.Components;
+﻿using UtilityFace.Components.Pickers;
+
+namespace UtilityFace.Components.Filters;
 
 /// <summary>
 /// Draws a text field that builds a Regex
@@ -17,7 +19,8 @@ public class RegexFilter<T> : IOptionalFilter<T>
     private readonly Func<T, string> targetPredicate;
 
     //Todo: rethink, crashes if a filter is used from recursion but a filter isn't needed here
-    public EnumPicker<StringCompareType> Comparison = new() {
+    public EnumPicker<StringCompareType> Comparison = new()
+    {
         Choice = StringCompareType.Match,
     };
 

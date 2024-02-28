@@ -7,8 +7,8 @@ namespace UtilityFace.HUDs;
 internal class RadarHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)
 {
     KdTree<float, WorldObject> tree = new(2, new FloatMath(), AddDuplicateBehavior.Skip);
-    bool rotate = false;
-    bool big = true;
+    bool rotate = true;
+    bool big = false;
     float scale = 5000;
     float range = 75;   //Radar range
     private float alpha => big ? .5f : .8f;
@@ -16,15 +16,18 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
 
     public override void PreRender(object sender, EventArgs e)
     {
-        //Add opacity
-        ImGui.PushStyleVar(ImGuiStyleVar.Alpha, alpha);
-
         if (ImGui.IsKeyDown(ImGuiKey.ModCtrl))
+        {
             ubHud.WindowSettings = ubHud.WindowSettings.Set(ImGuiWindowFlags.NoMouseInputs);
+            ImGui.PushStyleVar(ImGuiStyleVar.Alpha, .1f); //Reduced alpha
+        }
         else
+        {
             ubHud.WindowSettings = ubHud.WindowSettings.Clear(ImGuiWindowFlags.NoMouseInputs);
+            ImGui.PushStyleVar(ImGuiStyleVar.Alpha, alpha);
+        }
 
-        base.PreRender(sender, e);
+            base.PreRender(sender, e);
     }
 
     public override void PostRender(object sender, EventArgs e)
@@ -38,7 +41,6 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
         MinSize = new(700);
         //MaxSize = new(700);
         ubHud.WindowSettings = ImGuiWindowFlags.NoTitleBar;
-
 
         base.Init();
     }

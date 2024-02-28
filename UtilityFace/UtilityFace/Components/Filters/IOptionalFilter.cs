@@ -1,4 +1,4 @@
-﻿namespace UtilityFace.Components;
+﻿namespace UtilityFace.Components.Filters;
 public abstract class IOptionalFilter<T>(Func<T, bool> filterPredicate = null) : IFilter<T>(filterPredicate)
 {
     /// <summary>
@@ -30,8 +30,8 @@ public abstract class IOptionalFilter<T>(Func<T, bool> filterPredicate = null) :
             Changed = false;
 
             DrawToggle();
-            
-            if(Active || ShowInactive)
+
+            if (Active || ShowInactive)
                 DrawBody();
         }
         catch (Exception ex) { Log.Error(ex); }

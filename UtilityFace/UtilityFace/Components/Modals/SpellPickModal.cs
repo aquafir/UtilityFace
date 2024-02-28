@@ -1,4 +1,6 @@
-﻿namespace UtilityFace.Components;
+﻿using UtilityFace.Components.Pickers;
+
+namespace UtilityFace.Components.Modals;
 
 public class SpellPickModal : IModal
 {

@@ -1,4 +1,6 @@
-﻿namespace UtilityFace.Components;
+﻿using UtilityFace.Components.Pickers;
+
+namespace UtilityFace.Components.Modals;
 public class EnumModal<T> : IModal where T : struct, Enum
 {
     public Vector2 IconSize = new(24);

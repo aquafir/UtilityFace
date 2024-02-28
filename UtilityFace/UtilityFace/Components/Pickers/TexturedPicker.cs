@@ -1,4 +1,4 @@
-﻿namespace UtilityFace.Components;
+﻿namespace UtilityFace.Components.Pickers;
 //public class TexturedPicker<T> : IPicker<T>
 public class TexturedPicker<T> : IPagedPicker<T>
 {
@@ -17,7 +17,7 @@ public class TexturedPicker<T> : IPagedPicker<T>
     public TexturedPicker(Func<T, ManagedTexture> textureMap, IEnumerable<T> choices)
     {
         this.textureMap = textureMap;
-        this.Choices = choices;
+        Choices = choices;
     }
 
     public override void DrawBody()
@@ -27,7 +27,7 @@ public class TexturedPicker<T> : IPagedPicker<T>
         var margin = ImGui.GetStyle().FramePadding.X;
         var colWidth = 1 + IconSize.X + margin * 2;
         columns = (int)(width / colWidth);
-                
+
         base.DrawBody();
     }
 

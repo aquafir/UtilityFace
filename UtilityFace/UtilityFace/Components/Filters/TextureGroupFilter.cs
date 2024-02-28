@@ -1,4 +1,6 @@
-﻿namespace UtilityFace.Components;
+﻿using UtilityFace.Components.Pickers;
+
+namespace UtilityFace.Components.Filters;
 
 public class TextureGroupFilter : IOptionalFilter<TextureGroup>
 {
@@ -40,8 +42,8 @@ public class TextureGroupFilter : IOptionalFilter<TextureGroup>
 
     public override bool IsFiltered(TextureGroup item) =>
         filter?.IsFiltered(item) ?? false ||
-        item.Size.X < MinWidth  || 
-        item.Size.X > MaxWidth  ||
-        item.Size.Y < MinHeight || 
+        item.Size.X < MinWidth ||
+        item.Size.X > MaxWidth ||
+        item.Size.Y < MinHeight ||
         item.Size.Y > MaxHeight;
 }

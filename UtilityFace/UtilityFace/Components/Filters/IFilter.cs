@@ -1,4 +1,4 @@
-﻿namespace UtilityFace.Components;
+﻿namespace UtilityFace.Components.Filters;
 public abstract class IFilter<T>(Func<T, bool> filterPredicate = null) : IComp
 {
     /// <summary>
@@ -18,7 +18,7 @@ public abstract class IFilter<T>(Func<T, bool> filterPredicate = null) : IComp
 
     public virtual bool IsFiltered(T item) => filterPredicate(item);
 
-    public virtual IEnumerable<T> GetFiltered(IEnumerable<T> input) 
+    public virtual IEnumerable<T> GetFiltered(IEnumerable<T> input)
     {
         if (input is null)
             return null;

@@ -1,5 +1,7 @@
-﻿namespace UtilityFace.Components;
-public class ValueComparisonFilter<T> : IOptionalFilter<T> 
+﻿using UtilityFace.Components.Pickers;
+
+namespace UtilityFace.Components.Filters;
+public class ValueComparisonFilter<T> : IOptionalFilter<T>
 {
     protected double value;
     protected readonly Func<T, double?> targetPredicate;
@@ -9,17 +11,17 @@ public class ValueComparisonFilter<T> : IOptionalFilter<T>
         this.targetPredicate = targetPredicate; //?? throw new ArgumentNullException(nameof(targetPredicate));
     }
 
-    FilteredEnumPicker<CompareType> comparison = new() { Label = "Comparison"};
+    FilteredEnumPicker<CompareType> comparison = new() { Label = "Comparison" };
     public override void DrawBody()
     {
-        if(comparison.Check())
+        if (comparison.Check())
         {
             Changed = true;
             Log.Chat($"{comparison.Choice}");
         }
 
         ImGui.SameLine();
-        if(ImGui.InputDouble($"Value##{_id}", ref value, .1, .5, value.ToString(), ImGuiInputTextFlags.AutoSelectAll))
+        if (ImGui.InputDouble($"Value##{_id}", ref value, .1, .5, value.ToString(), ImGuiInputTextFlags.AutoSelectAll))
         {
             Log.Chat($"{value}");
             Changed = true;

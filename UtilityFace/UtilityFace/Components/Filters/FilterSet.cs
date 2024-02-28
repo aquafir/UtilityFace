@@ -1,4 +1,4 @@
-﻿namespace UtilityFace.Components;
+﻿namespace UtilityFace.Components.Filters;
 /// <summary>
 /// FilterSets are groups of filters sharing a type they are filtering
 /// </summary>
@@ -25,7 +25,7 @@ public class FilterSet<T>(List<IFilter<T>> filters) : IFilter<T>
     public override bool IsFiltered(T item) => Filters.Any(x => x.IsFiltered(item));
 
 
-    public override void DrawBody() 
+    public override void DrawBody()
     {
         foreach (var filter in Filters)
         {

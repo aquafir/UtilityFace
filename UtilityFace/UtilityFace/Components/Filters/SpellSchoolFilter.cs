@@ -1,4 +1,4 @@
-﻿namespace UtilityFace.Components;
+﻿namespace UtilityFace.Components.Filters;
 
 public class SpellSchoolFilter : IOptionalFilter<SpellInfo>
 {
