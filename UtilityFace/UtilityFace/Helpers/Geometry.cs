@@ -1,8 +1,4 @@
-﻿using System.Drawing;
-using Quaternion = System.Numerics.Quaternion;
-using Vector3 = System.Numerics.Vector3;
-
-namespace UtilityBelt.Lib
+﻿namespace UtilityBelt.Lib
 {
     public static class Geometry {
         public static Quaternion HeadingToQuaternion(float angle) {

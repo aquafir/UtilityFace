@@ -1,5 +1,4 @@
 ﻿using ACE.DatLoader.FileTypes;
-using UtilityFace.Components.Filters;
 using UtilityFace.HUDs;
 
 namespace UtilityFace.Components.Pickers;

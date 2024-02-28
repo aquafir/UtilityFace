@@ -1,6 +1,4 @@
-﻿using UtilityFace.Components.Pickers;
-
-namespace UtilityFace.Components.Filters;
+﻿namespace UtilityFace.Components.Filters;
 
 /// <summary>
 /// Draws a text field that builds a Regex

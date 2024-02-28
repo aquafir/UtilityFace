@@ -1,6 +1,5 @@
 ﻿using ACE.DatLoader.FileTypes;
 using System.Drawing;
-using UtilityFace.Components.Pickers;
 
 namespace UtilityFace.HUDs;
 public class ActionHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)
@@ -54,7 +53,7 @@ public class ActionBar : TexturedPicker<Action>
         var color = item == Selection ? Color.Blue.ToVec4() : new System.Numerics.Vector4(0);
         if (ImGui.TextureButton($"{Name}{index}", icon, IconSize, 1, color))
         {
-            Selection = item;
+            Select(item); //Selection = item;
             Changed = true;
         }
 
@@ -118,7 +117,8 @@ public class ActionBar : TexturedPicker<Action>
         {
             if (ImGui.IsKeyPressed(kvp.Key))
             {
-                Selection = Choices.ElementAt(kvp.Value - 1);
+                Select(Choices.ElementAt(kvp.Value - 1));
+                //Selection = Choices.ElementAt(kvp.Value - 1);
                 Changed = true;
 
                 return;

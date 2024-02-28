@@ -1,6 +1,4 @@
-﻿using UtilityFace.Components.Filters;
-
-namespace UtilityFace.Components.Pickers;
+﻿namespace UtilityFace.Components.Pickers;
 public class TextureGroupPicker : ICollectionPicker<TextureGroup>
 {
     TextureGroupFilter filter = new() { Active = false, Label = "Filter Groups?" };
@@ -37,7 +35,7 @@ public class TextureGroupPicker : ICollectionPicker<TextureGroup>
                 bool open;
                 if (ImGui.Selectable(choiceCombo[i]))
                 {
-                    Selection = Choices.ElementAt(i);
+                    Select(Choices.ElementAt(i)); //Selection = Choices.ElementAt(i);
                     Log.Chat($"Selected {Selection}");
                     Changed = true;
                 }

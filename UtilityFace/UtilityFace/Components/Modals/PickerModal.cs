@@ -1,6 +1,4 @@
-﻿using UtilityFace.Components.Pickers;
-
-namespace UtilityFace.Components.Modals;
+﻿namespace UtilityFace.Components.Modals;
 
 /// <summary>
 /// Picker modals display their picker and a close button

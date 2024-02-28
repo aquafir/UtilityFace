@@ -1,14 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
-using System.Reflection;
-using UtilityBelt.Scripting.Actions;
-using UtilityBelt.Scripting.Lib;
-using UtilityBelt.Scripting.ScriptEnvs.Lua;
-using UtilityFace.Components.Modals;
-using UtilityFace.Components.Pickers;
-using static System.Net.Mime.MediaTypeNames;
-
-namespace UtilityFace.Table;
+﻿namespace UtilityFace.Table;
 
 public class PropertyTable
 {

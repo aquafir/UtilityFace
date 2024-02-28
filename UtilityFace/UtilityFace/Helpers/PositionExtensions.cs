@@ -1,6 +1,4 @@
-﻿using Vector3 = System.Numerics.Vector3;
-using Position = UtilityBelt.Scripting.Interop.Position;
-using UtilityBelt.Service.Lib.ACClientModule;
+﻿using UtilityBelt.Service.Lib.ACClientModule;
 
 namespace UtilityFace.Helpers;
 public static class PositionExtensions

@@ -1,6 +1,4 @@
-﻿using UtilityFace.Components.Filters;
-
-namespace UtilityFace.Components.Pickers;
+﻿namespace UtilityFace.Components.Pickers;
 public class FilteredEnumPicker<T> : EnumPicker<T> where T : struct, Enum
 {
     protected string[] filteredChoices = { };

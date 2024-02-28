@@ -1,5 +1,4 @@
 ﻿namespace UtilityFace.Components.Pickers;
-//public class TexturedPicker<T> : IPicker<T>
 public class TexturedPicker<T> : IPagedPicker<T>
 {
     /// <summary>
@@ -38,11 +37,14 @@ public class TexturedPicker<T> : IPagedPicker<T>
 
         var icon = textureMap(item);
 
-        if (ImGui.TextureButton($"{Name}{index}", icon, IconSize))
-        {
-            Selection = item;
-            Changed = true;
-        }
+        //Style
+        bool selected = Selected.Contains(item);
+        Vector4 bg = selected ? new(.6f) : new(0);
+        if (Selection.Equals(item))
+            bg = new(0xAACC000011);
+
+        if (ImGui.TextureButton($"{Name}{index}", icon, IconSize, 1, bg))
+            SelectItem(item, index);
     }
 }
 

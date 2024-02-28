@@ -19,11 +19,6 @@ public abstract class IComp: IDisposable
     }
 
     /// <summary>
-    /// Draw the main content of the Filter
-    /// </summary>
-    public abstract void DrawBody();
-
-    /// <summary>
     /// Render the Filter, returning the finished state, the opposite of Open, to match the ImGui pattern?
     /// </summary>
     public virtual bool Check()
@@ -38,6 +33,11 @@ public abstract class IComp: IDisposable
 
         return Changed;
     }
+
+    /// <summary>
+    /// Draw the main content of the Filter
+    /// </summary>
+    public abstract void DrawBody();
 
     public virtual void Init() { }
 

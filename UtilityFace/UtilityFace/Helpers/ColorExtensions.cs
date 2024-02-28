@@ -1,7 +1,4 @@
-﻿using System.Drawing;
-using Vector3 = System.Numerics.Vector3;
-
-namespace UtilityFace.Helpers;
+﻿namespace UtilityFace.Helpers;
 public static class ColorExtensions
 {
     //https://stackoverflow.com/questions/801406/c-create-a-lighter-darker-color-based-on-a-system-color

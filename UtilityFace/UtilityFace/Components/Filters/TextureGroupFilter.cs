@@ -1,6 +1,4 @@
-﻿using UtilityFace.Components.Pickers;
-
-namespace UtilityFace.Components.Filters;
+﻿namespace UtilityFace.Components.Filters;
 
 public class TextureGroupFilter : IOptionalFilter<TextureGroup>
 {

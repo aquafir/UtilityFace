@@ -23,6 +23,9 @@ public abstract class IModal : IComp
     {
         if (ImGui.Button("Close"))
             Close();
+        ImGui.SameLine();
+        if (ImGui.Button("Cancel - todo"))
+            Close();
     }
 
     /// <summary>

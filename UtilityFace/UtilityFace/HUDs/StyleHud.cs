@@ -1,5 +1,4 @@
-﻿using UtilityFace.Components.Modals;
-using UtilityFace.Components.Pickers;
+﻿using System.Drawing.Drawing2D;
 
 namespace UtilityFace.HUDs;
 public class StyleHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)
@@ -21,6 +20,8 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
 
     Dictionary<Vector2, PickerModal<uint>> modals = new();
     static PickerModal<uint> Modal;
+
+    TexturedPicker<uint> picker;
     public override void Draw(object sender, EventArgs e)
     {
         if (texG.Check())
@@ -29,17 +30,24 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
 
             if (!TextureManager.TryGetModal(group.Size, out Modal))
                 return;
-
             //Set up the modal
             Modal.MinSize = new(525);
             Modal.Open();
-
         }
         if (Modal is null)
             return;
-        
-        if(Modal.Check())
+
+        if (Modal.Check())
             Log.Chat($"Picked {Modal.Selection}"); ;
+
+
+        //if (!TextureManager.TryGetPicker(new(128), out picker))
+        //    return;
+
+        //if(picker.Check())
+        //{
+        //    Log.Chat($"{picker.Selection} - {picker.Selected.Count}");
+        //}
 
         #region Ignore
         //if (ImGui.Button("Foo"))
