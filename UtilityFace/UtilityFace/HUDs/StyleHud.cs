@@ -1,4 +1,6 @@
-﻿using System.Drawing.Drawing2D;
+﻿using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Security.Policy;
 
 namespace UtilityFace.HUDs;
 public class StyleHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)
@@ -14,6 +16,26 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
     public override void Init()
     {
         texModal = new(new TextureGroupPicker());
+
+        Vector2 size = new(32);
+        Vector2 area = new(200);
+        //if (!TextureManager.TextureGroups.TryGetValue(size, out var ids))
+        //    return;
+
+        //picker = new(x => TextureManager.GetOrCreateTexture(x), ids);
+        //picker.PerPage = (int)Math.Max(1, 20480 * 3 / (size.X * size.Y));    //Page size based on texture size
+
+        ////Approximate size for a goal area?sqrt(Per page) rows x columns = 
+        //var rows = (int)Math.Max(1, Math.Sqrt(picker.PerPage));
+        //area /= rows;
+        ////Vector2 max = new(100);
+        //picker.IconSize = size.ScaleTo(area);
+
+        //if (!TextureManager.TryGetPicker(size, out picker))
+        //    return;
+
+
+
         base.Init();
     }
 
@@ -24,30 +46,29 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
     TexturedPicker<uint> picker;
     public override void Draw(object sender, EventArgs e)
     {
-        if (texG.Check())
-        {
-            var group = texG.Selection;
+        //if (texG.Check())
+        //{
+        //    var group = texG.Selection;
 
-            if (!TextureManager.TryGetModal(group.Size, out Modal))
-                return;
-            //Set up the modal
-            Modal.MinSize = new(525);
-            Modal.Open();
-        }
-        if (Modal is null)
-            return;
-
-        if (Modal.Check())
-            Log.Chat($"Picked {Modal.Selection}"); ;
-
-
-        //if (!TextureManager.TryGetPicker(new(128), out picker))
+        //    if (!TextureManager.TryGetModal(group.Size, out Modal))
+        //        return;
+        //    //Set up the modal
+        //    Modal.MinSize = new(525);
+        //    Modal.Open();
+        //}
+        //if (Modal is null)
         //    return;
 
-        //if(picker.Check())
-        //{
-        //    Log.Chat($"{picker.Selection} - {picker.Selected.Count}");
-        //}
+        //if (Modal.Check())
+        //    Log.Chat($"Picked {Modal.Selection}"); ;
+
+        if (!TextureManager.TryGetPicker(new(128), out picker))
+            return;
+
+        if (picker.Check())
+        {
+            Log.Chat($"{picker.Selection} - {picker.Selected.Count}");
+        }
 
         #region Ignore
         //if (ImGui.Button("Foo"))

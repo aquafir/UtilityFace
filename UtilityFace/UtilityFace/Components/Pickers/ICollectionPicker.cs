@@ -18,35 +18,40 @@ public abstract class ICollectionPicker<T> : IPicker<T>
     //Vector2 Size / float Width / etc.
 
 
-    public virtual void ToggleRange(int i)
+    public virtual void ToggleRange(T item)
     {
-        //Get index of selected
+        //Get index of already selected
         var list = Choices.ToList();
-        var currentIndex = Selection.Equals(default(T)) ? -1 : list.IndexOf(Selection);
+        var selectionIndex = Selection.Equals(default(T)) ? -1 : list.IndexOf(Selection);
 
         //Missing goes from start?
-        if (currentIndex < 0)
-            currentIndex = 0;
+        if (selectionIndex < 0)
+            selectionIndex = 0;
 
-        var start = Math.Min(currentIndex, i);
-        var end = Math.Max(currentIndex, i);
+        //Get index of item being selected
+        var targetIndex = list.IndexOf(item);
+
+
+        var start = Math.Min(selectionIndex, targetIndex);
+        var end = Math.Max(selectionIndex, targetIndex);
         var num = end - start + 1;
-
-        Log.Chat($"i={i} - {currentIndex} - {start} to {end}");
-
         var range = list.Skip(start).Take(num);
 
-        if (range.All(x => Selected.Contains(x)))
+        Log.Chat($"{start} to {end}: {range.Count()}");
+
+        bool allSelected = range.All(x => Selected.Contains(x));
+        if (allSelected)
         {
+            Selection = default(T);
             Log.Chat($"Remove");
             foreach (var e in range)
-                Remove(e);
+                Selected.Remove(e); //Remove(e);
         }
         else
         {
             Log.Chat($"Add");
             foreach (var e in range)
-                Add(e);
+                Selected.Add(e); //Add(e);
         }
     }
     /// <summary>
@@ -56,13 +61,16 @@ public abstract class ICollectionPicker<T> : IPicker<T>
     /// <param name="item"></param>
     public virtual bool Toggle(T item)
     {
+        //If the item could be added
         if (Selected.Add(item))
         {
+            Log.Chat($"Successfully added {item}");
             Selection = item;
             return true;
         }
         else
         {
+            Log.Chat($"Removed {item}");
             Selected.Remove(item);
             if (item.Equals(Selection))
                 Selection = default(T);
@@ -140,7 +148,7 @@ public abstract class ICollectionPicker<T> : IPicker<T>
         //TODO ADD MULTI SELECTION?
         if (ImGui.IsKeyDown(ImGuiKey.ModShift))
         {
-            ToggleRange(index);
+            ToggleRange(item);
             Changed = false;
             Log.Chat($"Range {index} - {Selected.Count} - {Selection}");
         }
@@ -156,6 +164,5 @@ public abstract class ICollectionPicker<T> : IPicker<T>
             Changed = true;
             Log.Chat($"Select {index} - {Selected.Count} - {Selection}");
         }
-
     }
 }

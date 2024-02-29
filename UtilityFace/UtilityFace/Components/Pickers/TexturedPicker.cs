@@ -1,6 +1,11 @@
 ﻿namespace UtilityFace.Components.Pickers;
 public class TexturedPicker<T> : IPagedPicker<T>
 {
+    static readonly Vector4 SELECTED_GROUP_BORDER = new(1);
+    static readonly Vector4 SELECTED_GROUP_TINT = new(.5f);
+    static readonly Vector4 SELECTED_TINT = new(.8f, .8f, 0, 1);
+    static readonly Vector4 SELECTED_BORDER = new(1, 1, 0, 1);
+
     /// <summary>
     /// Size of the TextureButtons used for selections
     /// </summary>
@@ -36,14 +41,23 @@ public class TexturedPicker<T> : IPagedPicker<T>
             ImGui.SameLine();
 
         var icon = textureMap(item);
+        Vector4 border = new(0);
+        Vector4 tint = new(1);
 
-        //Style
-        bool selected = Selected.Contains(item);
-        Vector4 bg = selected ? new(.6f) : new(0);
+        //Style based on whether select / in group / neither
+        int borderSize = 1;
         if (Selection.Equals(item))
-            bg = new(0xAACC000011);
+        {
+            border = SELECTED_BORDER;
+            tint = SELECTED_TINT;
+        }
+        else if (Selected.Contains(item))
+        {
+            border = SELECTED_GROUP_BORDER;
+            tint = SELECTED_GROUP_TINT;
+        }
 
-        if (ImGui.TextureButton($"{Name}{index}", icon, IconSize, 1, bg))
+        if (ImGui.TextureButton($"{Name}{index}", icon, IconSize, borderSize, border, tint))
             SelectItem(item, index);
     }
 }

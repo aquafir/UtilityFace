@@ -133,6 +133,8 @@ public static class TextureManager
             area /= rows;
             //Vector2 max = new(100);
             picker.IconSize = size.ScaleTo(area);
+
+            _pickers.AddOrUpdate(size, picker);
         }
 
         return true;
