@@ -1,11 +1,20 @@
-﻿namespace UtilityFace.HUDs;
+﻿using System.Drawing;
+using UtilityFace.Components.Pickers;
+
+namespace UtilityFace.HUDs;
+
+public class InventorySettings
+{
+    public bool showBags = true;
+    public bool showIcons = true;
+    public bool showExtraFilter;
+    public bool showGroupActions = true;
+    public bool showEquipment = true;
+}
 
 public class InventoryHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)
 {
     #region State / Config
-    ScriptHudManager sHud = new();
-    //readonly Hud ubHud;
-    //Game game = new();
     private float Index = 0;
     uint SelectedBag = 0;
     uint SelectedItem = 0;
@@ -22,11 +31,12 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
     bool refreshHud = false;
 
     //Options
-    bool showBags = true;
-    bool showIcons = true;
-    bool showExtraFilter;
-    bool showGroupActions = true;
-    bool showEquipment = true;
+    InventorySettings settings = new();
+    //bool showBags = true;
+    //bool showIcons = true;
+    //bool showExtraFilter;
+    //bool showGroupActions = true;
+    //bool showEquipment = true;
 
     #region Filter Setup
     //Standard name (maybe more?) filter
@@ -76,21 +86,16 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
 
     #endregion
 
+    ContainerPicker containers = new();
+    InventoryPicker inventory = new();
+
+
     #region Event Handling
-    private void Hud_OnShow(object sender, EventArgs e)
-    {
-        refreshHud = true;
-    }
-
+    private void Hud_OnShow(object sender, EventArgs e) => refreshHud = true;
     private void Incoming_Qualities_PrivateUpdateInstanceID(object sender, UtilityBelt.Common.Messages.Events.Qualities_PrivateUpdateInstanceID_S2C_EventArgs e)
-    {
-        refreshHud = true;
-    }
-
+        => refreshHud = true;
     private void Incoming_Qualities_UpdateInstanceID(object sender, UtilityBelt.Common.Messages.Events.Qualities_UpdateInstanceID_S2C_EventArgs e)
-    {
-        refreshHud = true;
-    }
+        => refreshHud = true;
 
     private void Game_OnRender2D(object sender, EventArgs e)
     {
@@ -116,9 +121,9 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
         if (ImGui.IsKeyDown(ImGuiKey.LeftCtrl))
         {
             if (ImGui.IsKeyPressed(ImGuiKey.B))
-                showBags = !showBags;
+                settings.showBags = !settings.showBags;
             if (ImGui.IsKeyPressed(ImGuiKey.E))
-                showExtraFilter = !showExtraFilter;
+                settings.showExtraFilter = !settings.showExtraFilter;
 
             if (ImGui.IsKeyPressed(ImGuiKey.I))
             {
@@ -136,20 +141,18 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
     }
     #endregion
 
+
     #region Draw
     public override void Draw(object sender, EventArgs e)
     {
         try
         {
-            //var watch = Stopwatch.StartNew();
             CheckRefresh();
             DrawOptions();
             DrawEquipment();
             DrawGroupActions();
             DrawFilters();
             DrawInventory();
-            //watch.Stop();
-            //C.Chat($"{watch.ElapsedMilliseconds}ms");
         }
         catch (Exception ex)
         {
@@ -164,11 +167,11 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
         {
             if (ImGui.BeginMenu("Options###InvOpt"))
             {
-                ImGui.MenuItem("Show Bags", "", ref showBags);
-                ImGui.MenuItem("Show Icons", "", ref showIcons);
-                ImGui.MenuItem("Show Extra Filters", "", ref showExtraFilter);
-                ImGui.MenuItem("Show Group Actions", "", ref showGroupActions);
-                ImGui.MenuItem("Show Equipment", "", ref showEquipment);
+                ImGui.MenuItem("Show Bags", "", ref settings.showBags);
+                ImGui.MenuItem("Show Icons", "", ref settings.showIcons);
+                ImGui.MenuItem("Show Extra Filters", "", ref settings.showExtraFilter);
+                ImGui.MenuItem("Show Group Actions", "", ref settings.showGroupActions);
+                ImGui.MenuItem("Show Equipment", "", ref settings.showEquipment);
 
                 ImGui.EndMenu();
             }
@@ -193,7 +196,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
 
     private void DrawEquipment()
     {
-        if (!showEquipment)
+        if (!settings.showEquipment)
             return;
 
         EquipmentHelper.DrawEquipment();
@@ -201,7 +204,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
 
     private void DrawGroupActions()
     {
-        if (!showGroupActions)
+        if (!settings.showGroupActions)
             return;
 
         if (ImGui.Button("Drop All"))
@@ -233,7 +236,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
         }
 
         //Extra filter section
-        if (!showExtraFilter) return;
+        if (!settings.showExtraFilter) return;
 
         bool changed = false;
 
@@ -280,7 +283,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
         FilterRegex = new(FilterText, RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         //ExtraFilter stuff
-        if (showExtraFilter)
+        if (settings.showExtraFilter)
         {
             //Set up custom filter for either a string or a ValueRequirement
             if (propType == PropType.String)
@@ -333,7 +336,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
             return true;
 
         //Filter by prop
-        if (!showExtraFilter)
+        if (!settings.showExtraFilter)
             return false;
 
         //Skip missing?
@@ -369,7 +372,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
     {
         //If a bag is selected and available use the items in it, otherwise use the inventory
         var bag = game.World.Get(SelectedBag);
-        var items = !showBags || bag is null ? game.Character.Inventory : bag.Items;
+        var items = !settings.showBags || bag is null ? game.Character.Inventory : bag.Items;
 
         filteredItems = items.Where(x => !IsFiltered(x)).ToList();
         //C.Chat($"Rebuild filter {items.Count}->{filteredItems.Count}");
@@ -381,7 +384,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
     {
         Index = 0;
 
-        if (showBags)
+        if (settings.showBags)
         {
             //Create a 2 - column table for bags and inventory
             if (ImGui.BeginTable("layout", 2, ImGuiTableFlags.BordersInner | ImGuiTableFlags.ContextMenuInBody))
@@ -418,7 +421,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
     private void DrawItems()
     {
         //Start the content area for items based on whether icons or a table is used
-        if (showIcons)
+        if (settings.showIcons)
             DrawItemsAsIcons();
         else
             DrawItemsAsTable();
@@ -479,7 +482,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
             ImGui.Text(wo.Name);
             DrawItemContextMenu(wo);
 
-            if (showExtraFilter && propFilter.EnumIndex != null)
+            if (settings.showExtraFilter && propFilter.EnumIndex != null)
             {
                 ImGui.TableSetColumnIndex((int)ItemColumn.Value);
                 ImGui.Text(propFilter.FindValue(wo) ?? "");
@@ -495,12 +498,12 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
 
     private void BeginBagTable()
     {
-        ImGui.BeginTable("items-table", showExtraFilter ? COLUMN_FLAGS.Count : COLUMN_FLAGS.Count - 1, TABLE_FLAGS, ImGui.GetContentRegionAvail());
+        ImGui.BeginTable("items-table", settings.showExtraFilter ? COLUMN_FLAGS.Count : COLUMN_FLAGS.Count - 1, TABLE_FLAGS, ImGui.GetContentRegionAvail());
 
         ImGui.TableSetupColumn("Icon", COLUMN_FLAGS[ItemColumn.Icon], IconSize.X + ICON_PAD, (int)ItemColumn.Icon);
         ImGui.TableSetupColumn("Name", COLUMN_FLAGS[ItemColumn.Name], 0, (int)ItemColumn.Name);
 
-        if (showExtraFilter && propFilter.EnumIndex != null)
+        if (settings.showExtraFilter && propFilter.EnumIndex != null)
             ImGui.TableSetupColumn(propFilter.Selection, COLUMN_FLAGS[ItemColumn.Value], 60, (int)ItemColumn.Value);
         //else
         //    ImGui.TableSetupColumn("Value", COLUMN_FLAGS[ItemColumn.Value], 60, (int)ItemColumn.Value);
@@ -590,9 +593,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
     private void DrawBagItemTooltip(WorldObject wo)
     {
         if (ImGui.IsItemHovered())
-        {
             wo.DrawTooltip();
-        }
     }
 
     /// <summary>
@@ -654,24 +655,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
                 item.Give(game.World.Selected.Id);
 
         return;
-        foreach (var item in filteredItems)
-        {
-            using (var stream = new MemoryStream())
-            using (var writer = new BinaryWriter(stream))
-            {
-                writer.Write((uint)0xF7B1); // order header
-                writer.Write((uint)0x0); // sequence.. ace doesnt verify this
-                writer.Write((uint)0x00CD); // give item
-                writer.Write(game.World.Selected.Id); //target
-                writer.Write((uint)item); // item
-                writer.Write(1); // amount
-                var bytes = stream.ToArray();
-                fixed (byte* bytesPtr = bytes)
-                {
-                    Proto_UI.SendToControl((char*)bytesPtr, bytes.Length);
-                }
-            }
-        }
+
     }
 
     #region Sorting
@@ -700,7 +684,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
             {
                 1 => filteredItems.OrderBy(x => x.Name).ToList(),
                 //Default to value
-                2 when !showExtraFilter => filteredItems.OrderBy(x => x.Value(IntId.Value)).ToList(),
+                2 when !settings.showExtraFilter => filteredItems.OrderBy(x => x.Value(IntId.Value)).ToList(),
                 //StringProp
                 2 when valueRequirement is null => filteredItems.OrderBy(x => propFilter.FindValue(x) ?? "").ToList(),
                 //Value requirement available
@@ -714,7 +698,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
             {
                 1 => filteredItems.OrderByDescending(x => x.Name).ToList(),
                 //Default to value
-                2 when !showExtraFilter => filteredItems.OrderByDescending(x => x.Value(IntId.Value)).ToList(),
+                2 when !settings.showExtraFilter => filteredItems.OrderByDescending(x => x.Value(IntId.Value)).ToList(),
                 //StringProp
                 2 when valueRequirement is null => filteredItems.OrderByDescending(x => propFilter.FindValue(x) ?? "").ToList(),
                 //Value requirement available
@@ -778,6 +762,8 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
 
     public override void Init()
     {
+        ubHud.WindowSettings |= ImGuiWindowFlags.MenuBar;
+
         SelectedBag = game.CharacterId;
         UpdateFilters();
 

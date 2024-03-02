@@ -1,5 +1,6 @@
 ﻿namespace UtilityFace.Components.Pickers;
 
+
 public abstract class ICollectionPicker<T> : IPicker<T>
 {
     //Debated about where to put this.  Some choices till be different, like string[] for Combos and mapped to the generic type
@@ -14,11 +15,123 @@ public abstract class ICollectionPicker<T> : IPicker<T>
     /// </summary>
     public System.Collections.Generic.HashSet<T> Selected;
 
-    //How to handle layout?
-    //Vector2 Size / float Width / etc.
+    /// <summary>
+    /// Controls how selecting items works
+    /// </summary>
+    public SelectionStyle Mode = SelectionStyle.Single;
+
+    public override void Init()
+    {
+        Selected = new();
+        base.Init();
+    }
+
+    public override void DrawBody()
+    {
+        //Index used for line breaks?
+        int index = 0;
+
+        foreach (var choice in Choices)
+            DrawItem(choice, index++);
+
+        if (Mode.HasFlag(SelectionStyle.Multiple))
+            DrawSelectionControls();
+    }
+
+    public virtual void DrawSelectionControls()
+    {
+        if (ImGui.Button($"Clear##{_id}"))
+            ClearSelection();
+        ImGui.SameLine();
+        if (ImGui.Button($"Select All##{_id}"))
+        {
+            Selection = Choices.FirstOrDefault();
+            Selected = Choices.ToHashSet();
+        }
+        ImGui.SameLine();
+        if (ImGui.Button($"Accept##{_id}"))
+            Changed = true;
+    }
+
+    //public abstract void DrawItem(T item, int index);
+    public virtual void DrawItem(T item, int index) { }
+
+    /// <summary>
+    /// Called when an item is interacted with
+    /// </summary>
+    public virtual void SelectItem(T item, int index)
+    {
+        //TODO ADD MULTI SELECTION?
+        switch (Mode)
+        {
+            case SelectionStyle.Single:
+                SelectOnly(item); //Selection = item;
+                Changed = true;
+                Log.Chat($"Select {index} - {Selected.Count} - {Selection}");
+                break;
+
+            case SelectionStyle.Multiple:
+                if (ImGui.IsKeyDown(ImGuiKey.ModShift))
+                {
+                    SelectRange(item);
+                    Changed = false;
+                    Log.Chat($"Range {index} - {Selected.Count} - {Selection}");
+                }
+                else if (ImGui.IsKeyDown(ImGuiKey.ModCtrl))
+                {
+                    Toggle(item);
+                    Changed = false;
+                    Log.Chat($"Toggle {index} - {Selected.Count} - {Selection}");
+                }
+                else
+                {
+                    SelectOnly(item); //Selection = item;
+                    Changed = true;
+                    Log.Chat($"Select {index} - {Selected.Count} - {Selection}");
+                }
+                break;
+        }
+    }
 
 
-    public virtual void ToggleRange(T item)
+    /// <summary>
+    /// Toggles the presence of a Choice in Selected, setting Selection to the item if it is being added.
+    /// Returns true if the item was added
+    /// </summary>
+    /// <param name="item"></param>
+    public virtual bool Toggle(T item)
+    {
+        //If the item could be added
+        if (Selected.Add(item))
+        {
+            Log.Chat($"Successfully added {item}");
+            Selection = item;
+            return true;
+        }
+        else
+        {
+            Log.Chat($"Removed {item}");
+            Selected.Remove(item);
+            if (item.Equals(Selection))
+                Selection = default(T);
+
+            return false;
+        }
+    }
+    /// <summary>
+    /// Select an individual item, clearing any already 
+    /// </summary>
+    public virtual void SelectOnly(T item)
+    {
+        Selected.Clear();
+        Selected.Add(item);
+        Selection = item;
+    }
+    /// <summary>
+    /// Selects all elements between the already selected one (or the initial item) and the target one.  If all items are already selected, deselect them
+    /// </summary>
+    /// <param name="item"></param>
+    public virtual void SelectRange(T item)
     {
         //Get index of already selected
         var list = Choices.ToList();
@@ -54,115 +167,34 @@ public abstract class ICollectionPicker<T> : IPicker<T>
                 Selected.Add(e); //Add(e);
         }
     }
+
+    protected void ClearSelection()
+    {
+        Selection = default(T);
+        Selected?.Clear();
+    }
+}
+
+
+
+/// <summary>
+/// Todo: think about this
+/// </summary>
+[Flags]
+public enum SelectionStyle
+{
     /// <summary>
-    /// Toggles the presence of a Choice in Selected, setting Selection to the item if it is being added.
-    /// Returns true if the item was added
+    /// Displays with no selection
     /// </summary>
-    /// <param name="item"></param>
-    public virtual bool Toggle(T item)
-    {
-        //If the item could be added
-        if (Selected.Add(item))
-        {
-            Log.Chat($"Successfully added {item}");
-            Selection = item;
-            return true;
-        }
-        else
-        {
-            Log.Chat($"Removed {item}");
-            Selected.Remove(item);
-            if (item.Equals(Selection))
-                Selection = default(T);
-
-            return false;
-        }
-    }
+    None = 0x0,
     /// <summary>
-    /// Select an individual item
+    /// Any selection sets the picker to interacted with
     /// </summary>
-    public virtual void Select(T item, bool deselect = false)
-    {
-        if (deselect)
-        {
-            item = default(T);
-            Selected.Remove(item);
-        }
-        else
-        {
-            Selection = item;
-            Selected.Add(item);
-        }
-    }
+    Single = 0x1,
     /// <summary>
-    /// Adds item to the Selection
+    /// Adds shift/ctrl modifiers for selection
     /// </summary>
-    public virtual bool Add(T item)
-    {
-        if (Selected.Add(item))
-        {
-            Selection = item;
-            return true;
-        }
-        return false;
-    }
-    /// <summary>
-    /// Removes item from the Selection
-    /// </summary>
-    public virtual bool Remove(T item)
-    {
-        if (Selected.Contains(item))
-        {
-            Selected.Remove(item);
-            if (item.Equals(Selection))
-                Selection = default(T);
+    Multiple = 0x2,
 
-            return true;
-        }
-        return false;
-    }
-
-    public override void Init()
-    {
-        Selected = new();
-        base.Init();
-    }
-
-    public override void DrawBody()
-    {
-        //Index used for line breaks?
-        int index = 0;
-
-        foreach (var choice in Choices)
-            DrawItem(choice, index++);
-    }
-
-    //public abstract void DrawItem(T item, int index);
-    public virtual void DrawItem(T item, int index) { }
-
-    /// <summary>
-    /// Called when an item is interacted with
-    /// </summary>
-    public virtual void SelectItem(T item, int index)
-    {
-        //TODO ADD MULTI SELECTION?
-        if (ImGui.IsKeyDown(ImGuiKey.ModShift))
-        {
-            ToggleRange(item);
-            Changed = false;
-            Log.Chat($"Range {index} - {Selected.Count} - {Selection}");
-        }
-        else if (ImGui.IsKeyDown(ImGuiKey.ModCtrl))
-        {
-            Toggle(item);
-            Changed = false;
-            Log.Chat($"Toggle {index} - {Selected.Count} - {Selection}");
-        }
-        else
-        {
-            Select(item); //Selection = item;
-            Changed = true;
-            Log.Chat($"Select {index} - {Selected.Count} - {Selection}");
-        }
-    }
+    //    Immediate = 0x4,
 }

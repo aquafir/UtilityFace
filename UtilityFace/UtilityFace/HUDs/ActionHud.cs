@@ -53,7 +53,7 @@ public class ActionBar : TexturedPicker<Action>
         var color = item == Selection ? Color.Blue.ToVec4() : new System.Numerics.Vector4(0);
         if (ImGui.TextureButton($"{Name}{index}", icon, IconSize, 1, color))
         {
-            Select(item); //Selection = item;
+            SelectOnly(item); //Selection = item;
             Changed = true;
         }
 
@@ -117,7 +117,7 @@ public class ActionBar : TexturedPicker<Action>
         {
             if (ImGui.IsKeyPressed(kvp.Key))
             {
-                Select(Choices.ElementAt(kvp.Value - 1));
+                SelectOnly(Choices.ElementAt(kvp.Value - 1));
                 //Selection = Choices.ElementAt(kvp.Value - 1);
                 Changed = true;
 

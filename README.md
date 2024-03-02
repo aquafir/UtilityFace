@@ -1,11 +1,6 @@
-Adding dll:
+## Todo
 
-* if you search for `${APPNAME}.pdb` in the installer you should see the two spots, one to copy on install and one to delete on uninstall
-
-* if you need subdirs it looks like this: https://gitlab.com/trevis/lbvisualizer/-/blob/master/LBVisualizer/scripts/installer.nsi?ref_type=heads#L150
-
-  
-
+* Fix `ScreenAdjust` for radar
 
 
 ## HUDs

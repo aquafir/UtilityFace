@@ -69,7 +69,7 @@ public abstract class IPagedPicker<T> : ICollectionPicker<T>  //where T
         var p = page.Count;
         var next = ((index + offset) % p + p) % p;
 
-        Select(page[next]); //Selection = page[next];
+        SelectOnly(page[next]); //Selection = page[next];
     }
 
     /// <summary>

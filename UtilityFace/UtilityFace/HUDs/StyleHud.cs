@@ -13,29 +13,12 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
     //PickerModal<ManagedTexture> texModal;
     PickerModal<uint> texModal;
 
+    ContainerPicker containers = new();
+    InventoryPicker inventory = new();
     public override void Init()
     {
-        texModal = new(new TextureGroupPicker());
-
-        Vector2 size = new(32);
-        Vector2 area = new(200);
-        //if (!TextureManager.TextureGroups.TryGetValue(size, out var ids))
-        //    return;
-
-        //picker = new(x => TextureManager.GetOrCreateTexture(x), ids);
-        //picker.PerPage = (int)Math.Max(1, 20480 * 3 / (size.X * size.Y));    //Page size based on texture size
-
-        ////Approximate size for a goal area?sqrt(Per page) rows x columns = 
-        //var rows = (int)Math.Max(1, Math.Sqrt(picker.PerPage));
-        //area /= rows;
-        ////Vector2 max = new(100);
-        //picker.IconSize = size.ScaleTo(area);
-
-        //if (!TextureManager.TryGetPicker(size, out picker))
-        //    return;
-
-
-
+        containers.Choices = ContainerPicker.GetPlayerContainers();
+        inventory.Choices = HudBase.game.Character.Inventory.ToArray();
         base.Init();
     }
 
@@ -43,32 +26,33 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
     Dictionary<Vector2, PickerModal<uint>> modals = new();
     static PickerModal<uint> Modal;
 
-    TexturedPicker<uint> picker;
+    //TexturedPicker<uint> picker;
     public override void Draw(object sender, EventArgs e)
     {
-        //if (texG.Check())
-        //{
-        //    var group = texG.Selection;
+        //Draw vertical containers
+        ImGui.BeginChild("test", new(34, -1));
+        if (containers.Check())
+        {
+            containers.Choices = ContainerPicker.GetPlayerContainers().ToArray();
 
-        //    if (!TextureManager.TryGetModal(group.Size, out Modal))
-        //        return;
-        //    //Set up the modal
-        //    Modal.MinSize = new(525);
-        //    Modal.Open();
-        //}
-        //if (Modal is null)
+        }
+        ImGui.EndChild();
+
+        //Draw inventory to the rest
+        ImGui.SameLine();
+        ImGui.BeginChild("Inventory", ImGui.GetContentRegionAvail());
+        if (inventory.Check())
+        {
+        }
+        ImGui.EndChild();
+
+        //if (!TextureManager.TryGetPicker(new(128), out picker))
         //    return;
 
-        //if (Modal.Check())
-        //    Log.Chat($"Picked {Modal.Selection}"); ;
-
-        if (!TextureManager.TryGetPicker(new(128), out picker))
-            return;
-
-        if (picker.Check())
-        {
-            Log.Chat($"{picker.Selection} - {picker.Selected.Count}");
-        }
+        //if (picker.Check())
+        //{
+        //    Log.Chat($"{picker.Selection} - {picker.Selected.Count}");
+        //}
 
         #region Ignore
         //if (ImGui.Button("Foo"))

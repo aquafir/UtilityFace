@@ -7,7 +7,7 @@ public abstract class HudBase : IDisposable
     public Hud ubHud;
 
     //Defaults?
-    const ImGuiWindowFlags CHAT_WINDOW_FLAGS = ImGuiWindowFlags.HorizontalScrollbar | ImGuiWindowFlags.AlwaysAutoResize;
+    const ImGuiWindowFlags CHAT_WINDOW_FLAGS = ImGuiWindowFlags.HorizontalScrollbar;
 
 
     public HudBase(string name, bool showInBar = false, bool visible = false)

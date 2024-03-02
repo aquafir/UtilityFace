@@ -35,7 +35,7 @@ public class TextureGroupPicker : ICollectionPicker<TextureGroup>
                 bool open;
                 if (ImGui.Selectable(choiceCombo[i]))
                 {
-                    Select(Choices.ElementAt(i)); //Selection = Choices.ElementAt(i);
+                    SelectOnly(Choices.ElementAt(i)); //Selection = Choices.ElementAt(i);
                     Log.Chat($"Selected {Selection}");
                     Changed = true;
                 }

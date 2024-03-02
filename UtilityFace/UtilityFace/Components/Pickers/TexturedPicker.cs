@@ -1,10 +1,10 @@
 ﻿namespace UtilityFace.Components.Pickers;
 public class TexturedPicker<T> : IPagedPicker<T>
 {
-    static readonly Vector4 SELECTED_GROUP_BORDER = new(1);
-    static readonly Vector4 SELECTED_GROUP_TINT = new(.5f);
+    static readonly Vector4 SELECTED_BACKGROUND = new(1, 1, 0, .8f);
+    static readonly Vector4 SELECTED_GROUP_BACKGROUND = new(1, 1, 1, .3f);
     static readonly Vector4 SELECTED_TINT = new(.8f, .8f, 0, 1);
-    static readonly Vector4 SELECTED_BORDER = new(1, 1, 0, 1);
+    static readonly Vector4 SELECTED_GROUP_TINT = new(1f);
 
     /// <summary>
     /// Size of the TextureButtons used for selections
@@ -41,23 +41,23 @@ public class TexturedPicker<T> : IPagedPicker<T>
             ImGui.SameLine();
 
         var icon = textureMap(item);
-        Vector4 border = new(0);
+        Vector4 bg = new(0);
         Vector4 tint = new(1);
 
         //Style based on whether select / in group / neither
-        int borderSize = 1;
-        if (Selection.Equals(item))
+        int borderSize = 2;
+
+        if (Selection is not null && Selection.Equals(item))
         {
-            border = SELECTED_BORDER;
-            tint = SELECTED_TINT;
+            bg = SELECTED_BACKGROUND;
+            //tint = SELECTED_TINT;
         }
         else if (Selected.Contains(item))
         {
-            border = SELECTED_GROUP_BORDER;
-            tint = SELECTED_GROUP_TINT;
+            bg = SELECTED_GROUP_BACKGROUND;
+            //tint = SELECTED_GROUP_TINT;
         }
-
-        if (ImGui.TextureButton($"{Name}{index}", icon, IconSize, borderSize, border, tint))
+        if (ImGui.TextureButton($"{Name}{index}", icon, IconSize, borderSize, bg))//, tint))
             SelectItem(item, index);
     }
 }

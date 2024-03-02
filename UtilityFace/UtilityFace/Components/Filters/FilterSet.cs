@@ -7,14 +7,6 @@ public class FilterSet<T>(List<IFilter<T>> filters) : IFilter<T>
     public List<IFilter<T>> Filters = filters;
 
     /// <summary>
-    /// Checks if any Filter has been interacted with
-    /// </summary>
-    //public override bool Check()
-    //{
-    //    retu
-    //}
-
-    /// <summary>
     /// Returns all items that have not been filtered
     /// </summary>
     public override IEnumerable<T> GetFiltered(IEnumerable<T> input) => input.Where(x => !IsFiltered(x));
@@ -33,4 +25,18 @@ public class FilterSet<T>(List<IFilter<T>> filters) : IFilter<T>
                 Changed = true;
         }
     }
+}
+
+public class AdjustableFilterSet<T>(List<IFilter<T>> filters) : FilterSet<T>(filters)
+{
+
+    public override void DrawBody()
+    {
+        foreach (var filter in Filters)
+        {
+            if (filter.Check())
+                Changed = true;
+        }
+    }
+
 }

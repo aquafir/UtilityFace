@@ -1,5 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text;
+using UtilityFace.HUDs;
 
 namespace UtilityFace.Helpers;
 
@@ -42,6 +44,49 @@ public static class ImGuiDragDrop
         payload = (pload != null) ? Encoding.Default.GetString((byte*)pload->Data, pload->DataSize) : null;
         return pload != null;
     }
+
+
+
+    const string WO_ID = "WO";
+    /// <summary>
+    /// Checks if this WorldObject has been dragged
+    /// </summary>
+    /// <param name="item"></param>
+    public static void AddDragDrop(this WorldObject item)
+    {
+        if (ImGui.BeginDragDropSource(ImGuiDragDropFlags.None))
+        {
+            ImGuiDragDrop.SetDragDropPayload<WorldObject>(WO_ID, item);
+            ImGui.EndDragDropSource();
+        }
+    }
+    /// <summary>
+    /// Checks if a dragged WorldObject interacts with the previous ImGui element
+    /// </summary>
+    /// <returns></returns>
+    public static bool TryAcceptDrop(this WorldObject item, out WorldObject payload)
+    {
+        payload = null;
+        if (ImGui.BeginDragDropTarget())
+        {
+            if (ImGuiDragDrop.AcceptDragDropPayload<WorldObject>(WO_ID, out payload))
+            {
+  //              Log.Chat($"Drop {payload.Name ?? "n/a"}");
+                //Won't hit the other
+//                ImGui.EndDragDropTarget();
+
+                if (payload is null)
+                    return false;
+                else return true;
+
+                return payload is null;
+            }
+            ImGui.EndDragDropTarget();
+        }
+
+        return false;
+    }
+    
 }
 
 public static class ImGuiExtensions
