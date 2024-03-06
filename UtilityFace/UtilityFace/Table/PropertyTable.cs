@@ -254,18 +254,18 @@ public class PropertyTable
 
     public void RenderEdit(PropertyTable table, TableRow row, int i)
     {
-        //Special handling of enum type
-        bool changed = false;
-
-        if (Type == PropType.Int && ((IntId)row.Key).TryGetEnumNames(out var names))
-            changed = RenderPickEnum(row, i, names);
-        else if (Type == PropType.DataId && row.Property.Contains("Icon"))
-            //else if (Type == PropType.DataId && ((DataId)row.Key) == DataId.Icon)
-            changed = RenderPickIcon(row, i);
-        else if (Type == PropType.Bool)
-            changed = RenderPickBool(row, i);
-        else if (ImGui.InputText($"###{Type}{i}", ref row.CurrentValue, 300, ImGuiInputTextFlags.EnterReturnsTrue))
-            changed = true;
+        //Render input components and check if they've changed
+        bool changed = Type switch
+        {
+            //Checkbox
+            PropType.Bool => RenderPickBool(row, i),
+            //Icons
+            PropType.DataId when row.Property.Contains("Icon") => RenderPickIcon(row, i),
+            //Enum ints
+            PropType.Int when ((IntId)row.Key).TryGetEnumNames(out var names) => RenderPickEnum(row, i, names),
+            //Default to a string
+            _ => ImGui.InputText($"###{Type}{i}", ref row.CurrentValue, 300, ImGuiInputTextFlags.EnterReturnsTrue),
+        };
 
         if (changed)
         {
