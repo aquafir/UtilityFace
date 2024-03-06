@@ -112,7 +112,7 @@ public static class EquipmentHelper
         if (wo.ValidWieldedLocations.HasFlag(EquipMask.Ammunition))
             slots.Add(EquipSlots.Ammunition);
         if (wo.ValidWieldedLocations.HasFlag(EquipMask.Wand) || 
-            wo.ValidWieldedLocations.HasFlag(EquipMask.MeleeWeapon) || 
+            wo.ValidWieldedLocations.HasFlag(EquipMask.MissileWeapon) || 
             wo.ValidWieldedLocations.HasFlag(EquipMask.MeleeWeapon))
             slots.Add(EquipSlots.Weapon);
         if (wo.ValidWieldedLocations.HasFlag(EquipMask.Necklace))

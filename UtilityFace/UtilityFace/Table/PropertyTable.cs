@@ -256,11 +256,14 @@ public class PropertyTable
     {
         //Special handling of enum type
         bool changed = false;
+
         if (Type == PropType.Int && ((IntId)row.Key).TryGetEnumNames(out var names))
             changed = RenderPickEnum(row, i, names);
         else if (Type == PropType.DataId && row.Property.Contains("Icon"))
             //else if (Type == PropType.DataId && ((DataId)row.Key) == DataId.Icon)
             changed = RenderPickIcon(row, i);
+        else if (Type == PropType.Bool)
+            changed = RenderPickBool(row, i);
         else if (ImGui.InputText($"###{Type}{i}", ref row.CurrentValue, 300, ImGuiInputTextFlags.EnterReturnsTrue))
             changed = true;
 
@@ -290,7 +293,7 @@ public class PropertyTable
                 PropType.InstanceId => $"/setproperty PropertyInstanceId.{row.Property} {row.CurrentValue}",
                 PropType.Int => $"/setproperty PropertyInt.{row.Property} {row.CurrentValue}",
                 PropType.Int64 => $"/setproperty PropertyInt64.{row.Property} {row.CurrentValue}",
-                PropType.String => $"/setproperty PropertyString.{row.Property} {row.CurrentValue}",
+                PropType.String => $"/setproperty PropertyString.{row.Property} \"{row.CurrentValue}\"",
             };
 
             g.Actions.InvokeChat(cmd);
@@ -388,5 +391,19 @@ public class PropertyTable
 
         return false;
     }
+
+    private bool RenderPickBool(TableRow row, int i)
+    {
+        if (!bool.TryParse(row.CurrentValue, out var value))
+            return false;
+
+        if(ImGui.Checkbox($"##{i}", ref value))
+        {
+            row.CurrentValue = value.ToString();
+            return true;
+        }
+
+        return false;
+    }    
 }
 

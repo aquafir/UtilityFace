@@ -1,6 +1,8 @@
 ﻿using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Security.Policy;
+using UtilityBelt.Service.Views.SettingsEditor;
+using UtilityFace.Settings;
 
 namespace UtilityFace.HUDs;
 public class StyleHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)
@@ -45,14 +47,6 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
         {
         }
         ImGui.EndChild();
-
-        //if (!TextureManager.TryGetPicker(new(128), out picker))
-        //    return;
-
-        //if (picker.Check())
-        //{
-        //    Log.Chat($"{picker.Selection} - {picker.Selected.Count}");
-        //}
 
         #region Ignore
         //if (ImGui.Button("Foo"))
@@ -113,5 +107,28 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
         //ImGui.Text($"{truth}"); 
         #endregion
     }
+
+    
+
+
+    #region Settings
+    protected override void AddEvents()
+    {
+        PluginCore.Settings.Changed += Settings_Changed;
+
+        base.AddEvents();
+    }
+    protected override void RemoveEvents()
+    {
+        PluginCore.Settings.Changed -= Settings_Changed;
+        base.RemoveEvents();
+    }
+    private void Settings_Changed(object sender, SettingChangedEventArgs e)
+    {
+        //DisposeLandblockBoundaries();
+        //TryUpdateLandblockBoundaries();
+        Log.Chat("Settings changed!");
+    }
+    #endregion
 }
 

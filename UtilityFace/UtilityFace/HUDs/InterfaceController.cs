@@ -1,4 +1,6 @@
 ﻿using UtilityBelt.Service.Lib.Settings;
+using UtilityBelt.Service.Views.SettingsEditor;
+using UtilityFace.Settings;
 
 namespace UtilityFace.HUDs;
 
@@ -8,7 +10,7 @@ namespace UtilityFace.HUDs;
 internal class InterfaceController(string name) : SizedHud(name, true, true)
 {
 
-//    public Settings Settings;
+    //    public Settings Settings;
 
     //[Summary("Show landblock boundaries")]
     public Global<bool> ShowLandblockBoundaries = new(false);
@@ -20,9 +22,7 @@ internal class InterfaceController(string name) : SizedHud(name, true, true)
     //Settings = new Settings(this, settingsPath, p => p.SettingType == SettingType.Global, null, "LBVisualizer Settings");
     //Settings.Load();
 
-    //SettingsEditor _settingsUI = new SettingsEditor("My Settings", new List<object>() { typeof(SettingsRoot)
-    //    });
-    // dispose _settingsUI later...
+    SettingsEditor settingsEditor;
 
     List<HudBase> Huds = new();
 
@@ -40,7 +40,7 @@ internal class InterfaceController(string name) : SizedHud(name, true, true)
             //new RadarHud("Radar", true, true),
             //new ActionHud("ActionBar", true, true),
             //new DragHud("Drag", true, true),  //Shows drag/top functionality
-            new StyleHud("Styles", true, true),
+            //new StyleHud("Styles", true, true),
         };
 
         ubHud.WindowSettings = ImGuiWindowFlags.AlwaysAutoResize;
@@ -54,11 +54,26 @@ internal class InterfaceController(string name) : SizedHud(name, true, true)
         ImGui.Text("UIs");
 
         //if (ImGui.Button("Settings"))
-        //{
         //    _settingsUI.Hud.Visible = !_settingsUI.Hud.Visible;
-        //}
 
-        foreach (var hud in Huds)
+
+        if (ImGui.Button("Settings"))
+        {
+            //settingsEditor = new SettingsEditor("My Settings", new List<object>() { typeof(TestSettings) });
+            if (settingsEditor == null)
+            {
+                settingsEditor = new SettingsEditor("UBService Settings", new object[] { typeof(SettingsRoot) });
+                settingsEditor.Hud.ShowInBar = false;
+                settingsEditor.Hud.OnHide += (s, e) =>
+                {
+                    settingsEditor?.Dispose();
+                    settingsEditor = null;
+                };
+            }
+            settingsEditor.Hud.Visible = !settingsEditor.Hud.Visible;
+        }
+
+            foreach (var hud in Huds)
         {
             bool vis = hud.ubHud.Visible;
             if (ImGui.Checkbox(hud.Name, ref vis))
@@ -155,16 +170,8 @@ internal class InterfaceController(string name) : SizedHud(name, true, true)
                 hud?.Dispose();
             Huds.Clear();
 
-            //if (Settings != null)
-            //{
 
-            //    if (Settings.NeedsSave)
-            //    {
-            //        Settings.Save();
-            //    }
-            //}
-
-            //_settingsUI?.Dispose();
+            settingsEditor?.Dispose();
         }
         catch (Exception ex)
         {

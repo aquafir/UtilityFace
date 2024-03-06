@@ -20,6 +20,7 @@ global using UtilityFace.Components.Pickers;
 global using UtilityFace.Helpers;
 global using UtilityFace.Table;
 global using UtilityFace;
+global using UtilityBelt.Service.Lib.Settings;
 
 global using Attribute = UtilityBelt.Scripting.Interop.Attribute;
 global using Hud = UtilityBelt.Service.Views.Hud;
@@ -31,3 +32,5 @@ global using Vector4 = System.Numerics.Vector4;
 global using Quaternion = System.Numerics.Quaternion;
 global using Vital = UtilityBelt.Scripting.Interop.Vital;
 global using WorldObject = UtilityBelt.Scripting.Interop.WorldObject;
+//Was confusing namespace/type for Settings
+global using S = UtilityBelt.Service.Lib.Settings.Settings;
