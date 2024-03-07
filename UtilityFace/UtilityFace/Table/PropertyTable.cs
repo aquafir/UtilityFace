@@ -1,4 +1,7 @@
-﻿namespace UtilityFace.Table;
+﻿using System.CodeDom;
+using UtilityBelt.Service.Views;
+
+namespace UtilityFace.Table;
 
 public class PropertyTable
 {
@@ -262,7 +265,7 @@ public class PropertyTable
             //Icons
             PropType.DataId when row.Property.Contains("Icon") => RenderPickIcon(row, i),
             //Enum ints
-            PropType.Int when ((IntId)row.Key).TryGetEnumNames(out var names) => RenderPickEnum(row, i, names),
+            PropType.Int when ((IntId)row.Key).TryGetEnumType(out var type) => RenderPickEnum(row, i, type),
             //Default to a string
             _ => ImGui.InputText($"###{Type}{i}", ref row.CurrentValue, 300, ImGuiInputTextFlags.EnterReturnsTrue),
         };
@@ -305,11 +308,23 @@ public class PropertyTable
     /// <summary>
     /// Render a combobox for an enum
     /// </summary>
-    private bool RenderPickEnum(TableRow row, int i, string[] names)
+    private bool RenderPickEnum(TableRow row, int i, Type type)
     {
+        //Check if this enum uses flags
+        if(type.IsDefined(typeof(FlagsAttribute), false))
+        {
+            ImGui.Text("Uses flags");
+            return false;
+        }
+
+        //Get cached names for enum
+        if (!((IntId)row.Key).TryGetEnumNames(out var names))
+            return false;
+
         if (!int.TryParse(row.CurrentValue, out var value))
         {
-            Log.Chat($"Can't parse?");
+            ImGui.Text("Parse failure");
+            return false;
         }
 
         if (ImGui.Combo($"###{Type}{i}", ref value, names, names.Length))
@@ -320,6 +335,13 @@ public class PropertyTable
         }
 
         return false;
+    }
+
+    private bool RenderPickFlags(TableRow row, int i, Type type)
+    {
+        FlagsPicker<typeof(type)>
+
+            type.make
     }
 
 

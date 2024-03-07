@@ -2,6 +2,7 @@
 using System.Drawing.Drawing2D;
 using System.Security.Policy;
 using UtilityBelt.Service.Views.SettingsEditor;
+using UtilityFace.Enums;
 using UtilityFace.Settings;
 
 namespace UtilityFace.HUDs;
@@ -25,28 +26,32 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
     }
 
 
+    FlagsPicker<Usable> flags = new() { Choice = Usable.ContainedViewedRemoteNeverWalk};
     Dictionary<Vector2, PickerModal<uint>> modals = new();
     static PickerModal<uint> Modal;
 
     //TexturedPicker<uint> picker;
     public override void Draw(object sender, EventArgs e)
     {
+        if (flags.Check())
+            Log.Chat($"{flags.Choice}");
+
         //Draw vertical containers
-        ImGui.BeginChild("test", new(34, -1));
-        if (containers.Check())
-        {
-            containers.Choices = ContainerPicker.GetPlayerContainers().ToArray();
+        //ImGui.BeginChild("test", new(34, -1));
+        //if (containers.Check())
+        //{
+        //    containers.Choices = ContainerPicker.GetPlayerContainers().ToArray();
 
-        }
-        ImGui.EndChild();
+        //}
+        //ImGui.EndChild();
 
-        //Draw inventory to the rest
-        ImGui.SameLine();
-        ImGui.BeginChild("Inventory", ImGui.GetContentRegionAvail());
-        if (inventory.Check())
-        {
-        }
-        ImGui.EndChild();
+        ////Draw inventory to the rest
+        //ImGui.SameLine();
+        //ImGui.BeginChild("Inventory", ImGui.GetContentRegionAvail());
+        //if (inventory.Check())
+        //{
+        //}
+        //ImGui.EndChild();
 
         #region Ignore
         //if (ImGui.Button("Foo"))
