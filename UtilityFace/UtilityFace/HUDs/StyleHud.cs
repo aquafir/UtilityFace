@@ -10,7 +10,6 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
 {
     TextureEnumModal modal = new();
     SpellPickModal sModal = new();
-    EnumModal<IntId> enumPickModal = new();
     //TextureGroupFilter texG = new() { Active = true };
     TextureGroupPicker texG = new();
     //PickerModal<ManagedTexture> texModal;
@@ -26,6 +25,8 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
     }
 
 
+    EnumPicker enums = new(typeof(Usable));
+    FilteredEnumPicker fEnums = new(typeof(Usable));
     FlagsPicker<Usable> flags = new() { Choice = Usable.ContainedViewedRemoteNeverWalk};
     Dictionary<Vector2, PickerModal<uint>> modals = new();
     static PickerModal<uint> Modal;
@@ -33,9 +34,13 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
     //TexturedPicker<uint> picker;
     public override void Draw(object sender, EventArgs e)
     {
-        if (flags.Check())
-            Log.Chat($"{flags.Choice}");
+        //if (flags.Check())
+        //Log.Chat($"{flags.Choice}");
+        if (enums.Check())
+            Log.Chat($"{enums.EnumValue}");
 
+        if(fEnums.Check())
+            Log.Chat($"{fEnums.EnumValue}");
         //Draw vertical containers
         //ImGui.BeginChild("test", new(34, -1));
         //if (containers.Check())
@@ -113,7 +118,7 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
         #endregion
     }
 
-    
+
 
 
     #region Settings

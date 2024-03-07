@@ -1,8 +1,10 @@
-﻿using UtilityBelt.Scripting.ScriptEnvs.Lua;
+﻿using System.Runtime.InteropServices.ComTypes;
+using System;
+using UtilityBelt.Lib.VTNav;
+using UtilityBelt.Scripting.ScriptEnvs.Lua;
 
 namespace UtilityFace.Components.Pickers;
 
-//May need to change to enum struct
 public class EnumPicker<T> : IPicker<T> where T : struct, Enum
 {
     protected int index = 0;
@@ -12,11 +14,6 @@ public class EnumPicker<T> : IPicker<T> where T : struct, Enum
     /// Number of items shown by the combo box
     /// </summary>
     public int ItemsShown = 5;
-
-    /// <summary>
-    /// Current selection
-    /// </summary>
-    public T Choice;
 
     /// <summary>
     /// Tracks whether the selection is defined in the enum
@@ -42,14 +39,14 @@ public class EnumPicker<T> : IPicker<T> where T : struct, Enum
 
         //Parse enum if there's an update, ignore invalid choices?
         if (Changed && index >= 0 && index < choices.Length)
-            Valid = Enum.TryParse(choices[index], out Choice);
+            Valid = Enum.TryParse(choices[index], out Selection);
     }
 }
 
-
-public class FlagsPicker<T> : IPicker<T> where T : struct, Enum
+public class EnumPicker : IPicker<int>
 {
-    protected T[] choices = { };
+    protected int index = 0;
+    protected string[] choices = { };
 
     /// <summary>
     /// Number of items shown by the combo box
@@ -59,39 +56,56 @@ public class FlagsPicker<T> : IPicker<T> where T : struct, Enum
     /// <summary>
     /// Current selection
     /// </summary>
-    public T Choice;
+    //public int Choice;
 
     /// <summary>
-    /// Parse an int from Choice on init and use it for CheckboxFlags, converting back to Choice when changed
+    /// The 
     /// </summary>
-    protected int choiceValue;
-
-    /// <summary>
-    /// Tracks whether the selection is defined in the enum
-    /// </summary>
-    public bool Valid;
+    public Type EnumType;
+    public object EnumValue => Enum.ToObject(EnumType, Selection);
 
     /// <summary>
     /// Width of the combo box
     /// </summary>
     public float Width = 120;
 
-    public override void Init()
+    public EnumPicker(Type type)
     {
-        choices = Enum.GetValues(typeof(T)).Cast<T>().ToArray();
-        choiceValue = Convert.ToInt32(Choice);
+        //Check for valid enum
+        if (!type.IsEnum)
+            throw new ArgumentException($"{type.Name} must be an Enum.");
 
-        base.Init();
+        this.EnumType = type;
+
+        //Populate choices for combo box
+        choices = Enum.GetNames(EnumType);
+        //Log.Chat($"{choices.Length} choices for {EnumType}");
     }
 
     public override void DrawBody()
     {
-        for (var i = 0; i < choices.Length; i++)
+        //Separate the choice array to allow for filtered choices
+        DrawParseCombo(choices);
+    }
+
+    /// <summary>
+    /// Render a combo box for a given array of string choices
+    /// </summary>
+    protected void DrawParseCombo(string[] comboChoices)
+    {
+        if (ImGui.Combo(Name, ref index, comboChoices, comboChoices.Length, ItemsShown))
+            Changed = true;
+
+        //Try to parse enum if there's an update, ignore invalid choices?
+        if (Changed && index >= 0 && index < comboChoices.Length)
         {
-            if (ImGui.CheckboxFlags($"{choices[i]}##{_id}", ref choiceValue, Convert.ToInt32(choices[i])))
+            try
             {
-                Choice = (T)Enum.ToObject(typeof(T), choiceValue);
-                Changed = true;
+                Selection = Convert.ToInt32(Enum.Parse(EnumType, comboChoices[index]));
+            }
+            catch (ArgumentException)
+            {
+                Console.WriteLine($"Failed to parse {EnumType} enum value from the string: {comboChoices[index]}");
             }
         }
     }

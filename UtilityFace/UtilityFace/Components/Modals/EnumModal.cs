@@ -1,9 +1,9 @@
 ﻿namespace UtilityFace.Components.Modals;
-public class EnumModal<T> : IModal where T : struct, Enum
+public class EnumModal(Type type) : IModal
 {
     public Vector2 IconSize = new(24);
 
-    protected EnumPicker<T> picker = new();
+    protected EnumPicker picker = new(type);
 
     public override void DrawBody()
     {        
@@ -11,7 +11,7 @@ public class EnumModal<T> : IModal where T : struct, Enum
         {
             if (picker.Changed)
             {
-                Log.Chat($"{picker.Choice}");
+                Log.Chat($"{picker.Selection}");
                 picker.Changed = false;
             }
         }

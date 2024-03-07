@@ -15,7 +15,7 @@ public class ValueComparisonFilter<T> : IOptionalFilter<T>
         if (comparison.Check())
         {
             Changed = true;
-            Log.Chat($"{comparison.Choice}");
+            Log.Chat($"{comparison.Selection}");
         }
 
         ImGui.SameLine();
@@ -32,8 +32,8 @@ public class ValueComparisonFilter<T> : IOptionalFilter<T>
             return false;
 
         var comp = targetPredicate(item);
-        var result = comparison.Choice.VerifyRequirement(targetPredicate(item), value);
-        Log.Chat($"{comp} {comparison.Choice} {value} -> {result}");
-        return comparison.Choice.VerifyRequirement(targetPredicate(item), value);
+        var result = comparison.Selection.VerifyRequirement(targetPredicate(item), value);
+        Log.Chat($"{comp} {comparison.Selection} {value} -> {result}");
+        return comparison.Selection.VerifyRequirement(targetPredicate(item), value);
     }
 }

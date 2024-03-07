@@ -339,9 +339,10 @@ public class PropertyTable
 
     private bool RenderPickFlags(TableRow row, int i, Type type)
     {
-        FlagsPicker<typeof(type)>
+        //FlagsPicker<typeof(type)>
 
-            type.make
+        //    type.make
+        return false;
     }
 
 

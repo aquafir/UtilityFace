@@ -19,7 +19,7 @@ public class RegexFilter<T> : IOptionalFilter<T>
     //Todo: rethink, crashes if a filter is used from recursion but a filter isn't needed here
     public EnumPicker<StringCompareType> Comparison = new()
     {
-        Choice = StringCompareType.Match,
+        Selection = StringCompareType.Match,
     };
 
     public RegexFilter(Func<T, string> targetPredicate) : base(null)
@@ -32,7 +32,7 @@ public class RegexFilter<T> : IOptionalFilter<T>
     {
         if (Regex is null) return false;
 
-        return Comparison.Choice switch
+        return Comparison.Selection switch
         {
             StringCompareType.Match => !Regex.IsMatch(targetPredicate(item)),
             StringCompareType.NoMatch => Regex.IsMatch(targetPredicate(item)),
