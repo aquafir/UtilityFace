@@ -85,6 +85,12 @@ public abstract class IModal : IComp
         ImGui.OpenPopup(Name);
     }
 
+    public virtual void Save()
+    {
+        Changed = true;
+        Close();
+    }
+
     public virtual void Close()
     {
         //ImGui.CloseCurrentPopup();

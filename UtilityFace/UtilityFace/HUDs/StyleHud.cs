@@ -25,22 +25,23 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
     }
 
 
-    EnumPicker enums = new(typeof(Usable));
-    FilteredEnumPicker fEnums = new(typeof(Usable));
-    FlagsPicker<Usable> flags = new() { Choice = Usable.ContainedViewedRemoteNeverWalk};
-    Dictionary<Vector2, PickerModal<uint>> modals = new();
-    static PickerModal<uint> Modal;
+    FlagsPicker<Usable> flags = new() { Selection = (int)Usable.ContainedViewedRemoteNeverWalk};
+    //FlagsPicker flags = new(typeof(Usable)) {  };
+    //Dictionary<Vector2, PickerModal<uint>> modals = new();
+    //static FlagsModal Modal = new(typeof(Usable));
 
     //TexturedPicker<uint> picker;
     public override void Draw(object sender, EventArgs e)
     {
-        //if (flags.Check())
-        //Log.Chat($"{flags.Choice}");
-        if (enums.Check())
-            Log.Chat($"{enums.EnumValue}");
+        if(flags.Check())
+            Log.Chat($"{flags.EnumValue}");
 
-        if(fEnums.Check())
-            Log.Chat($"{fEnums.EnumValue}");
+        //if (ImGui.Button("Choose"))
+        //    Modal.Open();
+
+        //if (Modal.Check())
+        //    Log.Chat($"{Modal.Picker.EnumValue}");
+
         //Draw vertical containers
         //ImGui.BeginChild("test", new(34, -1));
         //if (containers.Check())

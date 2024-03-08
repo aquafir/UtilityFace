@@ -1,6 +1,6 @@
 ﻿namespace UtilityFace.Enums;
 
-public enum Texture
+public enum Textures
 {
     PlayerIcon,
     EquipAmmunition,

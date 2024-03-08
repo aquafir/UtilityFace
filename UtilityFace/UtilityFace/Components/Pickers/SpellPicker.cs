@@ -11,12 +11,27 @@ public class SpellPicker : TexturedPicker<SpellInfo>
     //Unfiltered set of choices
     static readonly SpellInfo[] choices = table.Spells.Select(x => new SpellInfo(x.Key, x.Value)).ToArray();
 
-    SpellFilter filter = new() { Active = true, Label = "Filter Spells?" };
+    public SpellFilter Filter = new() { Active = true, Label = "Filter Spells?" };
+
+    public void SetSpellFromId(uint id)
+    {
+        if (table.Spells.TryGetValue(id, out var spell))
+        {
+            Selection = new(id, spell);
+
+            //Update page?
+            var index = Choices.ToList().IndexOf(Selection);
+            if (index < 0)
+                return;
+
+            CurrentPage = index / PerPage;
+        }
+    }
 
     public override void DrawBody()
     {
-        if (filter.Check())
-            Choices = filter.Active ? filter.GetFiltered(choices).ToArray() : choices;
+        if (Filter.Check())
+            Choices = Filter.Active ? Filter.GetFiltered(choices).ToArray() : choices;
 
         base.DrawBody();
     }

@@ -1,5 +1,8 @@
 ﻿using System.CodeDom;
+using System.Data;
 using UtilityBelt.Service.Views;
+using UtilityFace.Components.Pickers;
+using UtilityFace.HUDs;
 
 namespace UtilityFace.Table;
 
@@ -264,14 +267,17 @@ public class PropertyTable
             PropType.Bool => RenderPickBool(row, i),
             //Icons
             PropType.DataId when row.Property.Contains("Icon") => RenderPickIcon(row, i),
+            PropType.DataId when ((DataId)row.Key).IsSpell() => RenderPickSpell(row, i),
             //Enum ints
             PropType.Int when ((IntId)row.Key).TryGetEnumType(out var type) => RenderPickEnum(row, i, type),
             //Default to a string
             _ => ImGui.InputText($"###{Type}{i}", ref row.CurrentValue, 300, ImGuiInputTextFlags.EnterReturnsTrue),
         };
 
+        //If the prop value changed update it on ACE by command
         if (changed)
         {
+            Log.Chat($"Row {i} changed! {row.CurrentValue}");
             var g = new Game();
             //var s = g.World.Selected;
             if (!g.World.TryGet(Target.Id, out var wo))
@@ -305,6 +311,20 @@ public class PropertyTable
 
     }
 
+    private bool RenderPickBool(TableRow row, int i)
+    {
+        if (!bool.TryParse(row.CurrentValue, out var value))
+            return false;
+
+        if (ImGui.Checkbox($"##{i}", ref value))
+        {
+            row.CurrentValue = value.ToString();
+            return true;
+        }
+
+        return false;
+    }
+
     /// <summary>
     /// Render a combobox for an enum
     /// </summary>
@@ -312,10 +332,7 @@ public class PropertyTable
     {
         //Check if this enum uses flags
         if(type.IsDefined(typeof(FlagsAttribute), false))
-        {
-            ImGui.Text("Uses flags");
-            return false;
-        }
+            return RenderPickFlags(row, i, type);
 
         //Get cached names for enum
         if (!((IntId)row.Key).TryGetEnumNames(out var names))
@@ -337,16 +354,41 @@ public class PropertyTable
         return false;
     }
 
+    int modalRow = -1;
+    FlagsModal flagsModal;
     private bool RenderPickFlags(TableRow row, int i, Type type)
     {
-        //FlagsPicker<typeof(type)>
+        if(ImGui.Button($"Edit##{i}"))
+        {
+            modalRow = i;
+            flagsModal = new(type);
+            flagsModal.MaxSize = new(450);
 
-        //    type.make
+            //Try to parse enum of the row's type
+            var parsedValue = Enum.Parse(type, row.CurrentValue);// uint.TryParse(row.CurrentValue, out var result) ? result : 0;
+            flagsModal.Picker.Selection = Convert.ToUInt32(parsedValue);
+            Log.Chat($"Edit row {i}: {row.CurrentValue} = {parsedValue}");
+
+            flagsModal.Open();
+        }
+
+        //Only check flags for the opening row
+        if (modalRow != i || flagsModal is null)
+            return false;
+
+        if (flagsModal.Check() && flagsModal.Changed)
+        {
+            //Reset row and set value?
+            modalRow = -1;
+            row.CurrentValue = flagsModal.Picker.Selection.ToString();
+
+            Log.Chat($"Selected {flagsModal.Picker.EnumValue}");
+            return true;
+        }
+
         return false;
     }
 
-
-    int modalRow = -1;
     PickerModal<uint> textureModal;
     private bool RenderPickIcon(TableRow row, int i)
     {
@@ -415,18 +457,43 @@ public class PropertyTable
         return false;
     }
 
-    private bool RenderPickBool(TableRow row, int i)
+    SpellPickModal spellModal;
+    private bool RenderPickSpell(TableRow row, int i)
     {
-        if (!bool.TryParse(row.CurrentValue, out var value))
+        var name = "Unknown";
+        if(uint.TryParse(row.CurrentValue, out var id) && UBService.PortalDat.SpellTable.Spells.TryGetValue(id, out var spell))
+            name =  spell.Name;
+
+        if (ImGui.Button($"{name}##{i}"))
+        {
+            modalRow = i;
+            spellModal = new();
+            spellModal.MinSize = new(500);
+            spellModal.Picker.Mode = SelectionStyle.Single;
+
+            spellModal.Picker.Filter.Active = false;
+            
+            if (uint.TryParse(row.CurrentValue, out var spellId))
+                spellModal.Picker.SetSpellFromId(spellId);
+
+            spellModal.Open();
+        }
+
+        //Only check flags for the opening row
+        if (modalRow != i || spellModal is null)
             return false;
 
-        if(ImGui.Checkbox($"##{i}", ref value))
+        if (spellModal.Check() && spellModal.Changed)
         {
-            row.CurrentValue = value.ToString();
+            //Reset row and set value?
+            modalRow = -1;
+            row.CurrentValue = spellModal.Picker.Selection.Id.ToString();
+            Log.Chat($"{row.CurrentValue} from {spellModal.Picker.Selection}");
+
             return true;
         }
 
         return false;
-    }    
+    }
 }
 

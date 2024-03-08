@@ -2,14 +2,14 @@
 
 public class SpellPickModal : IModal
 {
-    SpellPicker picker = new();
+    public SpellPicker Picker = new();
 
     public override void DrawBody()
     {
-        if (picker.Check())
+        if (Picker.Check())
         {
-            Log.Chat($"{picker.Selection.Spell.Name}");
-            Close();
+            Log.Chat($"{Picker.Selection.Spell.Name}");
+            Save();
         }
     }
 }

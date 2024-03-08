@@ -43,6 +43,11 @@ public class EnumPicker<T> : IPicker<T> where T : struct, Enum
     }
 }
 
+//public class EnumPicker<T> : EnumPicker
+//{
+//    public EnumPicker() : base(typeof(T)) { }
+//}
+
 public class EnumPicker : IPicker<int>
 {
     protected int index = 0;
@@ -53,14 +58,6 @@ public class EnumPicker : IPicker<int>
     /// </summary>
     public int ItemsShown = 5;
 
-    /// <summary>
-    /// Current selection
-    /// </summary>
-    //public int Choice;
-
-    /// <summary>
-    /// The 
-    /// </summary>
     public Type EnumType;
     public object EnumValue => Enum.ToObject(EnumType, Selection);
 

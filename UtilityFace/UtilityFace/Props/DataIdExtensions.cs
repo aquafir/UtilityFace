@@ -57,18 +57,15 @@ public static class DataIdExtensions
         return values[0].ToString();
     }
 
-    static readonly Dictionary<DataId, string> _formatStrings = new()
+
+    static readonly System.Collections.Generic.HashSet<DataId> _spellProps = new()
     {
-
+        DataId.Spell,
+        DataId.ProcSpell,
     };
+    public static bool IsSpell(this DataId prop) => _spellProps.Contains(prop);
 
-    static readonly Dictionary<DataId, string> _labels = new()
-    {
-
-    };
-
-    static readonly Dictionary<DataId, Type> _enums = new()
-    {
-
-    };
+    static readonly Dictionary<DataId, string> _formatStrings = new() { };
+    static readonly Dictionary<DataId, string> _labels = new() { };
+    static readonly Dictionary<DataId, Type> _enums = new() { };
 }

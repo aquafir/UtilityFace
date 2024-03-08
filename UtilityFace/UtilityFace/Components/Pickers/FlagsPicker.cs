@@ -1,46 +1,66 @@
 ﻿namespace UtilityFace.Components.Pickers;
 
-public class FlagsPicker<T> : IPicker<T> where T : struct, Enum
+public class FlagsPicker : IPicker<uint>
 {
-    protected T[] choices = { };
-
-    /// <summary>
-    /// Number of items shown by the combo box
-    /// </summary>
-    public int ItemsShown = 5;
-
-    /// <summary>
-    /// Current selection
-    /// </summary>
-    public T Choice;
-
-    /// <summary>
-    /// Parse an int from Choice on init and use it for CheckboxFlags, converting back to Choice when changed
-    /// </summary>
-    protected int choiceValue;
+    //Enum name/int values
+    protected string[] choiceNames;
+    protected uint[] choiceValues;
+    //Type of enum
+    public Type EnumType;
+    public object EnumValue => Enum.ToObject(EnumType, Selection);
 
     /// <summary>
     /// Width of the combo box
     /// </summary>
     public float Width = 120;
 
-    public override void Init()
+    public FlagsPicker(Type type) : base()
     {
-        choices = Enum.GetValues(typeof(T)).Cast<T>().ToArray();
-        choiceValue = Convert.ToInt32(Choice);
+        //Check for valid enum
+        //todo: decide on checking for Flags attribute
+        if (!type.IsEnum)
+            throw new ArgumentException($"{type.Name} must be an Enum.");
 
-        base.Init();
+        this.EnumType = type;
+
+        //Populate choices
+        //choiceNames = Enum.GetNames(EnumType);
+        //choiceValues = Enum.GetValues(EnumType).Cast<int>().ToArray();    //Fails with non-ints?
+
+        var values = Enum.GetValues(EnumType);
+        choiceNames = new string[values.Length];
+        choiceValues = new uint[values.Length];
+
+        int index = 0;
+        foreach (var value in values)
+        {
+            try
+            {
+                choiceNames[index] = value.ToString();
+                choiceValues[index] = Convert.ToUInt32(value);
+                index++;
+            }catch(Exception ex) { Log.Chat($"Failed {value}"); }
+        }
+        Log.Chat($"{values.Length}->{choiceValues.Length}");
     }
 
     public override void DrawBody()
     {
-        for (var i = 0; i < choices.Length; i++)
+        for (var i = 0; i < choiceNames.Length; i++)
         {
-            if (ImGui.CheckboxFlags($"{choices[i]}##{_id}", ref choiceValue, Convert.ToInt32(choices[i])))
+            if (ImGui.CheckboxFlags($"{choiceNames[i]}##{_id}", ref Selection, choiceValues[i]))
             {
-                Choice = (T)Enum.ToObject(typeof(T), choiceValue);
+                //Ctrl click to select only one flag
+                if (ImGui.IsKeyDown(ImGuiKey.ModCtrl))
+                    Selection = choiceValues[i];
+
                 Changed = true;
             }
         }
     }
+}
+
+public class FlagsPicker<T> : FlagsPicker
+{
+    public FlagsPicker() : base(typeof(T)) { }
 }

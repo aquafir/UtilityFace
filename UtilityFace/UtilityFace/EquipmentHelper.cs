@@ -14,35 +14,35 @@ public static class EquipmentHelper
     static Dictionary<EquipSlots, uint> slotDefaults = new()
     {
         //Misc
-        [EquipSlots.Trinket] = Texture.EquipTrinket.IconId(),
-        [EquipSlots.Cloak] = Texture.EquipCloak.IconId(),
-        [EquipSlots.BlueAetheria] = Texture.EquipBlueAetheria.IconId(),
-        [EquipSlots.YellowAetheria] = Texture.EquipYellowAetheria.IconId(),
-        [EquipSlots.RedAetheria] = Texture.EquipRedAetheria.IconId(),
+        [EquipSlots.Trinket] = Textures.EquipTrinket.IconId(),
+        [EquipSlots.Cloak] = Textures.EquipCloak.IconId(),
+        [EquipSlots.BlueAetheria] = Textures.EquipBlueAetheria.IconId(),
+        [EquipSlots.YellowAetheria] = Textures.EquipYellowAetheria.IconId(),
+        [EquipSlots.RedAetheria] = Textures.EquipRedAetheria.IconId(),
         //Jewelry
-        [EquipSlots.Necklace] = Texture.EquipNecklace.IconId(),
-        [EquipSlots.LeftBracelet] = Texture.EquipLeftBracelet.IconId(),
-        [EquipSlots.RightBracelet] = Texture.EquipLeftBracelet.IconId(),
-        [EquipSlots.LeftRing] = Texture.EquipLeftRing.IconId(),
-        [EquipSlots.RightRing] = Texture.EquipLeftRing.IconId(),
+        [EquipSlots.Necklace] = Textures.EquipNecklace.IconId(),
+        [EquipSlots.LeftBracelet] = Textures.EquipLeftBracelet.IconId(),
+        [EquipSlots.RightBracelet] = Textures.EquipLeftBracelet.IconId(),
+        [EquipSlots.LeftRing] = Textures.EquipLeftRing.IconId(),
+        [EquipSlots.RightRing] = Textures.EquipLeftRing.IconId(),
         //Torso
-        [EquipSlots.Head] = Texture.EquipHead.IconId(),
-        [EquipSlots.Chest] = Texture.EquipChest.IconId(),
-        [EquipSlots.UpperArms] = Texture.EquipUpperarm.IconId(),
-        [EquipSlots.LowerArms] = Texture.EquipLowerarm.IconId(),
-        [EquipSlots.Hands] = Texture.EquipHands.IconId(),
+        [EquipSlots.Head] = Textures.EquipHead.IconId(),
+        [EquipSlots.Chest] = Textures.EquipChest.IconId(),
+        [EquipSlots.UpperArms] = Textures.EquipUpperarm.IconId(),
+        [EquipSlots.LowerArms] = Textures.EquipLowerarm.IconId(),
+        [EquipSlots.Hands] = Textures.EquipHands.IconId(),
         //Lowerbody
-        [EquipSlots.Abdomen] = Texture.EquipAbdomen.IconId(),
-        [EquipSlots.UpperLegs] = Texture.EquipUpperleg.IconId(),
-        [EquipSlots.LowerLegs] = Texture.EquipLowerleg.IconId(),
-        [EquipSlots.Feet] = Texture.EquipFeet.IconId(),
+        [EquipSlots.Abdomen] = Textures.EquipAbdomen.IconId(),
+        [EquipSlots.UpperLegs] = Textures.EquipUpperleg.IconId(),
+        [EquipSlots.LowerLegs] = Textures.EquipLowerleg.IconId(),
+        [EquipSlots.Feet] = Textures.EquipFeet.IconId(),
         //Weapons/clothes
-        [EquipSlots.Ammunition] = Texture.EquipAmmunition.IconId(),
-        [EquipSlots.Weapon] = Texture.EquipWeapon.IconId(),
-        [EquipSlots.Shield] = Texture.EquipShield.IconId(),
+        [EquipSlots.Ammunition] = Textures.EquipAmmunition.IconId(),
+        [EquipSlots.Weapon] = Textures.EquipWeapon.IconId(),
+        [EquipSlots.Shield] = Textures.EquipShield.IconId(),
 
-        [EquipSlots.UpperUnderwear] = Texture.EquipShirt.IconId(),
-        [EquipSlots.LowerUnderwear] = Texture.EquipPants.IconId(),
+        [EquipSlots.UpperUnderwear] = Textures.EquipShirt.IconId(),
+        [EquipSlots.LowerUnderwear] = Textures.EquipPants.IconId(),
 
     };
 
