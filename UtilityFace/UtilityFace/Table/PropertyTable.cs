@@ -469,7 +469,8 @@ public class PropertyTable
             modalRow = i;
             spellModal = new();
             spellModal.MinSize = new(500);
-            spellModal.Picker.Mode = SelectionStyle.Single;
+            //spellModal.Picker.Mode = SelectionStyle.Single;
+            spellModal.Picker.Mode = SelectionStyle.Multiple;
 
             spellModal.Picker.Filter.Active = false;
             

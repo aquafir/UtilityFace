@@ -33,8 +33,8 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
     //TexturedPicker<uint> picker;
     public override void Draw(object sender, EventArgs e)
     {
-        if(flags.Check())
-            Log.Chat($"{flags.EnumValue}");
+        //if(flags.Check())
+        //    Log.Chat($"{flags.EnumValue}");
 
         //if (ImGui.Button("Choose"))
         //    Modal.Open();
@@ -43,21 +43,21 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
         //    Log.Chat($"{Modal.Picker.EnumValue}");
 
         //Draw vertical containers
-        //ImGui.BeginChild("test", new(34, -1));
-        //if (containers.Check())
-        //{
-        //    containers.Choices = ContainerPicker.GetPlayerContainers().ToArray();
+        ImGui.BeginChild("test", new(34, -1));
+        if (containers.Check())
+        {
+            containers.Choices = ContainerPicker.GetPlayerContainers().ToArray();
 
-        //}
-        //ImGui.EndChild();
+        }
+        ImGui.EndChild();
 
-        ////Draw inventory to the rest
-        //ImGui.SameLine();
-        //ImGui.BeginChild("Inventory", ImGui.GetContentRegionAvail());
-        //if (inventory.Check())
-        //{
-        //}
-        //ImGui.EndChild();
+        //Draw inventory to the rest
+        ImGui.SameLine();
+        ImGui.BeginChild("Inventory", ImGui.GetContentRegionAvail());
+        if (inventory.Check())
+        {
+        }
+        ImGui.EndChild();
 
         #region Ignore
         //if (ImGui.Button("Foo"))

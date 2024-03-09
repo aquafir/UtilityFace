@@ -22,7 +22,7 @@ public static class TextureManager
     public const uint TEXTURE_OFFSET = 0x06000000;
     const uint TEXTURE_START = 0x06000133;
     const uint TEXTURE_END = 0x06007576;
-    private const uint DEFAULT_ICON = 0x0600110C;
+    private const uint DEFAULT_ICON = 0x0600127E;
     static private Lazy<Dictionary<Vector2, List<uint>>> _textureGroups = new Lazy<Dictionary<Vector2, List<uint>>>(() => GetTextureGroups());
 
     static Dictionary<Vector2, List<uint>> GetTextureGroups()
@@ -92,7 +92,7 @@ public static class TextureManager
         [Textures.ShortcutB0]			= 0x06006C33,
         [Textures.ShortcutC0]			= 0x060019EC,
         [Textures.ShortcutD0]			= 0x06006C1F,
-        [Textures.Vitae]			        = DEFAULT_ICON,       //Some icons like vitae / allegiance around here
+        [Textures.Vitae]			    = 0x0600110C,       //Some icons like vitae / allegiance around here
     };
 
     //Todo: rework, only used for character ID
@@ -164,12 +164,14 @@ public static class TextureManager
     /// </summary>
     public static ManagedTexture GetOrCreateTexture(uint iconId)
     {
-        if (iconId == 32)
+        if (true)
         {
-            iconId += 100663296;
+            if (iconId != 0 && iconId < 0x06000000)
+                iconId += 0x06000000;
+
             Texture tex = UBService.PortalDat.ReadFromDat<Texture>(iconId);
-            //Log.Chat($"{tex.Width} - {tex.Height} - {tex.SourceData.Length} - {tex.Format}");
-            return GetOrCreateTexture(DEFAULT_ICON);
+            if(tex is null || tex.SourceData is null)
+                return GetOrCreateTexture(DEFAULT_ICON);
         }
 
         if (!_woTextures.TryGetValue(iconId, out var texture))

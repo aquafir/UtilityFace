@@ -1,4 +1,6 @@
-﻿namespace UtilityFace.Components.Modals;
+﻿using ImGuizmoNET;
+
+namespace UtilityFace.Components.Modals;
 
 public class SpellPickModal : IModal
 {
@@ -10,6 +12,13 @@ public class SpellPickModal : IModal
         {
             Log.Chat($"{Picker.Selection.Spell.Name}");
             Save();
+        }
+
+        if(Picker.Mode == SelectionStyle.Multiple)
+        {
+            int index = 0;
+            foreach (var item in Picker.Selected)
+                Picker.DrawItem(item, index++);
         }
     }
 }

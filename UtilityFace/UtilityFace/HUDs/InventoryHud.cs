@@ -1,16 +1,8 @@
 ﻿using System.Drawing;
 using UtilityFace.Components.Pickers;
+using UtilityFace.Settings;
 
 namespace UtilityFace.HUDs;
-
-public class InventorySettings
-{
-    public bool showBags = true;
-    public bool showIcons = true;
-    public bool showExtraFilter;
-    public bool showGroupActions = true;
-    public bool showEquipment = true;
-}
 
 public class InventoryHud(string name, bool showInBar = false, bool visible = false) : SizedHud(name, showInBar, visible)
 {
@@ -32,11 +24,6 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
 
     //Options
     InventorySettings settings = new();
-    //bool showBags = true;
-    //bool showIcons = true;
-    //bool showExtraFilter;
-    //bool showGroupActions = true;
-    //bool showEquipment = true;
 
     #region Filter Setup
     //Standard name (maybe more?) filter
