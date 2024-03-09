@@ -7,21 +7,6 @@ namespace UtilityFace.HUDs;
 /// </summary>
 internal class InterfaceController(string name) : SizedHud(name, true, true)
 {
-
-    //    public Settings Settings;
-
-    //[Summary("Show landblock boundaries")]
-    //public Global<bool> ShowLandblockBoundaries = new(false);
-
-    //[Summary("Landblock boundary distance to draw to, setting to 0 only draws current landblock boundaries")]
-    //[MinMax(0, 5)]
-    //public Global<int> LandblockBoundaryDrawDistance = new(0);
-    //var settingsPath = System.IO.Path.Combine(AssemblyDirectory, "settings.json");
-    //Settings = new Settings(this, settingsPath, p => p.SettingType == SettingType.Global, null, "LBVisualizer Settings");
-    //Settings.Load();
-
-    //SettingsEditor settingsEditor;
-
     List<HudBase> Huds = new();
 
     public override void Init()
@@ -32,7 +17,7 @@ internal class InterfaceController(string name) : SizedHud(name, true, true)
             //new InventoryHud("Inventory", true, true),
             //new NetworkHud("Network", true, true),
             //new ChatHud("Chat", true, true),
-            new PropertyEditorHud("PropertyEditor", true, true),
+            //new PropertyEditorHud("PropertyEditor", true, true),
             //new NavHud("Navs", true, false),
             //new HaxHud("Hax", true, true),
             //new RadarHud("Radar", true, true),
@@ -47,37 +32,16 @@ internal class InterfaceController(string name) : SizedHud(name, true, true)
         base.Init();
     }
 
-    public override void Draw(object sender, EventArgs e)
+    public override void DrawBody()
     {
         ImGui.Text("UIs");
 
-        //if (ImGui.Button("Settings"))
-        //    _settingsUI.Hud.Visible = !_settingsUI.Hud.Visible;
-
-
-        //if (ImGui.Button("Settings"))
-        //{
-        //    //settingsEditor = new SettingsEditor("My Settings", new List<object>() { typeof(TestSettings) });
-        //    if (settingsEditor == null)
-        //    {
-        //        settingsEditor = new SettingsEditor("UBService Settings", new object[] { typeof(SettingsRoot) });
-        //        settingsEditor.Hud.ShowInBar = false;
-        //        settingsEditor.Hud.OnHide += (s, e) =>
-        //        {
-        //            settingsEditor?.Dispose();
-        //            settingsEditor = null;
-        //        };
-        //    }
-        //    settingsEditor.Hud.Visible = !settingsEditor.Hud.Visible;
-        //}
-
-            foreach (var hud in Huds)
+        foreach (var hud in Huds)
         {
             bool vis = hud.ubHud.Visible;
             if (ImGui.Checkbox(hud.Name, ref vis))
                 hud.ubHud.Visible = vis;
         }
-        base.Draw(sender, e);
     }
 
     unsafe private void World_OnChatInput(object sender, UtilityBelt.Scripting.Events.ChatInputEventArgs e)

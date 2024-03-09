@@ -31,7 +31,7 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
     //static FlagsModal Modal = new(typeof(Usable));
 
     //TexturedPicker<uint> picker;
-    public override void Draw(object sender, EventArgs e)
+    public override void DrawBody()
     {
         //if(flags.Check())
         //    Log.Chat($"{flags.EnumValue}");

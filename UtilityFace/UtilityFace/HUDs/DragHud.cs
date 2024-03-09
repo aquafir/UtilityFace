@@ -18,7 +18,7 @@ public class DragHud(string name, bool showInBar = false, bool visible = false) 
                 "Bibi", "Blaine", "Bryn"
     };
 
-    unsafe public override void Draw(object sender, EventArgs e)
+    unsafe public override void DrawBody()
     {
         if (ImGui.RadioButton("Copy", mode == Mode.Copy)) { mode = Mode.Copy; }
         ImGui.SameLine();

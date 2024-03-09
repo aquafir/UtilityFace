@@ -74,7 +74,7 @@ internal class PropertyEditorHud(string name, bool showInBar = false, bool visib
             table.SetTarget(Original);
     }
 
-    public override void Draw(object sender, EventArgs e)
+    public override void DrawBody()
     {
         try
         {

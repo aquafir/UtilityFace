@@ -93,7 +93,7 @@ public class NetworkHud(string name, bool showInBar = false, bool visible = fals
             entry.Filtered = filter.IsFiltered(entry.Message);
     }
 
-    public override void Draw(object sender, EventArgs e)
+    public override void DrawBody()
     {
         var colPadding = 8;
         var contentPanelSize = new Vector2(600, 600);

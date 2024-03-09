@@ -1,5 +1,14 @@
-﻿namespace UtilityFace.HUDs;
-public abstract class HudBase : IDisposable
+﻿using UtilityFace.Components;
+
+namespace UtilityFace.HUDs;
+
+//Global stuff?
+public static class G
+{
+    public readonly static Game Game = new();
+}
+
+public abstract class HudBase : IComp, IDisposable
 {
     public readonly string Name = nameof(HudBase);
 
@@ -25,15 +34,14 @@ public abstract class HudBase : IDisposable
     /// <summary>
     /// Render loop
     /// </summary>
-    public virtual void Draw(object sender, EventArgs e) { }
-
+    protected void RenderHud(object sender, EventArgs e) => DrawBody();
 
     protected virtual void AddEvents()
     {
         try
         {
             //Log.Chat($"Adding events for {Name}");
-            ubHud.OnRender += Draw;
+            ubHud.OnRender += RenderHud;
         }
         catch (Exception ex)
         {
@@ -47,7 +55,7 @@ public abstract class HudBase : IDisposable
         try
         {
             //Log.Chat($"Removing events for {Name}");
-            ubHud.OnRender -= Draw;
+            ubHud.OnRender -= RenderHud;
         }
         catch (Exception ex)
         {

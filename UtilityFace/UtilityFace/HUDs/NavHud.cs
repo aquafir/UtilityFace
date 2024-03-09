@@ -72,7 +72,7 @@ public class NavHud(string name, bool showInBar = false, bool visible = false) :
         return tree;
     }
 
-    public override void Draw(object sender, EventArgs e)
+    public override void DrawBody()
     {
         if (ImGui.Button("Refresh") || navNames is null)
             LoadNavs();

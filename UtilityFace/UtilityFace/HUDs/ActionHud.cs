@@ -18,7 +18,7 @@ public class ActionHud(string name, bool showInBar = false, bool visible = false
         base.Init();
     }
 
-    public override void Draw(object sender, EventArgs e)
+    public override void DrawBody()
     {
         if (Actions.Check())
         {
@@ -27,8 +27,6 @@ public class ActionHud(string name, bool showInBar = false, bool visible = false
             var cmd = $"/ubs lexecs {ctx} {Actions.Selection.Script}";
             Log.Chat(cmd);
         }
-
-        base.Draw(sender, e);
     }
 }
 

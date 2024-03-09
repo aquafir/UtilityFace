@@ -94,7 +94,7 @@ public class ChatHud(string name, bool showInBar = false, bool visible = false) 
         style.PopStyles();
         base.PostRender(sender, e);
     }
-    public override void Draw(object sender, EventArgs e)
+    public override void DrawBody()
     {
         try
         {

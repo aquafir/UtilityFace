@@ -90,7 +90,7 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
 
     string search = "";
     Regex re = new("");
-    public override void Draw(object sender, EventArgs e)
+    public override void DrawBody()
     {
         if (ImGui.IsKeyPressed(ImGuiKey.Equal))
         {
@@ -343,6 +343,5 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
             //dl.AddImage(texture.TexturePtr, start, end);
 
         }
-        base.Draw(sender, e);
     }
 }

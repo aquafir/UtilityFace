@@ -130,7 +130,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
 
 
     #region Draw
-    public override void Draw(object sender, EventArgs e)
+    public override void DrawBody()
     {
         try
         {
