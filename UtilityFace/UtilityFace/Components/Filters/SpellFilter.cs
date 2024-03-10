@@ -1,6 +1,5 @@
 ﻿using ACE.DatLoader.Entity;
 using ACE.DatLoader.FileTypes;
-using UtilityFace.HUDs;
 using SpellBook = UtilityBelt.Scripting.Interop.SpellBook;
 
 namespace UtilityFace.Components.Filters;
@@ -9,7 +8,7 @@ namespace UtilityFace.Components.Filters;
 public class SpellFilter : IOptionalFilter<SpellInfo>
 {
     static readonly SpellTable table = UBService.PortalDat.SpellTable;
-    static readonly SpellBook spellbook = HudBase.game.Character.SpellBook;
+    static readonly SpellBook spellbook = G.Game.Character.SpellBook;
 
     FilterSet<SpellInfo> filters;
 
@@ -69,7 +68,7 @@ public class SpellFilter : IOptionalFilter<SpellInfo>
 
         if (UseCastable)
         {
-            int skill = HudBase.game.Character.GetMagicSkill(spell.School);
+            int skill = G.Game.Character.GetMagicSkill(spell.School);
             var chance = SkillCheck.GetMagicSkillChance(skill, (int)spell.Power) + .001f;
 
             if (chance < CastChance)

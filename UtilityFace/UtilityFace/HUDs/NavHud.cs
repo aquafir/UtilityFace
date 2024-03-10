@@ -95,7 +95,7 @@ public class NavHud(string name, bool showInBar = false, bool visible = false) :
             watch.Stop();
             Log.Chat($"Loaded {routes.Count} routes with {tree.Count} points in {watch.ElapsedMilliseconds}ms using {(GC.GetTotalMemory(false) - memStart) / (1024 * 1024)}MB of memory");
 
-            var pos = game.Character.Weenie.ServerPosition;
+            var pos = Game.Character.Weenie.ServerPosition;
             var nearest = tree.GetNearestNeighbours(pos.ToArray(), 1).FirstOrDefault();
             if (nearest is not null)
             {
@@ -117,7 +117,7 @@ public class NavHud(string name, bool showInBar = false, bool visible = false) :
         {
             if (currentRoute is not null)
                 //&& Path.GetFileNameWithoutExtension(currentRoute.NavPath) != nearbyNavs[selectedNear]
-                game.Actions.InvokeChat($"/vt nav load {currentRoute.NavName}");
+                Game.Actions.InvokeChat($"/vt nav load {currentRoute.NavName}");
             else
                 Log.Chat($"{currentRoute?.NavName}");
         }
@@ -195,12 +195,12 @@ public class NavHud(string name, bool showInBar = false, bool visible = false) :
     {
         //game.Character.OnPortalSpaceExited
         //game.World.OnChatInput
-        game.OnTick += OnTick;
+        Game.OnTick += OnTick;
         base.AddEvents();
     }
     protected override void RemoveEvents()
     {
-        game.OnTick -= OnTick;
+        Game.OnTick -= OnTick;
         base.RemoveEvents();
     }
 

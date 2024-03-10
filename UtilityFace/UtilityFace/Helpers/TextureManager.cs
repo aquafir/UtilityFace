@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Drawing;
 using UtilityBelt.Service.Lib;
 using UtilityFace.Enums;
-using UtilityFace.HUDs;
 
 namespace UtilityFace.Helpers;
 
@@ -95,10 +94,6 @@ public static class TextureManager
         [Textures.Vitae]			    = 0x0600110C,       //Some icons like vitae / allegiance around here
     };
 
-    //Todo: rework, only used for character ID
-    static readonly Game game = HudBase.game;
-
-
 
     //static PickerModal<uint> Modal;
     public static bool TryGetModal(Vector2 size, out PickerModal<uint> modal, bool open = false)
@@ -147,7 +142,7 @@ public static class TextureManager
     /// </summary>
     /// <param name="wo"></param>
     /// <returns></returns>
-    public static uint GetIconId(this WorldObject wo) => wo.Id == game.CharacterId ?
+    public static uint GetIconId(this WorldObject wo) => wo.Id == G.Game.CharacterId ?
         Textures.PlayerIcon.IconId() : 
         wo.Value(DataId.Icon, DEFAULT_ICON);
 
@@ -155,7 +150,7 @@ public static class TextureManager
     /// Get the texture for the Icon of a WorldObject
     /// </summary>
     public static ManagedTexture GetOrCreateTexture(this WorldObject wo) => GetOrCreateTexture(wo?.GetIconId() ?? DEFAULT_ICON);
-        //wo.Id == game.CharacterId ?
+        //wo.Id == G.Game..CharacterId ?
         //GetOrCreateTexture(Texture.PlayerIcon.IconId()) :
         //GetOrCreateTexture(wo.Value(DataId.Icon, 0x0600110C));
 

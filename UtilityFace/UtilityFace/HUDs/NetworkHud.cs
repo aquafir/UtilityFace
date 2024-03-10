@@ -52,16 +52,16 @@ public class NetworkHud(string name, bool showInBar = false, bool visible = fals
 
     protected override void AddEvents()
     {
-        game.Messages.Incoming.Message += Incoming_Message;
-        game.Messages.Outgoing.Message += Outgoing_Message;
+        Game.Messages.Incoming.Message += Incoming_Message;
+        Game.Messages.Outgoing.Message += Outgoing_Message;
 
         base.AddEvents();
     }
 
     protected override void RemoveEvents()
     {
-        game.Messages.Incoming.Message -= Incoming_Message;
-        game.Messages.Outgoing.Message -= Outgoing_Message;
+        Game.Messages.Incoming.Message -= Incoming_Message;
+        Game.Messages.Outgoing.Message -= Outgoing_Message;
 
         base.RemoveEvents();
     }

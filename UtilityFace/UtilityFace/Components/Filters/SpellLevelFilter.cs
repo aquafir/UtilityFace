@@ -1,12 +1,11 @@
-﻿using UtilityFace.HUDs;
-using SpellBook = UtilityBelt.Scripting.Interop.SpellBook;
+﻿using SpellBook = UtilityBelt.Scripting.Interop.SpellBook;
 
 namespace UtilityFace.Components.Filters;
 
 public class SpellLevelFilter : IOptionalFilter<SpellInfo>
 {
     public bool[] Levels = Enumerable.Range(0, 8).Select(x => true).ToArray();
-    static readonly SpellBook spellbook = HudBase.game.Character.SpellBook;
+    static readonly SpellBook spellbook = G.Game.Character.SpellBook;
 
     public override void DrawBody()
     {

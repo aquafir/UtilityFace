@@ -54,7 +54,7 @@ internal class PropertyEditorHud(string name, bool showInBar = false, bool visib
         if (!ubHud.Visible)
             return;
 
-        var wo = game.World.Get(e.ObjectId);
+        var wo = Game.World.Get(e.ObjectId);
         if (wo is null)
             return;
 
@@ -92,8 +92,8 @@ internal class PropertyEditorHud(string name, bool showInBar = false, bool visib
         //Draw each table as a tab
         if (ImGui.Button("Selected"))
         {
-            if (game.World.Selected != null)
-                SetTarget(game.World.Selected);
+            if (Game.World.Selected != null)
+                SetTarget(Game.World.Selected);
             else
                 Log.Chat("No WorldObject selected!");
         }

@@ -171,7 +171,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
         var texture = wo.GetOrCreateTexture();
         if (ImGui.TextureButton($"{wo.Id}", texture, IconSize))
         {
-            game.Actions.InvokeChat($"{wo.Id}");
+            Game.Actions.InvokeChat($"{wo.Id}");
         }
 
         DrawItemTooltip(wo);
@@ -358,8 +358,8 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
     private void SetFilteredItems()
     {
         //If a bag is selected and available use the items in it, otherwise use the inventory
-        var bag = game.World.Get(SelectedBag);
-        var items = !settings.showBags || bag is null ? game.Character.Inventory : bag.Items;
+        var bag = Game.World.Get(SelectedBag);
+        var items = !settings.showBags || bag is null ? Game.Character.Inventory : bag.Items;
 
         filteredItems = items.Where(x => !IsFiltered(x)).ToList();
         //C.Chat($"Rebuild filter {items.Count}->{filteredItems.Count}");
@@ -381,8 +381,8 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
                 ImGui.TableNextColumn();
 
                 //Draw player and containers
-                DrawBagIcon(game.Character.Weenie);
-                foreach (var bag in game.Character.Containers)
+                DrawBagIcon(Game.Character.Weenie);
+                foreach (var bag in Game.Character.Containers)
                     DrawBagIcon(bag);
 
                 //Move to next column and render selected bag
@@ -517,14 +517,14 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
 
             if (ImGui.MenuItem("Give Selected"))
             {
-                if (game.World.Selected is not null)
-                    wo.Give(game.World.Selected.Id);
+                if (Game.World.Selected is not null)
+                    wo.Give(Game.World.Selected.Id);
             }
 
             if (ImGui.MenuItem("Give Player"))
             {
-                if (game.World.Selected is not null)
-                    wo.Give(game.World.Selected.Id);
+                if (Game.World.Selected is not null)
+                    wo.Give(Game.World.Selected.Id);
                 else if (TryGetNearest(out var player))
                     wo.Give(player.Id);
             }
@@ -551,7 +551,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
                 wo.Use();
 
             if (ImGui.MenuItem("Use Self"))
-                wo.UseOn(game.CharacterId);
+                wo.UseOn(Game.CharacterId);
 
             //if(wo.ObjectType == ObjectType)
             //if (ImGui.MenuItem("Give Selected"))
@@ -563,8 +563,8 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
             //Give selected or nearest
             if (ImGui.MenuItem("Give Player"))
             {
-                if (game.World.Selected is not null)
-                    wo.Give(game.World.Selected.Id);
+                if (Game.World.Selected is not null)
+                    wo.Give(Game.World.Selected.Id);
                 else if (TryGetNearest(out var player))
                     wo.Give(player.Id);
             }
@@ -618,28 +618,23 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
         //}
     }
 
-    ActionOptions quickFail = new()
-    {
-        MaxRetryCount = 0,
-        TimeoutMilliseconds = 100,
-    };
     private unsafe void FastGiveAll()
     {
-        if (game.World.Selected is null)
+        if (Game.World.Selected is null)
             return;
 
 
-        if (game.World.Selected.ObjectType == ObjectType.Container)
+        if (Game.World.Selected.ObjectType == ObjectType.Container)
         {
-            Log.Chat($"Moving items to {game.World.Selected.Name}");
+            Log.Chat($"Moving items to {Game.World.Selected.Name}");
             foreach (var item in filteredItems)
                 //game.Actions.ObjectMove(item.Id, game.World.Selected.Id);
-                item.Move(game.World.Selected.Id, 0, true, quickFail);
+                item.Move(Game.World.Selected.Id, 0, true, G.Fail);
 
         }
         else
             foreach (var item in filteredItems)
-                item.Give(game.World.Selected.Id);
+                item.Give(Game.World.Selected.Id);
 
         return;
 
@@ -702,7 +697,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
     #region Utility
     private bool TryGetNearest(out WorldObject wo)
     {
-        wo = game.World.GetNearest(ObjectClass.Player);
+        wo = Game.World.GetNearest(ObjectClass.Player);
         return wo is not null;
     }
     #endregion
@@ -712,13 +707,13 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
     {
         try
         {
-            game.OnRender2D += Game_OnRender2D;
+            Game.OnRender2D += Game_OnRender2D;
             //game.World.OnChatInput += World_OnChatInput;
 
             ubHud.OnShow += Hud_OnShow;
 
-            game.Messages.Incoming.Qualities_UpdateInstanceID += Incoming_Qualities_UpdateInstanceID;
-            game.Messages.Incoming.Qualities_PrivateUpdateInstanceID += Incoming_Qualities_PrivateUpdateInstanceID;
+            Game.Messages.Incoming.Qualities_UpdateInstanceID += Incoming_Qualities_UpdateInstanceID;
+            Game.Messages.Incoming.Qualities_PrivateUpdateInstanceID += Incoming_Qualities_PrivateUpdateInstanceID;
         }
         catch (Exception ex)
         {
@@ -731,13 +726,13 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
     {
         try
         {
-            game.OnRender2D -= Game_OnRender2D;
+            Game.OnRender2D -= Game_OnRender2D;
             //game.World.OnChatInput -= World_OnChatInput;
 
             ubHud.OnShow -= Hud_OnShow;
 
-            game.Messages.Incoming.Qualities_UpdateInstanceID -= Incoming_Qualities_UpdateInstanceID;
-            game.Messages.Incoming.Qualities_PrivateUpdateInstanceID -= Incoming_Qualities_PrivateUpdateInstanceID;
+            Game.Messages.Incoming.Qualities_UpdateInstanceID -= Incoming_Qualities_UpdateInstanceID;
+            Game.Messages.Incoming.Qualities_PrivateUpdateInstanceID -= Incoming_Qualities_PrivateUpdateInstanceID;
         }
         catch (Exception ex)
         {
@@ -751,7 +746,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
     {
         ubHud.WindowSettings |= ImGuiWindowFlags.MenuBar;
 
-        SelectedBag = game.CharacterId;
+        SelectedBag = Game.CharacterId;
         UpdateFilters();
 
         base.Init();

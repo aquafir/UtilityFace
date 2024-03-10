@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UtilityBelt.Scripting.Interop;
-using UtilityFace.HUDs;
 
 namespace UtilityFace.Components.Pickers;
 public class InventoryPicker : TexturedPicker<WorldObject>
@@ -49,7 +48,7 @@ public class InventoryPicker : TexturedPicker<WorldObject>
 
     public void Update()
     {
-        //Choices = HudBase.game.Character.Inventory.ToArray();
+        //Choices = G.Game.Character.Inventory.ToArray();
             //.Where(x => !nameFilter.IsFiltered(x)).ToArray();
     }
 
@@ -61,7 +60,7 @@ public class ContainerPicker : TexturedPicker<WorldObject>
 {
     public ContainerPicker() : base(x => x.GetOrCreateTexture(), GetPlayerContainers()) { }
 
-    public static WorldObject[] GetPlayerContainers() => HudBase.game.Character.Containers.Prepend(HudBase.game.Character.Weenie).ToArray();
+    public static WorldObject[] GetPlayerContainers() => G.Game.Character.Containers.Prepend(G.Game.Character.Weenie).ToArray();
 
     public override void DrawItem(WorldObject item, int index)
     {
@@ -110,7 +109,7 @@ public class ContainerPicker : TexturedPicker<WorldObject>
                 Log.Chat($"Move to index {index}");
             }
             //Move item?
-            else if (payload.ContainerId == HudBase.game.CharacterId)
+            else if (payload.ContainerId == G.Game.CharacterId)
             {
                 payload.Move(item.Id);
             }

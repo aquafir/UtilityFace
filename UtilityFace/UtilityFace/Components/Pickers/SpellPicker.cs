@@ -1,12 +1,11 @@
 ﻿using ACE.DatLoader.FileTypes;
-using UtilityFace.HUDs;
 
 namespace UtilityFace.Components.Pickers;
 
 public class SpellPicker : TexturedPicker<SpellInfo>
 {
     static readonly SpellTable table = UBService.PortalDat.SpellTable;
-    static readonly SpellBook spellbook = HudBase.game.Character.SpellBook;
+    static readonly SpellBook spellbook = G.Game.Character.SpellBook;
 
     //Unfiltered set of choices
     static readonly SpellInfo[] choices = table.Spells.Select(x => new SpellInfo(x.Key, x.Value)).ToArray();
@@ -48,7 +47,7 @@ public class SpellPicker : TexturedPicker<SpellInfo>
             var spell = item.Spell;
             if (spellbook.TryGet(id, out var sd))
             {
-                var skill = HudBase.game.Character.GetMagicSkill(spell.School);
+                var skill = G.Game.Character.GetMagicSkill(spell.School);
                 ImGui.Text($"{spell.Name} ({id})\nChance: {SkillCheck.GetMagicSkillChance(skill, (int)spell.Power):P2}%\n{spell.School}\n{spell.Power}\n{spell.Desc}");
             }
 

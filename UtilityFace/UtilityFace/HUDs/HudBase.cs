@@ -2,17 +2,11 @@
 
 namespace UtilityFace.HUDs;
 
-//Global stuff?
-public static class G
-{
-    public readonly static Game Game = new();
-}
-
 public abstract class HudBase : IComp, IDisposable
 {
     public readonly string Name = nameof(HudBase);
 
-    public readonly static Game game = new();
+    protected readonly static Game Game = G.Game;
     public Hud ubHud;
 
     //Defaults?

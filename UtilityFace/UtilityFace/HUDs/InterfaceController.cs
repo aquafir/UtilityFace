@@ -23,7 +23,7 @@ internal class InterfaceController(string name) : SizedHud(name, true, true)
             //new RadarHud("Radar", true, true),
             //new ActionHud("ActionBar", true, true),
             //new DragHud("Drag", true, true),  //Shows drag/top functionality
-            //new StyleHud("Styles", true, true),
+            new StyleHud("Styles", true, true),
         };
 
         ubHud.WindowSettings = ImGuiWindowFlags.AlwaysAutoResize;
@@ -56,7 +56,7 @@ internal class InterfaceController(string name) : SizedHud(name, true, true)
 
         try
         {
-            var wo = game.Character.Weenie;
+            var wo = Game.Character.Weenie;
             var desc = wo.Describe((StringId)result);
 
             Log.Chat(desc);

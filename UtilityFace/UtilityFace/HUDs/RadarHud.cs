@@ -111,13 +111,13 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
         var dl = ImGui.GetWindowDrawList();
 
         //Get global coords / heading
-        var player = game.Character.Weenie.ServerPosition.ToVector2();
+        var player = Game.Character.Weenie.ServerPosition.ToVector2();
         //Log.Chat($"{game.Character.Weenie.PhysicsDesc is null}");
         //var phys = game.Character.Weenie.GetPosition();
         //Log.Chat($"{phys.FormatCartesian()}");
         //var player = phys.ToVector2();
 
-        var heading = rotate ? -game.Character.Heading() : 0;
+        var heading = rotate ? -Game.Character.Heading() : 0;
         var cosTheta = (float)Math.Cos(heading);
         var sinTheta = (float)Math.Sin(heading);
 
@@ -265,7 +265,7 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
         }
 
         //Mark player (triangle/circle/line)
-        var pHeading = rotate ? 0 : game.Character.Heading();
+        var pHeading = rotate ? 0 : Game.Character.Heading();
         var t1 = radarCenter + new Vector2(0, -20).Rotate(pHeading);
         var t2 = radarCenter + new Vector2(5, 0).Rotate(pHeading);
         var t3 = radarCenter + new Vector2(-5, 0).Rotate(pHeading);
@@ -277,9 +277,9 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
         dl.AddCircle(radarCenter, range * scale, (uint)Color.Blue.ToArgb());
 
         //Mark selection
-        if (game.World.Selected is not null)
+        if (Game.World.Selected is not null)
         {
-            var vto = game.Character.Weenie.ServerPosition.ScreenVectorTo(game.World.Selected.ServerPosition);
+            var vto = Game.Character.Weenie.ServerPosition.ScreenVectorTo(Game.World.Selected.ServerPosition);
             if (rotate)
                 vto = vto.Rotate(cosTheta, sinTheta);
             vto *= scale;
@@ -289,7 +289,7 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
         //Scan landscape/rebuild tree
         tree.Clear();
 
-        foreach (var wo in game.World.GetLandscape())
+        foreach (var wo in Game.World.GetLandscape())
         {
             if (!String.IsNullOrWhiteSpace(search) && !re.IsMatch(wo.Name))
                 continue;
@@ -314,7 +314,7 @@ internal class RadarHud(string name, bool showInBar = false, bool visible = fals
 
 
             //Get relative position with player as origin and y axis flipped
-            var vto = game.Character.Weenie.ServerPosition.ScreenVectorTo(wo.ServerPosition);
+            var vto = Game.Character.Weenie.ServerPosition.ScreenVectorTo(wo.ServerPosition);
 
             //Rotate the wo by the angle of the player.  Don't recompute thetas
             if (rotate)

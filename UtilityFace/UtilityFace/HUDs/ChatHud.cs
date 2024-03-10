@@ -266,7 +266,7 @@ public class ChatHud(string name, bool showInBar = false, bool visible = false) 
         ImGui.SameLine();
         if (ImGui.BeginPopup($"{SENDER_POPUP}{messageNumber}"))
         {
-            if (ImGui.Selectable($"Select") && game.World.TryGet(chat.SenderId, out var wo))
+            if (ImGui.Selectable($"Select") && Game.World.TryGet(chat.SenderId, out var wo))
                 wo.Select();
 
             ImGui.EndPopup();
@@ -420,54 +420,54 @@ public class ChatHud(string name, bool showInBar = false, bool visible = false) 
         switch (Mode)
         {
             case ChatMode.Allegiance:
-                game.Actions.InvokeChat($"/a {chatMessage}");
+                Game.Actions.InvokeChat($"/a {chatMessage}");
                 break;
             case ChatMode.Chat:
-                game.Actions.InvokeChat($"{chatMessage}");
+                Game.Actions.InvokeChat($"{chatMessage}");
                 //                game.Actions.InvokeChat($"/say {chatMessage}");
                 break;
             case ChatMode.Fellow:
-                game.Actions.InvokeChat($"/f {chatMessage}");
+                Game.Actions.InvokeChat($"/f {chatMessage}");
                 break;
             case ChatMode.General:
-                game.Actions.InvokeChat($"/general {chatMessage}");
+                Game.Actions.InvokeChat($"/general {chatMessage}");
                 break;
             case ChatMode.LFG:
-                game.Actions.InvokeChat($"/lfg {chatMessage}");
+                Game.Actions.InvokeChat($"/lfg {chatMessage}");
                 break;
             case ChatMode.Monarch:
-                game.Actions.InvokeChat($"/m {chatMessage}");
+                Game.Actions.InvokeChat($"/m {chatMessage}");
                 break;
             case ChatMode.Olthoi:
-                game.Actions.InvokeChat($"/olthoi {chatMessage}");
+                Game.Actions.InvokeChat($"/olthoi {chatMessage}");
                 break;
             case ChatMode.Patron:
-                game.Actions.InvokeChat($"/p {chatMessage}");
+                Game.Actions.InvokeChat($"/p {chatMessage}");
                 break;
             case ChatMode.Roleplay:
-                game.Actions.InvokeChat($"/roleplay {chatMessage}");
+                Game.Actions.InvokeChat($"/roleplay {chatMessage}");
                 break;
             case ChatMode.Selected:
-                if (game.World.Selected is null)
+                if (Game.World.Selected is null)
                     Log.Chat($"Nothing selected to send message to.");
                 else
-                    game.Actions.SendTellById(game.World.Selected.Id, $"{chatMessage}", new() { MaxRetryCount = 0, TimeoutMilliseconds = 1 });
+                    Game.Actions.SendTellById(Game.World.Selected.Id, $"{chatMessage}", new() { MaxRetryCount = 0, TimeoutMilliseconds = 1 });
                 break;
             //case ChatMode.Society:
             //    game.Actions.InvokeChat($"/soc {chatMessage}");
             //    break;
             case ChatMode.Trade:
-                game.Actions.InvokeChat($"/trade {chatMessage}");
+                Game.Actions.InvokeChat($"/trade {chatMessage}");
                 break;
             case ChatMode.Vassals:
-                game.Actions.InvokeChat($"/v {chatMessage}");
+                Game.Actions.InvokeChat($"/v {chatMessage}");
                 break;
             //case ChatMode.Omni:
             //Shouldn't be hit
             //    break;
             case ChatMode.Template:
                 //game.Actions.InvokeChat($"{template}");
-                game.Actions.InvokeChat($"{chatMessage}");
+                Game.Actions.InvokeChat($"{chatMessage}");
 
                 //Reset template
                 Mode = ChatMode.Chat;
@@ -667,27 +667,27 @@ public class ChatHud(string name, bool showInBar = false, bool visible = false) 
 
     protected override void AddEvents()
     {
-        game.World.OnChatText += World_OnChatText;
+        Game.World.OnChatText += World_OnChatText;
 
-        game.Messages.Incoming.Combat_HandleAttackerNotificationEvent += Incoming_Combat_HandleAttackerNotificationEvent;
-        game.Messages.Incoming.Combat_HandleDefenderNotificationEvent += Incoming_Combat_HandleDefenderNotificationEvent;
-        game.Messages.Incoming.Combat_HandleEvasionAttackerNotificationEvent += Incoming_Combat_HandleEvasionAttackerNotificationEvent;
-        game.Messages.Incoming.Combat_HandleEvasionDefenderNotificationEvent += Incoming_Combat_HandleEvasionDefenderNotificationEvent;
-        game.Messages.Incoming.Combat_HandleVictimNotificationEventOther += Incoming_Combat_HandleVictimNotificationEventOther;
-        game.Messages.Incoming.Combat_HandleVictimNotificationEventSelf += Incoming_Combat_HandleVictimNotificationEventSelf;
+        Game.Messages.Incoming.Combat_HandleAttackerNotificationEvent += Incoming_Combat_HandleAttackerNotificationEvent;
+        Game.Messages.Incoming.Combat_HandleDefenderNotificationEvent += Incoming_Combat_HandleDefenderNotificationEvent;
+        Game.Messages.Incoming.Combat_HandleEvasionAttackerNotificationEvent += Incoming_Combat_HandleEvasionAttackerNotificationEvent;
+        Game.Messages.Incoming.Combat_HandleEvasionDefenderNotificationEvent += Incoming_Combat_HandleEvasionDefenderNotificationEvent;
+        Game.Messages.Incoming.Combat_HandleVictimNotificationEventOther += Incoming_Combat_HandleVictimNotificationEventOther;
+        Game.Messages.Incoming.Combat_HandleVictimNotificationEventSelf += Incoming_Combat_HandleVictimNotificationEventSelf;
 
         base.AddEvents();
     }
     protected override void RemoveEvents()
     {
-        game.World.OnChatText -= World_OnChatText;
+        Game.World.OnChatText -= World_OnChatText;
 
-        game.Messages.Incoming.Combat_HandleAttackerNotificationEvent -= Incoming_Combat_HandleAttackerNotificationEvent;
-        game.Messages.Incoming.Combat_HandleDefenderNotificationEvent -= Incoming_Combat_HandleDefenderNotificationEvent;
-        game.Messages.Incoming.Combat_HandleEvasionAttackerNotificationEvent -= Incoming_Combat_HandleEvasionAttackerNotificationEvent;
-        game.Messages.Incoming.Combat_HandleEvasionDefenderNotificationEvent -= Incoming_Combat_HandleEvasionDefenderNotificationEvent;
-        game.Messages.Incoming.Combat_HandleVictimNotificationEventOther -= Incoming_Combat_HandleVictimNotificationEventOther;
-        game.Messages.Incoming.Combat_HandleVictimNotificationEventSelf -= Incoming_Combat_HandleVictimNotificationEventSelf;
+        Game.Messages.Incoming.Combat_HandleAttackerNotificationEvent -= Incoming_Combat_HandleAttackerNotificationEvent;
+        Game.Messages.Incoming.Combat_HandleDefenderNotificationEvent -= Incoming_Combat_HandleDefenderNotificationEvent;
+        Game.Messages.Incoming.Combat_HandleEvasionAttackerNotificationEvent -= Incoming_Combat_HandleEvasionAttackerNotificationEvent;
+        Game.Messages.Incoming.Combat_HandleEvasionDefenderNotificationEvent -= Incoming_Combat_HandleEvasionDefenderNotificationEvent;
+        Game.Messages.Incoming.Combat_HandleVictimNotificationEventOther -= Incoming_Combat_HandleVictimNotificationEventOther;
+        Game.Messages.Incoming.Combat_HandleVictimNotificationEventSelf -= Incoming_Combat_HandleVictimNotificationEventSelf;
 
         base.RemoveEvents();
     }
@@ -700,8 +700,8 @@ public class ChatHud(string name, bool showInBar = false, bool visible = false) 
 
         if (e.Type == ChatMessageType.Fellowship && String.IsNullOrEmpty(e.SenderName))
         {
-            entry.SenderName = game.Character.Weenie.Name;
-            entry.SenderId = game.CharacterId;
+            entry.SenderName = Game.Character.Weenie.Name;
+            entry.SenderId = Game.CharacterId;
         }
         AddMessage(entry);
     }
