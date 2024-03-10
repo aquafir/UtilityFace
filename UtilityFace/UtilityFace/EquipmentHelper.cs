@@ -42,51 +42,7 @@ public static class EquipmentHelper
 
         [EquipmentSlot.UpperUnderwear] = Textures.EquipShirt.IconId(),
         [EquipmentSlot.LowerUnderwear] = Textures.EquipPants.IconId(),
-    };
-
-    public static void DrawEquipment()
-    {
-        //Assume slots have default texture
-        Dictionary<EquipmentSlot, uint> slotIcons = new(DefaultIcons);
-
-        //Loop through inventory
-        foreach (var equip in G.Game.Character.Equipment)
-        {
-            //If an itemcovers a slot use its texture? 
-            foreach (var slot in equip.GetSlots())
-            {                
-                slotIcons[slot] = equip.GetIconId();
-                //C.Chat($"{equip.Name}: {slot} - {slotIcons[slot]}");
-            }
-        }
-
-        int index = 0;
-        foreach (var kvp in slotIcons)
-        {
-            var texture = TextureManager.GetOrCreateTexture(kvp.Value);
-            //C.Chat($"{kvp.Key} - {kvp.Value} - {texture is null}");
-
-            //ImGui.Image(texture.TexturePtr, IconSize);
-            if (ImGui.TextureButton($"EQ{index}", texture, IconSize, 0))
-            {
-                if (TryGetSlotEquipment(kvp.Key, out var equip))
-                {
-                    //equip.Select();
-                    //equip.Appraise();
-                    equip.Use();
-                    //G.Game.Actions.ObjectAppraise
-                }
-
-            }
-
-            index++;
-            if (index != 5 && index != 10 && index != 15 && index != 19 && index != slotIcons.Count)
-                ImGui.SameLine();
-        }
-
-
-
-    }
+    };      
 
     public static bool TryGetSlotEquipment(this EquipmentSlot slot, out WorldObject wo)
     {
