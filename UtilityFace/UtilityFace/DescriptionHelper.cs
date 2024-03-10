@@ -32,8 +32,8 @@ public static class DescriptionHelper
 
         ImGui.TextWrapped(desc);
 
-
-        if (wo.ValidWieldedLocations.TryGetSlotEquipment(out var equipped) && equipped.Id != wo.Id)
+        //Last check a final safety for multiple wield locations
+        if (wo.ValidWieldedLocations.TryGetSlotEquipment(out var equipped) && equipped.Id != wo.Id && !G.Game.Character.Equipment.Contains(wo))
         {            
             ImGui.NewLine();
             ImGui.Text("-------------------Equipped-------------------");

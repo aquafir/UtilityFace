@@ -186,7 +186,7 @@ public class InventoryHud(string name, bool showInBar = false, bool visible = fa
         if (!settings.showEquipment)
             return;
 
-        EquipmentHelper.DrawEquipment();
+        //EquipmentHelper.DrawEquipment();
     }
 
     private void DrawGroupActions()

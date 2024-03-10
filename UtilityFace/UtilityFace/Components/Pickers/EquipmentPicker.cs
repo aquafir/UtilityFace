@@ -30,6 +30,25 @@ public class EquipmentPicker : TexturedPicker<EquipmentSlot>
             ImGui.NewLine();
 
         base.DrawItem(item, index);
+
+        if (ImGui.IsItemHovered())
+        {
+            if (item.TryGetSlotEquipment(out var wo))
+            {
+                wo.DrawTooltip();
+                //var desc = wo.Describe();
+
+                //ImGui.SetNextWindowSizeConstraints(new(300), new(500));
+                //ImGui.BeginTooltip();
+                ////Icon
+                //var texture = wo.GetOrCreateTexture();
+                //ImGui.TextureButton($"{wo.Id}", texture, IconSize);
+                //ImGui.SameLine();
+
+                ////ImGui.TextWrapped(desc);
+                //ImGui.EndTooltip();
+            }
+        }
     }
 
     //No paging and enough items drawn to show all on one page
