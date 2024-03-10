@@ -13,7 +13,6 @@ public static class DescriptionHelper
     //Cache?
     static readonly Vector2 MIN_WIDTH = new(500f, 0);
     static readonly Vector2 MAX_WIDTH = new(1000f, float.MaxValue);
-
     public static readonly Vector2 IconSize = new(24, 24);
 
     static uint _lastTooltipId = 0;
@@ -34,7 +33,7 @@ public static class DescriptionHelper
 
         //Last check a final safety for multiple wield locations
         if (wo.ValidWieldedLocations.TryGetSlotEquipment(out var equipped) && equipped.Id != wo.Id && !G.Game.Character.Equipment.Contains(wo))
-        {            
+        {
             ImGui.NewLine();
             ImGui.Text("-------------------Equipped-------------------");
             //Icon
@@ -48,8 +47,6 @@ public static class DescriptionHelper
         ImGui.EndTooltip();
     }
 
-
-
     /// <summary>
     /// Returns a string description of a world object
     /// </summary>
@@ -58,14 +55,14 @@ public static class DescriptionHelper
         return new string[]
         {
             wo.Describe(IntId.AmmoType),
-                    wo.Describe(IntId.CreationTimestamp),
-                    wo.Describe(StringId.LongDesc),
-                    wo.Describe(Int64Id.ItemBaseXp),
-                    wo.Describe(FloatId.CriticalMultiplier),
-                    wo.Describe(DataId.Spell),
-                    //wo.Describe(InstanceId.Container),
-                    wo.Describe(BoolId.Inscribable),
-                    //wo.Describe(ComputedProperty.HealKitProps),
+            wo.Describe(IntId.CreationTimestamp),
+            wo.Describe(StringId.LongDesc),
+            wo.Describe(Int64Id.ItemBaseXp),
+            wo.Describe(FloatId.CriticalMultiplier),
+            wo.Describe(DataId.Spell),
+            //wo.Describe(InstanceId.Container),
+            wo.Describe(BoolId.Inscribable),
+            //wo.Describe(ComputedProperty.HealKitProps),
         }.DescribeGroup();
 
         string desc;
@@ -202,7 +199,7 @@ public static class DescriptionHelper
     public static bool TryDescribe(this WorldObject wo, StringId key, out string value, string prefix = "") =>
         !String.IsNullOrEmpty(value = wo.Describe(key, prefix));
     public static bool TryDescribe(this WorldObject wo, ComputedProperty key, out string value, string prefix = "") => (value = "") == "a";
-        //!String.IsNullOrEmpty(value = wo.Describe(key, prefix));
+    //!String.IsNullOrEmpty(value = wo.Describe(key, prefix));
 
     //Todo: think of a smarter way of doing this for reusable names
     static int _int;
@@ -212,7 +209,7 @@ public static class DescriptionHelper
     static List<ImbuedEffectType> _imbues = Enum.GetValues(typeof(ImbuedEffectType)).Cast<ImbuedEffectType>().ToList();
     static List<EquipMask> _equipSlots = Enum.GetValues(typeof(EquipMask)).Cast<EquipMask>().ToList();
     public static string Describe(this WorldObject wo, ComputedProperty key, string prefix = "")
-    {        
+    {
         return "";
         switch (key)
         {
@@ -451,6 +448,11 @@ public static class DescriptionHelper
     public static string SpellName(uint id) => g.Character.SpellBook.TryGet(id, out var s) ? s.Name : "";
 }
 
+
+public enum CompoundProperty
+{
+
+}
 
 /// <summary>
 /// Special properties that may involve things like looking up an enum or combining multiple other properties like weapon variance

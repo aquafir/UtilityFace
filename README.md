@@ -120,6 +120,20 @@ A `Modal` is a centered popup for complex inputs
 * `PropId.TryGetEnum(PropType value)` maps values of a property to their enum, if there is one
 * Used to find names / valid values
 
+
+
+
+
+#### ComputedProperty
+
+A `ComputedProperty` is a desired property that doesn't directly exist
+
+* Min damage from variance
+* Calculated resistance of armor
+* etc.
+
+
+
 #### Descriptions
 
 * `wo.Describe` returns a description of a given WorldObject by routing it to the relevant collections of descriptions
@@ -129,17 +143,15 @@ A `Modal` is a centered popup for complex inputs
 
 * `wo.Describe(PropId key, bool formatted)` exist for each type of property you may want to know about
 
-* A `ComputedProperty` also exists for values that don't directly map to a property value
+* `CompoundProperty` is used to handle descriptions that involve more than one property
 
-  * Min damage from variance
-  * Calculated resistance of armor
-  * etc.
-
+  * All types of resistance
+  
 * Dictionaries of [format strings](https://learn.microsoft.com/en-us/dotnet/api/system.string.format?view=net-8.0) exist for each type of property, and if `format=true` that value will be returned instead
 
   * Possibly make use of `params` for props with more than one input
 
-* `Prop.Friendly(value)` will return a friendly name for a property
+* `Prop.Friendly(value)` will return a friendly name for a property value
 
   * Based on ACE's  `GetValueEnumName` in `Property<Type>Extensions`
   * Enum values->names
@@ -157,8 +169,7 @@ A `Modal` is a centered popup for complex inputs
 ##### Example Usage
 
 * `wo.Describe(game.World.Selected)` 
-  * 
-
+  
 * `wo.Describe(IntId.AmmoType)` 
   * Starts by finding the value:
     `wo.TryGet(IntId.AmmoType)`
