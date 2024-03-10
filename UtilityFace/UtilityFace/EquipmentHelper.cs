@@ -98,7 +98,7 @@ public static class EquipmentHelper
     const EquipMask MASK = 0xFFFFFFFF - EquipMask.AbdomenUnderwear;
     public static bool TryGetSlotEquipment(this EquipMask slot, out WorldObject wo)
     {
-        wo = G.Game.Character.Equipment.Where(x => ((x.ValidWieldedLocations & slot & MASK) != 0)).FirstOrDefault();
+        wo = G.Game.Character.Equipment.Where(x => ((x.CurrentWieldedLocation & slot & MASK) != 0)).FirstOrDefault();
 
         return wo is not null;
     }
@@ -107,59 +107,59 @@ public static class EquipmentHelper
     {
         List<EquipmentSlot> slots = new();
         //wo.CurrentWieldedLocation.HasFlag(EquipMask.Ammunition)
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.Ammunition))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.Ammunition))
             slots.Add(EquipmentSlot.Ammunition);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.Wand) || 
-            wo.ValidWieldedLocations.HasFlag(EquipMask.MissileWeapon) || 
-            wo.ValidWieldedLocations.HasFlag(EquipMask.MeleeWeapon))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.Wand) || 
+            wo.CurrentWieldedLocation.HasFlag(EquipMask.MissileWeapon) || 
+            wo.CurrentWieldedLocation.HasFlag(EquipMask.MeleeWeapon))
             slots.Add(EquipmentSlot.Weapon);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.Necklace))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.Necklace))
             slots.Add(EquipmentSlot.Necklace);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.LeftBracelet))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.LeftBracelet))
             slots.Add(EquipmentSlot.LeftBracelet);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.RightBracelet))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.RightBracelet))
             slots.Add(EquipmentSlot.RightBracelet);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.LeftRing))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.LeftRing))
             slots.Add(EquipmentSlot.LeftRing);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.RightRing))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.RightRing))
             slots.Add(EquipmentSlot.RightRing);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.Shield))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.Shield))
             slots.Add(EquipmentSlot.Shield);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.UpperLegs))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.UpperLegs))
             slots.Add(EquipmentSlot.UpperLegs);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.UpperArms))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.UpperArms))
             slots.Add(EquipmentSlot.UpperArms);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.Feet))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.Feet))
             slots.Add(EquipmentSlot.Feet);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.LowerLegs))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.LowerLegs))
             slots.Add(EquipmentSlot.LowerLegs);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.LowerArms))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.LowerArms))
             slots.Add(EquipmentSlot.LowerArms);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.Head))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.Head))
             slots.Add(EquipmentSlot.Head);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.Hands))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.Hands))
             slots.Add(EquipmentSlot.Hands);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.Chest))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.Chest))
             slots.Add(EquipmentSlot.Chest);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.Abdomen))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.Abdomen))
             slots.Add(EquipmentSlot.Abdomen);
 
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.ChestUnderwear))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.ChestUnderwear))
             slots.Add(EquipmentSlot.UpperUnderwear);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.LowerLegsUnderwear))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.LowerLegsUnderwear))
             slots.Add(EquipmentSlot.LowerUnderwear);
 
-        if(wo.ValidWieldedLocations.HasFlag(EquipMask.Cloak))
+        if(wo.CurrentWieldedLocation.HasFlag(EquipMask.Cloak))
             slots.Add(EquipmentSlot.Cloak);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.Trinket))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.Trinket))
             slots.Add(EquipmentSlot.Trinket);
 
 
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.BlueAetheria))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.BlueAetheria))
             slots.Add(EquipmentSlot.BlueAetheria);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.YellowAetheria))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.YellowAetheria))
             slots.Add(EquipmentSlot.YellowAetheria);
-        if (wo.ValidWieldedLocations.HasFlag(EquipMask.RedAetheria))
+        if (wo.CurrentWieldedLocation.HasFlag(EquipMask.RedAetheria))
             slots.Add(EquipmentSlot.RedAetheria);
 
         return slots;
