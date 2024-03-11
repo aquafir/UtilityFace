@@ -138,6 +138,7 @@ A `ComputedProperty` is a desired property that doesn't directly exist
 
 * `wo.Describe` returns a description of a given WorldObject by routing it to the relevant collections of descriptions
 
+  * `wo.TryDescribe` fails if the property was missing
   * List of PropType - key?
   * Ignored if empty string / null
 
@@ -155,7 +156,7 @@ A `ComputedProperty` is a desired property that doesn't directly exist
 
   * Based on ACE's  `GetValueEnumName` in `Property<Type>Extensions`
   * Enum values->names
-  * Percent conversions like on attack skill
+  * *Percent conversions like on attack skill*
   * etc.
 
 * `Prop.Label()` returns a label for a property

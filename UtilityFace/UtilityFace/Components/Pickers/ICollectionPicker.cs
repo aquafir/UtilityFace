@@ -168,7 +168,7 @@ public abstract class ICollectionPicker<T> : IPicker<T>
         }
     }
 
-    protected void ClearSelection()
+    public void ClearSelection()
     {
         Selection = default(T);
         Selected?.Clear();

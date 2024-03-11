@@ -15,7 +15,7 @@ internal class InterfaceController(string name) : SizedHud(name, true, true)
         Huds = new()
         {
             //new InventoryHud("Inventory", true, true),
-            //new NetworkHud("Network", true, true),
+            new NetworkHud("Network", true, true),
             //new ChatHud("Chat", true, true),
             //new PropertyEditorHud("PropertyEditor", true, true),
             //new NavHud("Navs", true, false),

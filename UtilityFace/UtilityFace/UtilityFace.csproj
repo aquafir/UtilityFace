@@ -15,6 +15,11 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Lib\ManagedMaterial.cs" />
+    <Compile Remove="Lib\ManagedMesh.cs" />
+    <Compile Remove="Lib\ObjMeshLoader.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="PluginCore.cs" />
     <Content Include="scripts\installer.nsi" />
     <Content Include="scripts\post-build.ps1" />
@@ -31,7 +36,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="UtilityBelt.Service" Version="2.2.8">
+    <PackageReference Include="UtilityBelt.Service" Version="2.2.9">
       <ExcludeAssets>runtime; build;</ExcludeAssets>
     </PackageReference>
   </ItemGroup>

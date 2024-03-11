@@ -148,6 +148,7 @@ public static class DescriptionHelper
         => wo.Describe(ComputedProperty.WeaponProps);
 
 
+
     //public static string Describe(this WorldObject wo, PropType propType, int key, string prefix = "")
     //     => wo.TryGetString(propType, key, out var value) ? $"{prefix}{value}" : "";
     //public static string Describe(this WorldObject wo, BoolId key, string prefix = "")
@@ -167,6 +168,7 @@ public static class DescriptionHelper
 
     //public static string Describe(this WorldObject wo, PropType propType, int key, string prefix = "")
     // => wo.TryGetString(propType, key, out var value) ? $"{prefix}{value}" : "";
+    #region Describe Standard Property
     public static string Describe(this WorldObject wo, BoolId key, string prefix = "")
         => wo.TryGet(key, out var value) ? $"{key.Label(),-20}: {key.Format(value)}" : "";
     public static string Describe(this WorldObject wo, DataId key, string prefix = "")
@@ -181,9 +183,11 @@ public static class DescriptionHelper
         => wo.TryGet(key, out var value) ? $"{key.Label(),-20}: {key.Format(value)}" : "";
     public static string Describe(this WorldObject wo, StringId key, string prefix = "")
         => wo.TryGet(key, out var value) ? $"{key.Label(),-20}: {key.Format(value)}" : "";
+    #endregion
 
     //public static bool TryDescribe(this WorldObject wo, PropType propType, int key, out string value, string prefix = "") =>
     //    !String.IsNullOrEmpty(value = wo.Describe(propType, key, prefix));
+    #region TryDescribe Standard Property
     public static bool TryDescribe(this WorldObject wo, BoolId key, out string value, string prefix = "") =>
         !String.IsNullOrEmpty(value = wo.Describe(key, prefix));
     public static bool TryDescribe(this WorldObject wo, DataId key, out string value, string prefix = "") =>
@@ -198,16 +202,35 @@ public static class DescriptionHelper
         !String.IsNullOrEmpty(value = wo.Describe(key, prefix));
     public static bool TryDescribe(this WorldObject wo, StringId key, out string value, string prefix = "") =>
         !String.IsNullOrEmpty(value = wo.Describe(key, prefix));
-    public static bool TryDescribe(this WorldObject wo, ComputedProperty key, out string value, string prefix = "") => (value = "") == "a";
-    //!String.IsNullOrEmpty(value = wo.Describe(key, prefix));
+    #endregion
+    public static bool TryDescribe(this WorldObject wo, CompoundProperty key, out string value, string prefix = "") =>
+        !String.IsNullOrEmpty((value = wo.Describe(key)));
+    public static bool TryDescribe(this WorldObject wo, ComputedProperty key, out string value, string prefix = "") =>
+        !String.IsNullOrEmpty((value = wo.Describe(key)));
 
     //Todo: think of a smarter way of doing this for reusable names
+
     static int _int;
     static string _string;
     static float _float;
     static long _long;
     static List<ImbuedEffectType> _imbues = Enum.GetValues(typeof(ImbuedEffectType)).Cast<ImbuedEffectType>().ToList();
     static List<EquipMask> _equipSlots = Enum.GetValues(typeof(EquipMask)).Cast<EquipMask>().ToList();
+
+    public static string Describe(this WorldObject wo, CompoundProperty key, string prefix = "")
+    {
+        switch (key)
+        {
+            case CompoundProperty.MeleeDamage:
+                return (
+                    wo.IntValues.TryGetValue(IntId.Damage, out _int)
+                    && wo.FloatValues.TryGetValue(FloatId.DamageVariance, out _float)
+                    && _int != 0    //Can have missing damage on bows
+                    ) ? $"{prefix}{_int * _float}-{_int}" : "";
+        }
+
+        return "";
+    }
     public static string Describe(this WorldObject wo, ComputedProperty key, string prefix = "")
     {
         return "";
@@ -250,7 +273,7 @@ public static class DescriptionHelper
                 wo.Describe(IntId.Value, "Value: "),
                 wo.Describe(IntId.EncumbranceVal, "Burden: "),
                 wo.Describe(ComputedProperty.Skill, "Skill: "),
-                (wo.TryDescribe(ComputedProperty.MeleeDamage, out var dmg) && wo.TryDescribe(ComputedProperty.DamageType,out var dType)) ? $"{dmg}, {dType}" : "",
+                (wo.TryDescribe(CompoundProperty.MeleeDamage, out var dmg) && wo.TryDescribe(ComputedProperty.DamageType,out var dType)) ? $"{dmg}, {dType}" : "",
                 wo.Describe(IntId.WeaponTime, "Speed: "),
                 wo.Describe(IntId.WeaponRange, "Range: "),
                 wo.Describe(ComputedProperty.AmmoType),
@@ -386,12 +409,6 @@ public static class DescriptionHelper
             case ComputedProperty.ImbuedEffects:
                 return wo.IntValues.TryGetValue(IntId.ImbuedEffect, out _int) || _int == 0 ? "" :
                     $"{prefix}{String.Join(", ", _imbues.Where(x => ((uint)x & _int) != 0))}";
-            case ComputedProperty.MeleeDamage:
-                return (
-                    wo.IntValues.TryGetValue(IntId.Damage, out _int)
-                    && wo.FloatValues.TryGetValue(FloatId.DamageVariance, out _float)
-                    && _int != 0    //Can have missing damage on bows
-                    ) ? $"{prefix}{_int * _float}-{_int}" : "";
             case ComputedProperty.CreatureType:
                 break;
 
@@ -448,67 +465,6 @@ public static class DescriptionHelper
     public static string SpellName(uint id) => g.Character.SpellBook.TryGet(id, out var s) ? s.Name : "";
 }
 
-
-public enum CompoundProperty
-{
-
-}
-
-/// <summary>
-/// Special properties that may involve things like looking up an enum or combining multiple other properties like weapon variance
-/// </summary>
-public enum ComputedProperty
-{
-    /// <summary>
-    /// Damage range with low end from variance
-    /// </summary>
-    MeleeDamage,
-    CreatureType,
-    SlayerType,
-    Skill,
-    /// <summary>
-    /// DamageType as string
-    /// </summary>
-    DamageType,
-    /// <summary>
-    /// Imbued, Attuned, Ivoryable, Dyable, and other properties that don't better fit other groups
-    /// </summary>
-    Properties,
-    /// <summary>
-    /// All imbued effects
-    /// </summary>
-    ImbuedEffects,
-    /// <summary>
-    /// Cast of strike with chance and spell
-    /// </summary>
-    CastOnStrike,
-    /// <summary>
-    /// Special resistance cleaving like Bloodscorch
-    /// </summary>
-    ResistanceCleaving,
-    ArmorResistance,
-    EquipmentSet,
-    ItemLevel,
-    /// <summary>
-    /// Bonded status determines if it is destroyed, dropped, or always retained on death
-    /// </summary>
-    BondedStatus,
-    /// <summary>
-    /// All properties unique to magic/melee/missile weapons
-    /// </summary>
-    WeaponProps,
-    EquipmentCoverage,
-    WearableProps,
-    AmmoType,
-    ArmorResistancePercent,
-    Uses,
-    StackCount,
-    StandardProps,
-    /// <summary>
-    /// Heal/Mana/Stamina kit?
-    /// </summary>
-    HealKitProps,
-}
 
 public enum CleanImbue : uint
 {

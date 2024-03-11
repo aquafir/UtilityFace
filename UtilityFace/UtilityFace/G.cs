@@ -1,4 +1,6 @@
-﻿namespace UtilityFace;
+﻿using UtilityFace.Lib;
+
+namespace UtilityFace;
 
 //Global stuff placeholder?
 public static class G
@@ -10,6 +12,10 @@ public static class G
         MaxRetryCount = 0,
         TimeoutMilliseconds = 100,
     };
+
+    public readonly static Picker Picker = new();
+    public readonly static CameraH CameraH = new ();
+
 }
 
 

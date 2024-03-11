@@ -53,6 +53,4 @@ public class EquipmentPicker : TexturedPicker<EquipmentSlot>
 
     //No paging and enough items drawn to show all on one page
     public override void DrawPageControls() { }
-
-    Dictionary<EquipmentSlot, uint> slotIcons = new(EquipmentHelper.DefaultIcons);
 }

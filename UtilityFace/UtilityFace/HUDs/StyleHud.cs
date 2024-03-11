@@ -60,6 +60,15 @@ public class StyleHud(string name, bool showInBar = false, bool visible = false)
         ImGui.BeginChild("Inventory", ImGui.GetContentRegionAvail());
         if (inventory.Check())
         {
+
+        }
+        if(inventory.Selected.Count > 2 && ImGui.IsKeyDown(ImGuiKey.S))
+        {
+            foreach(var inv in inventory.Selected)
+            {
+                inv?.Move(G.Game.CharacterId, 0, true, G.Fail);
+            }
+            inventory.ClearSelection();
         }
         ImGui.EndChild();
 
