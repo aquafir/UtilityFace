@@ -20,6 +20,17 @@
     <Compile Remove="Lib\ObjMeshLoader.cs" />
   </ItemGroup>
   <ItemGroup>
+    <COMReference Include="D3DService">
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>8f6ef6ad-e982-40a4-b6cc-79e80b77313b</Guid>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
     <None Include="PluginCore.cs" />
     <Content Include="scripts\installer.nsi" />
     <Content Include="scripts\post-build.ps1" />
@@ -29,6 +40,21 @@
       <HintPath>.\..\deps\Decal.Adapter.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Decal.Interop.Core">
+      <HintPath>..\..\..\..\..\..\..\Downloads\PickerDemo-master\PickerDemo-master\deps\Decal.Interop.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Decal.Interop.D3DService">
+      <HintPath>C:\Program Files (x86)\Decal 3.0\.NET 4.0 PIA\Decal.Interop.D3DService.DLL</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.DirectX">
+      <HintPath>..\..\..\..\..\..\..\Downloads\PickerDemo-master\PickerDemo-master\deps\Microsoft.DirectX.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.DirectX.Direct3D">
+      <HintPath>..\..\..\..\..\..\..\Downloads\PickerDemo-master\PickerDemo-master\deps\Microsoft.DirectX.Direct3D.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.DirectX.Direct3DX">
+      <HintPath>..\..\..\..\..\..\..\Downloads\PickerDemo-master\PickerDemo-master\deps\Microsoft.DirectX.Direct3DX.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="KdTree" Version="1.4.1" />
@@ -36,7 +62,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="UtilityBelt.Service" Version="2.2.9">
+    <PackageReference Include="UtilityBelt.Service" Version="2.2.11">
       <ExcludeAssets>runtime; build;</ExcludeAssets>
     </PackageReference>
   </ItemGroup>

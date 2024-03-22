@@ -178,7 +178,7 @@ public static class IntIdExtensions
         [IntId.PlayerKillerStatus] = typeof(PlayerKillerStatus),
         [IntId.PortalBitmask] = typeof(PortalBitmask),
         [IntId.SummoningMastery] = typeof(SummoningMastery),
-        [IntId.TargetType] = typeof(ItemType),
+        [IntId.TargetingTactic] = typeof(TargetingTactic),
         [IntId.UiEffects] = typeof(UiEffects),
         [IntId.UseCreatesContractId] = typeof(ContractId),
         [IntId.WieldRequirements] = typeof(WieldRequirement),
